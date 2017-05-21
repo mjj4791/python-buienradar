@@ -3,8 +3,8 @@ Python buienradar library
 
 Library and CLI tools for interacting with buienradar xml/api.
 
-http://xml.buienradar.nl
-http://api.buienradar.nl).
+- http://xml.buienradar.nl
+- http://api.buienradar.nl
 
 
 Requirements
@@ -45,4 +45,3 @@ Usage
       --version                 Show version.
       --longitude=<longitude>   Longitude to use [default: 5.119734]
       --latitude=<latitude>     Latitude to use [default: 52.091579]
-
