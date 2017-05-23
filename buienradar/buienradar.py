@@ -20,6 +20,7 @@ ATTRIBUTION_INFO = "Data provided by buienradar.nl"
 # key names as user in returned result
 ATTRIBUTION = "attribution"
 DATETIME = 'datetime'
+DISTANCE = 'distance'
 FORECAST = 'forecast'
 GROUNDTEMP = 'groundtemperature'
 HUMIDITY = 'humidity'
@@ -104,7 +105,7 @@ def parse_data(content, latitude=52.091579, longitude=5.119734):
     # convert the xml data into a dictionary:
     try:
         xmldata = xmltodict.parse(content)[ROOT]
-    except (xmltodict.expat.ExpatError, IndexError) as err:
+    except (xmltodict.expat.ExpatError, KeyError) as err:
         result[MESSAGE] = "Unable to parse content as xml."
         log.exception(result[MESSAGE])
         return result
@@ -113,6 +114,9 @@ def parse_data(content, latitude=52.091579, longitude=5.119734):
     loc_data = __select_nearest_ws(xmldata, latitude, longitude)
     # process current weather data from selected weatherstation
     if loc_data:
+        # add distance to weatherstation
+        result[DISTANCE] = __get_ws_distance(loc_data, latitude, longitude)
+
         result = __parse_loc_data(loc_data, result)
         log.debug("Extracted weather-data: %s", result[DATA])
     else:
@@ -121,8 +125,8 @@ def parse_data(content, latitude=52.091579, longitude=5.119734):
     # extract weather forecast
     try:
         fc_data = xmldata[WEERGEGEVENS][VERWACHTING]
-    except (xmltodict.expat.ExpatError, IndexError) as err:
-        result[MESSAGE] = "Unable to extract forecast data."
+    except (xmltodict.expat.ExpatError, KeyError) as err:
+        result[MESSAGE] = 'Unable to extract forecast data.'
         log.exception(result[MESSAGE])
         return result
 
@@ -135,6 +139,7 @@ def parse_data(content, latitude=52.091579, longitude=5.119734):
 def __parse_loc_data(loc_data, result):
     """Parse the xml data from selected weatherstation."""
     result[DATA] = {ATTRIBUTION: ATTRIBUTION_INFO}
+
     for key, value in SENSOR_TYPES.items():
         result[DATA][key] = None
         try:
@@ -146,10 +151,14 @@ def __parse_loc_data(loc_data, result):
             else:
                 if key == STATIONNAME:
                     result[DATA][key] = sens_data[TEXT]
+                    result[DATA][key] += " (%s)" % loc_data[STATIONCODE]
                 else:
                     # update all other data
                     result[DATA][key] = sens_data
         except KeyError:
+            if result[MESSAGE] is None:
+                result[MESSAGE] = "Missing key(s) in br data: "
+            result[MESSAGE] += "%s " % value
             log.warning("Data element with key='%s' "
                         "not loaded from br data!", key)
     result[SUCCESS] = True
@@ -182,6 +191,30 @@ def __get_temp(section):
         return None
 
 
+def __get_ws_distance(wstation, latitude, longitude):
+    """
+    Get the distance to the weatherstation from wstation section of xml.
+
+    wstation: weerstation section of buienradar xml (dict)
+    latitude: our latitude
+    longitude: our longitude
+    """
+    if wstation:
+        try:
+            wslat = float(wstation[LAT])
+            wslon = float(wstation[LON])
+
+            dist = vincenty((latitude, longitude), (wslat, wslon))
+            log.debug("calc distance: %s (latitude: %s, longitude: %s, wslat: %s, wslon: %s)",
+                  dist, latitude, longitude, wslat, wslon)
+            return dist
+        except (ValueError, TypeError, KeyError):
+            # value does not exist, or is not a float
+            return None
+    else:
+        return None
+
+
 def __select_nearest_ws(xmldata, latitude, longitude):
     """Select the nearest weatherstation."""
     log.debug("__select_nearest_ws: latitude: %s, longitude: %s", latitude, longitude)
@@ -191,32 +224,31 @@ def __select_nearest_ws(xmldata, latitude, longitude):
 
     try:
         ws_xml = xmldata[WEERGEGEVENS][ACTUEELWEER][WEERSTATIONS][WEERSTATION]
-    except KeyError:
+    except (KeyError, TypeError):
         log.warning("Missing section in Buienradar xmldata (%s)."
                     "Can happen 00:00-01:00 CE(S)T",
                     WEERSTATION)
         return None
 
     for wstation in ws_xml:
-        wslat = float(wstation[LAT])
-        wslon = float(wstation[LON])
+        dist2 = __get_ws_distance(wstation, latitude, longitude)
 
-        dist2 = vincenty((latitude, longitude), (wslat, wslon))
-        log.debug("calc distance: %s: %s (latitude: %s, longitude: %s, wslat: %s, wslon: %s)",
-                  wstation[STATIONNAME][TEXT],
-                  dist2, latitude, longitude, wslat, wslon)
-        if ((loc_data is None) or (dist2 < dist)):
-            dist = dist2
-            loc_data = wstation
+        if dist2 is not None:
+            if ((loc_data is None) or (dist2 < dist)):
+                dist = dist2
+                loc_data = wstation
 
     if loc_data is None:
         log.warning("No weatherstation selected; aborting...")
         return None
     else:
-        log.debug("Selected station: code='%s', "
-                  "name='%s', lat='%s', lon='%s'.",
-                  loc_data[STATIONCODE],
-                  loc_data[STATIONNAME][TEXT],
-                  loc_data[LAT],
-                  loc_data[LON])
+        try:
+            log.debug("Selected weatherstation: code='%s', "
+                      "name='%s', lat='%s', lon='%s'.",
+                      loc_data[STATIONCODE],
+                      loc_data[STATIONNAME][TEXT],
+                      loc_data[LAT],
+                      loc_data[LON])
+        except KeyError:
+            log.debug("Selected weatherstation")
         return loc_data

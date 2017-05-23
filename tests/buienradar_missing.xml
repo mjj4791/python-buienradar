@@ -23,9 +23,8 @@ http://www.buienradar.nl/resources/images/logor.svg
         </image>
         <actueel_weer>
             <weerstations>
-                <weerstation id="6391">
+                <weerstation id="6391" test="Missing stationnaam">
                     <stationcode>6391</stationcode>
-                    <stationnaam regio="Venlo">Meetstation Arcen</stationnaam>
                     <lat>51.50</lat>
                     <lon>6.20</lon>
                     <datum>05/19/2017 00:20:00</datum>
@@ -35,11 +34,11 @@ http://www.buienradar.nl/resources/images/logor.svg
                     <windsnelheidBF>2</windsnelheidBF>
                     <windrichtingGR>77</windrichtingGR>
                     <windrichting>ONO</windrichting>
-                    <luchtdruk>1021.23</luchtdruk>
-                    <zichtmeters>38400</zichtmeters>
+                    <luchtdruk>-</luchtdruk>
+                    <zichtmeters>-</zichtmeters>
                     <windstotenMS>4.4</windstotenMS>
-                    <regenMMPU>2</regenMMPU>
-                    <zonintensiteitWM2>614</zonintensiteitWM2>
+                    <regenMMPU>-</regenMMPU>
+                    <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                     </icoonactueel>
@@ -50,7 +49,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6391
                     <latGraden>51.83</latGraden>
                     <lonGraden>6.33</lonGraden>
                 </weerstation>
-                <weerstation id="6275">
+                <weerstation id="6275" test="Missing icoonactueel">
                     <stationcode>6275</stationcode>
                     <stationnaam regio="Arnhem">Meetstation Arnhem</stationnaam>
                     <lat>52.07</lat>
@@ -67,9 +66,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6391
                     <windstotenMS>6.9</windstotenMS>
                     <regenMMPU>-</regenMMPU>
                     <zonintensiteitWM2>-</zonintensiteitWM2>
-                    <icoonactueel ID="cc" zin="Zwaar bewolkt">
-https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
-                    </icoonactueel>
                     <temperatuur10cm>14.3</temperatuur10cm>
                     <url>
 http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6275
@@ -77,13 +73,12 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6275
                     <latGraden>52.11</latGraden>
                     <lonGraden>6.47</lonGraden>
                 </weerstation>
-                <weerstation id="6249">
+                <weerstation id="6249" test="Missing luchtvochtigheid">
                     <stationcode>6249</stationcode>
                     <stationnaam regio="Berkhout">Meetstation Berkhout</stationnaam>
                     <lat>52.65</lat>
                     <lon>4.98</lon>
                     <datum>05/19/2017 00:20:00</datum>
-                    <luchtvochtigheid>88</luchtvochtigheid>
                     <temperatuurGC>13.8</temperatuurGC>
                     <windsnelheidMS>5.87</windsnelheidMS>
                     <windsnelheidBF>4</windsnelheidBF>
@@ -104,14 +99,13 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6249
                     <latGraden>53.08</latGraden>
                     <lonGraden>5.64</lonGraden>
                 </weerstation>
-                <weerstation id="6260">
+                <weerstation id="6260" test="Missing temperatuurGC">
                     <stationcode>6260</stationcode>
                     <stationnaam regio="Utrecht">Meetstation De Bilt</stationnaam>
                     <lat>52.10</lat>
                     <lon>5.18</lon>
                     <datum>05/19/2017 00:20:00</datum>
                     <luchtvochtigheid>88</luchtvochtigheid>
-                    <temperatuurGC>16.0</temperatuurGC>
                     <windsnelheidMS>4.64</windsnelheidMS>
                     <windsnelheidBF>3</windsnelheidBF>
                     <windrichtingGR>72</windrichtingGR>
@@ -131,7 +125,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6260
                     <latGraden>52.17</latGraden>
                     <lonGraden>5.31</lonGraden>
                 </weerstation>
-                <weerstation id="6235">
+                <weerstation id="6235" test="Missing temperatuur10cm">
                     <stationcode>6235</stationcode>
                     <stationnaam regio="Den Helder">Meetstation Den Helder</stationnaam>
                     <lat>52.92</lat>
@@ -151,14 +145,13 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6260
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                     </icoonactueel>
-                    <temperatuur10cm>13.0</temperatuur10cm>
                     <url>
 http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6235
                     </url>
                     <latGraden>53.53</latGraden>
                     <lonGraden>5.31</lonGraden>
                 </weerstation>
-                <weerstation id="6370">
+                <weerstation id="6370" test="Missing windsnelheidMS">
                     <stationcode>6370</stationcode>
                     <stationnaam regio="Eindhoven">Meetstation Eindhoven</stationnaam>
                     <lat>51.45</lat>
@@ -166,7 +159,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6235
                     <datum>05/19/2017 00:20:00</datum>
                     <luchtvochtigheid>88</luchtvochtigheid>
                     <temperatuurGC>17.2</temperatuurGC>
-                    <windsnelheidMS>3.93</windsnelheidMS>
                     <windsnelheidBF>3</windsnelheidBF>
                     <windrichtingGR>82</windrichtingGR>
                     <windrichting>O</windrichting>
@@ -185,7 +177,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6370
                     <latGraden>51.75</latGraden>
                     <lonGraden>5.69</lonGraden>
                 </weerstation>
-                <weerstation id="6377">
+                <weerstation id="6377" test="Missing windsnelheidBF">
                     <stationcode>6377</stationcode>
                     <stationnaam regio="Weert">Meetstation Ell</stationnaam>
                     <lat>51.20</lat>
@@ -194,7 +186,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6370
                     <luchtvochtigheid>93</luchtvochtigheid>
                     <temperatuurGC>16.7</temperatuurGC>
                     <windsnelheidMS>2.45</windsnelheidMS>
-                    <windsnelheidBF>2</windsnelheidBF>
                     <windrichtingGR>79</windrichtingGR>
                     <windrichting>O</windrichting>
                     <luchtdruk>-</luchtdruk>
@@ -212,7 +203,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6377
                     <latGraden>51.33</latGraden>
                     <lonGraden>6.28</lonGraden>
                 </weerstation>
-                <weerstation id="6321">
+                <weerstation id="6321" test="Missing windrichtingGR">
                     <stationcode>6321</stationcode>
                     <stationnaam regio="Noordzee">Meetstation Euro platform</stationnaam>
                     <lat>52.00</lat>
@@ -222,7 +213,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6377
                     <temperatuurGC>-</temperatuurGC>
                     <windsnelheidMS>12.07</windsnelheidMS>
                     <windsnelheidBF>6</windsnelheidBF>
-                    <windrichtingGR>47</windrichtingGR>
                     <windrichting>-</windrichting>
                     <luchtdruk>-</luchtdruk>
                     <zichtmeters>-</zichtmeters>
@@ -239,7 +229,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6321
                     <latGraden>52.00</latGraden>
                     <lonGraden>3.47</lonGraden>
                 </weerstation>
-                <weerstation id="6350">
+                <weerstation id="6350" test="Missing windrichting">
                     <stationcode>6350</stationcode>
                     <stationnaam regio="Gilze Rijen">Meetstation Gilze Rijen</stationnaam>
                     <lat>51.57</lat>
@@ -250,7 +240,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6321
                     <windsnelheidMS>6.27</windsnelheidMS>
                     <windsnelheidBF>4</windsnelheidBF>
                     <windrichtingGR>88</windrichtingGR>
-                    <windrichting>O</windrichting>
                     <luchtdruk>1007.21</luchtdruk>
                     <zichtmeters>7410</zichtmeters>
                     <windstotenMS>9.1</windstotenMS>
@@ -266,7 +255,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6350
                     <latGraden>51.94</latGraden>
                     <lonGraden>5.56</lonGraden>
                 </weerstation>
-                <weerstation id="6283">
+                <weerstation id="6283" test="Missing luchtdruk">
                     <stationcode>6283</stationcode>
                     <stationnaam regio="Oost-Overijssel">Meetstation Groenlo-Hupsel</stationnaam>
                     <lat>52.07</lat>
@@ -278,7 +267,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6350
                     <windsnelheidBF>2</windsnelheidBF>
                     <windrichtingGR>60</windrichtingGR>
                     <windrichting>ONO</windrichting>
-                    <luchtdruk>-</luchtdruk>
                     <zichtmeters>-</zichtmeters>
                     <windstotenMS>3</windstotenMS>
                     <regenMMPU>-</regenMMPU>
@@ -293,7 +281,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6283
                     <latGraden>52.11</latGraden>
                     <lonGraden>7.08</lonGraden>
                 </weerstation>
-                <weerstation id="6280">
+                <weerstation id="6280" test="Missing zichtmeters">
                     <stationcode>6280</stationcode>
                     <stationnaam regio="Groningen">Meetstation Groningen</stationnaam>
                     <lat>53.13</lat>
@@ -306,7 +294,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6283
                     <windrichtingGR>55</windrichtingGR>
                     <windrichting>NO</windrichting>
                     <luchtdruk>1011.18</luchtdruk>
-                    <zichtmeters>20300</zichtmeters>
                     <windstotenMS>5.8</windstotenMS>
                     <regenMMPU>-</regenMMPU>
                     <zonintensiteitWM2>-</zonintensiteitWM2>
@@ -320,7 +307,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6280
                     <latGraden>53.22</latGraden>
                     <lonGraden>6.97</lonGraden>
                 </weerstation>
-                <weerstation id="6278">
+                <weerstation id="6278" test="Missing windstotenMS">
                     <stationcode>6278</stationcode>
                     <stationnaam regio="Zwolle">Meetstation Heino</stationnaam>
                     <lat>52.43</lat>
@@ -334,7 +321,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6280
                     <windrichting>ONO</windrichting>
                     <luchtdruk>-</luchtdruk>
                     <zichtmeters>-</zichtmeters>
-                    <windstotenMS>5.5</windstotenMS>
                     <regenMMPU>-</regenMMPU>
                     <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
@@ -347,7 +333,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6278
                     <latGraden>52.72</latGraden>
                     <lonGraden>6.44</lonGraden>
                 </weerstation>
-                <weerstation id="6356">
+                <weerstation id="6356" test="Missing regenMMPU">
                     <stationcode>6356</stationcode>
                     <stationnaam regio="Gorinchem">Meetstation Herwijnen</stationnaam>
                     <lat>51.87</lat>
@@ -362,7 +348,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6278
                     <luchtdruk>1008.2</luchtdruk>
                     <zichtmeters>-</zichtmeters>
                     <windstotenMS>4.6</windstotenMS>
-                    <regenMMPU>-</regenMMPU>
                     <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
@@ -374,7 +359,7 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6356
                     <latGraden>52.44</latGraden>
                     <lonGraden>5.25</lonGraden>
                 </weerstation>
-                <weerstation id="6330">
+                <weerstation id="6330" test="zonintensiteitWM2">
                     <stationcode>6330</stationcode>
                     <stationnaam regio="Hoek van Holland">Meetstation Hoek van Holland</stationnaam>
                     <lat>51.98</lat>
@@ -390,7 +375,6 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6356
                     <zichtmeters>-</zichtmeters>
                     <windstotenMS>11.6</windstotenMS>
                     <regenMMPU>-</regenMMPU>
-                    <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                     </icoonactueel>
@@ -1109,17 +1093,17 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6239
                     <lat>53.22</lat>
                     <lon>3.22</lon>
                     <datum>05/19/2017 00:20:00</datum>
-                    <luchtvochtigheid>47</luchtvochtigheid>
-                    <temperatuurGC>16.8</temperatuurGC>
+                    <luchtvochtigheid>-</luchtvochtigheid>
+                    <temperatuurGC>-</temperatuurGC>
                     <windsnelheidMS>8.16</windsnelheidMS>
                     <windsnelheidBF>5</windsnelheidBF>
                     <windrichtingGR>59</windrichtingGR>
-                    <windrichting>O</windrichting>
-                    <luchtdruk>1004.95</luchtdruk>
-                    <zichtmeters>6200</zichtmeters>
-                    <windstotenMS>14</windstotenMS>
+                    <windrichting>-</windrichting>
+                    <luchtdruk>-</luchtdruk>
+                    <zichtmeters>-</zichtmeters>
+                    <windstotenMS>-</windstotenMS>
                     <regenMMPU>-</regenMMPU>
-                    <zonintensiteitWM2>614</zonintensiteitWM2>
+                    <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                     </icoonactueel>
@@ -1231,8 +1215,8 @@ https://www.buienradar.nl/resources/images/icons/weather/30x30/r.png
                 <maxmmregen>1.8</maxmmregen>
                 <mintemp>11</mintemp>
                 <mintempmax>11</mintempmax>
-                <maxtemp>18</maxtemp>
-                <maxtempmax>18</maxtempmax>
+                <maxtemp>17</maxtemp>
+                <maxtempmax>17</maxtempmax>
                 <windrichting>ZW</windrichting>
                 <windkracht>4</windkracht>
                 <icoon ID="m">

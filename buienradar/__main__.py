@@ -16,17 +16,17 @@ Usage:
 import logging
 import sys
 
-# import pkg_resources
+import pkg_resources
 from docopt import docopt
 
-import buienradar
+from .buienradar import CONTENT, MESSAGE, SUCCESS, get_data, parse_data
 
 
 def main(argv=sys.argv[1:]):
     """Parse argument and start main program."""
     args = docopt(__doc__, argv=argv,
-                  version=0.01)
-# version=pkg_resources.require('buienradar')[0].version)
+                  version=pkg_resources.require('buienradar')[0].version)
+
     level = logging.ERROR
     if args['-v']:
         level = logging.INFO
@@ -37,20 +37,19 @@ def main(argv=sys.argv[1:]):
     log = logging.getLogger(__name__)
     log.info("Start...")
 
-    result = buienradar.get_data()
+    result = get_data()
 
-    if result[buienradar.SUCCESS]:
-        parsed = buienradar.parse_data(
-                                        result[buienradar.CONTENT],
+    if result[SUCCESS]:
+        parsed = parse_data(
+                                        result[CONTENT],
                                         latitude=float(args['--latitude']),
                                         longitude=float(args['--longitude'])
                                     )
         log.info("Retrieved data:\n%s", parsed)
         print(parsed)
     else:
-        log.error("Retrieving xml weather data was not successfull (%s)", result[buienradar.MESSAGE])
-
-    return True
+        log.error("Retrieving xml weather data was not successfull (%s)",
+                  result[MESSAGE])
 
 
 if __name__ == '__main__':

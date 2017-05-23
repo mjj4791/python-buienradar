@@ -1,4 +1,4 @@
-<buienradarnl>
+<buienradarnl test="ws data contains invalid gps location data">
     <script>
     </script>
     <weergegevens>
@@ -23,10 +23,10 @@ http://www.buienradar.nl/resources/images/logor.svg
         </image>
         <actueel_weer>
             <weerstations>
-                <weerstation id="6391">
+                <weerstation id="6391" test="Invalid lat value">
                     <stationcode>6391</stationcode>
                     <stationnaam regio="Venlo">Meetstation Arcen</stationnaam>
-                    <lat>51.50</lat>
+                    <lat>XXX51.50</lat>
                     <lon>6.20</lon>
                     <datum>05/19/2017 00:20:00</datum>
                     <luchtvochtigheid>95</luchtvochtigheid>
@@ -35,11 +35,11 @@ http://www.buienradar.nl/resources/images/logor.svg
                     <windsnelheidBF>2</windsnelheidBF>
                     <windrichtingGR>77</windrichtingGR>
                     <windrichting>ONO</windrichting>
-                    <luchtdruk>1021.23</luchtdruk>
-                    <zichtmeters>38400</zichtmeters>
+                    <luchtdruk>-</luchtdruk>
+                    <zichtmeters>-</zichtmeters>
                     <windstotenMS>4.4</windstotenMS>
-                    <regenMMPU>2</regenMMPU>
-                    <zonintensiteitWM2>614</zonintensiteitWM2>
+                    <regenMMPU>-</regenMMPU>
+                    <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                     </icoonactueel>
@@ -50,11 +50,11 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6391
                     <latGraden>51.83</latGraden>
                     <lonGraden>6.33</lonGraden>
                 </weerstation>
-                <weerstation id="6275">
+                <weerstation id="6275" test="Invalid lon value">
                     <stationcode>6275</stationcode>
                     <stationnaam regio="Arnhem">Meetstation Arnhem</stationnaam>
                     <lat>52.07</lat>
-                    <lon>5.88</lon>
+                    <lon>XXX5.88</lon>
                     <datum>05/19/2017 00:20:00</datum>
                     <luchtvochtigheid>91</luchtvochtigheid>
                     <temperatuurGC>14.8</temperatuurGC>
@@ -77,11 +77,11 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6275
                     <latGraden>52.11</latGraden>
                     <lonGraden>6.47</lonGraden>
                 </weerstation>
-                <weerstation id="6249">
+                <weerstation id="6249" test="Invalid lat and lon value">
                     <stationcode>6249</stationcode>
                     <stationnaam regio="Berkhout">Meetstation Berkhout</stationnaam>
-                    <lat>52.65</lat>
-                    <lon>4.98</lon>
+                    <lat>XXX52.65</lat>
+                    <lon>XXX4.98</lon>
                     <datum>05/19/2017 00:20:00</datum>
                     <luchtvochtigheid>88</luchtvochtigheid>
                     <temperatuurGC>13.8</temperatuurGC>
@@ -1109,17 +1109,17 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6239
                     <lat>53.22</lat>
                     <lon>3.22</lon>
                     <datum>05/19/2017 00:20:00</datum>
-                    <luchtvochtigheid>47</luchtvochtigheid>
-                    <temperatuurGC>16.8</temperatuurGC>
+                    <luchtvochtigheid>-</luchtvochtigheid>
+                    <temperatuurGC>-</temperatuurGC>
                     <windsnelheidMS>8.16</windsnelheidMS>
                     <windsnelheidBF>5</windsnelheidBF>
                     <windrichtingGR>59</windrichtingGR>
-                    <windrichting>O</windrichting>
-                    <luchtdruk>1004.95</luchtdruk>
-                    <zichtmeters>6200</zichtmeters>
-                    <windstotenMS>14</windstotenMS>
+                    <windrichting>-</windrichting>
+                    <luchtdruk>-</luchtdruk>
+                    <zichtmeters>-</zichtmeters>
+                    <windstotenMS>-</windstotenMS>
                     <regenMMPU>-</regenMMPU>
-                    <zonintensiteitWM2>614</zonintensiteitWM2>
+                    <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                     </icoonactueel>
@@ -1177,7 +1177,7 @@ Grote kans (70%) op een licht wisselvallig weertype met temperaturen rond de nor
                 <maxmmregen>-</maxmmregen>
                 <mintemp>8</mintemp>
                 <mintempmax>8</mintempmax>
-                <maxtemp>16</maxtemp>
+                <maxtemp>17</maxtemp>
                 <maxtempmax>16</maxtempmax>
                 <windrichting>ZW</windrichting>
                 <windkracht>3</windkracht>
@@ -1196,7 +1196,7 @@ https://www.buienradar.nl/resources/images/icons/weather/30x30/j.png
                 <mintemp>8</mintemp>
                 <mintempmax>8</mintempmax>
                 <maxtemp>17</maxtemp>
-                <maxtempmax>17</maxtempmax>
+                <maxtempmax>16</maxtempmax>
                 <windrichting>ZW</windrichting>
                 <windkracht>3</windkracht>
                 <icoon ID="b">
@@ -1213,8 +1213,8 @@ https://www.buienradar.nl/resources/images/icons/weather/30x30/b.png
                 <maxmmregen>-</maxmmregen>
                 <mintemp>10</mintemp>
                 <mintempmax>10</mintempmax>
-                <maxtemp>22</maxtemp>
-                <maxtempmax>22</maxtempmax>
+                <maxtemp>17</maxtemp>
+                <maxtempmax>16</maxtempmax>
                 <windrichting>ZO</windrichting>
                 <windkracht>4</windkracht>
                 <icoon ID="r">
@@ -1231,8 +1231,8 @@ https://www.buienradar.nl/resources/images/icons/weather/30x30/r.png
                 <maxmmregen>1.8</maxmmregen>
                 <mintemp>11</mintemp>
                 <mintempmax>11</mintempmax>
-                <maxtemp>18</maxtemp>
-                <maxtempmax>18</maxtempmax>
+                <maxtemp>17</maxtemp>
+                <maxtempmax>17</maxtempmax>
                 <windrichting>ZW</windrichting>
                 <windkracht>4</windkracht>
                 <icoon ID="m">

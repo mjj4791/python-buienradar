@@ -36,7 +36,7 @@ setup(
 
     # Author details
     author='mjj4791',
-    # author_email='mjj4791@gmail.com',
+    author_email='mjj4791@gmail.com',
 
     # Choose your license
     license='MIT',

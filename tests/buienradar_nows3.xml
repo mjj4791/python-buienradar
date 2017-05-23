@@ -1,0 +1,144 @@
+<buienradarnl test="actueel_weer section is NON present">
+    <script>
+    </script>
+    <weergegevens>
+        <titel>www.buienradar.nl - actuele weersinformatie</titel>
+        <link>http://www.buienradar.nl</link>
+        <omschrijving>XML feed weersinformatie</omschrijving>
+        <language>nl-nl</language>
+        <copyright>
+(C)opyright 2005 - 2016 Buienradar B.V. Alle rechten voorbehouden
+        </copyright>
+        <gebruik>
+Deze XML feed mag vrij worden gebruikt onder voorwaarde van bronvermelding BuienRadar.NL inclusief een hyperlink naar http://www.buienradar.nl. Aan de feed kunnen door gebruikers of andere personen geen rechten worden ontleend.
+        </gebruik>
+        <image>
+            <titel>buienradar.nl</titel>
+            <link>http://www.buienradar.nl/</link>
+            <url>
+http://www.buienradar.nl/resources/images/logor.svg
+            </url>
+            <width>950</width>
+            <height>78</height>
+        </image>
+        <verwachting_meerdaags>
+            <url>
+http://www.buienradar.nl/nederland/verwachtingen/5-daagse-verwachting
+            </url>
+            <urlbackup>
+http://www.buienradar.nl/nederland/verwachtingen/5-daagse-verwachting
+            </urlbackup>
+            <tekst_middellang periode="vrijdag 19 mei 2017 tot dinsdag 23 mei 2017">
+De eerste dagen zonnige perioden, overwegend droog en middagtemperaturen oplopend van ca. 17&#176;C op zaterdag naar ca. 22&#176;C begin volgende week. In de loop van dinsdag buien gevolgd door afkoeling.
+            </tekst_middellang>
+            <tekst_lang periode="woensdag 24 mei 2017 tot zondag 28 mei 2017">
+Grote kans (70%) op een licht wisselvallig weertype met temperaturen rond de normale waarde voor de tijd van het jaar.
+            </tekst_lang>
+            <dag-plus1>
+                <datum>zaterdag 20 mei 2017</datum>
+                <dagweek>za</dagweek>
+                <kanszon>-</kanszon>
+                <kansregen>15</kansregen>
+                <minmmregen>-</minmmregen>
+                <maxmmregen>-</maxmmregen>
+                <mintemp>8</mintemp>
+                <mintempmax>8</mintempmax>
+                <maxtemp>16</maxtemp>
+                <maxtempmax>16</maxtempmax>
+                <windrichting>ZW</windrichting>
+                <windkracht>3</windkracht>
+                <icoon ID="j">
+https://www.buienradar.nl/resources/images/icons/weather/30x30/j.png
+                </icoon>
+                <sneeuwcms>0</sneeuwcms>
+            </dag-plus1>
+            <dag-plus2>
+                <datum>zondag 21 mei 2017</datum>
+                <dagweek>zo</dagweek>
+                <kanszon>43</kanszon>
+                <kansregen>1</kansregen>
+                <minmmregen>-</minmmregen>
+                <maxmmregen>-</maxmmregen>
+                <mintemp>8</mintemp>
+                <mintempmax>8</mintempmax>
+                <maxtemp>17</maxtemp>
+                <maxtempmax>17</maxtempmax>
+                <windrichting>ZW</windrichting>
+                <windkracht>3</windkracht>
+                <icoon ID="b">
+https://www.buienradar.nl/resources/images/icons/weather/30x30/b.png
+                </icoon>
+                <sneeuwcms>0</sneeuwcms>
+            </dag-plus2>
+            <dag-plus3>
+                <datum>maandag 22 mei 2017</datum>
+                <dagweek>ma</dagweek>
+                <kanszon>-</kanszon>
+                <kansregen>3</kansregen>
+                <minmmregen>-</minmmregen>
+                <maxmmregen>-</maxmmregen>
+                <mintemp>10</mintemp>
+                <mintempmax>10</mintempmax>
+                <maxtemp>22</maxtemp>
+                <maxtempmax>22</maxtempmax>
+                <windrichting>ZO</windrichting>
+                <windkracht>4</windkracht>
+                <icoon ID="r">
+https://www.buienradar.nl/resources/images/icons/weather/30x30/r.png
+                </icoon>
+                <sneeuwcms>0</sneeuwcms>
+            </dag-plus3>
+            <dag-plus4>
+                <datum>dinsdag 23 mei 2017</datum>
+                <dagweek>di</dagweek>
+                <kanszon>-</kanszon>
+                <kansregen>43</kansregen>
+                <minmmregen>1.8</minmmregen>
+                <maxmmregen>1.8</maxmmregen>
+                <mintemp>11</mintemp>
+                <mintempmax>11</mintempmax>
+                <maxtemp>17</maxtemp>
+                <maxtempmax>17</maxtempmax>
+                <windrichting>ZW</windrichting>
+                <windkracht>4</windkracht>
+                <icoon ID="m">
+https://www.buienradar.nl/resources/images/icons/weather/30x30/m.png
+                </icoon>
+                <sneeuwcms>0</sneeuwcms>
+            </dag-plus4>
+            <dag-plus5>
+                <datum>woensdag 24 mei 2017</datum>
+                <dagweek>wo</dagweek>
+                <kanszon>-</kanszon>
+                <kansregen>76</kansregen>
+                <minmmregen>4.4</minmmregen>
+                <maxmmregen>4.4</maxmmregen>
+                <mintemp>9</mintemp>
+                <mintempmax>9</mintempmax>
+                <maxtemp>15</maxtemp>
+                <maxtempmax>15</maxtempmax>
+                <windrichting>NW</windrichting>
+                <windkracht>4</windkracht>
+                <icoon ID="f">
+https://www.buienradar.nl/resources/images/icons/weather/30x30/f.png
+                </icoon>
+                <sneeuwcms>0</sneeuwcms>
+            </dag-plus5>
+        </verwachting_meerdaags>
+        <verwachting_vandaag>
+            <url>http://www.buienradar.nl/nederland/weerbericht</url>
+            <urlbackup>http://www.buienradar.nl/nederland/weerbericht</urlbackup>
+            <titel>Het weekend verbetering</titel>
+            <tijdweerbericht>Opgesteld op donderdag 18 mei 2017 om 11:30</tijdweerbericht>
+            <samenvatting>
+De warmte en de zon hebben plaatsgemaakt voor koelere lucht, meer wolken en zelfs wat regen. Even passen op de plaats dus, maar het weekend belooft beterschap.
+            </samenvatting>
+            <tekst>
+Na de tropische eendagsvlieg is het weer even gedaan met de hitte en de zon. Hogedruk is verruild voor een actief lagedrukgebied dat rakelings langs ons land trekt. Toch lijkt Nederland qua regen goeddeels de dans te ontspringen.Vannacht is het wisselend bewolkt en het ziet er naar uit dat het op de meeste plekken droog is. Het koelt af naar een graad of 13. De meeste regen valt op zee, rondom de kern van het lagedrukgebied, maar wellicht dat de kustprovincies hier toch nog een (onweers)bui van meekrijgen. Ook in het oosten kan er een lichte bui vallen. Verder waait het flink. Aan zee komt zelfs een krachtige wind te staan.Vrijdag is het vrijwel overal droog. Het oosten blijft wel gevoelig voor wat regen. Zo af en toe komt de zon tevoorschijn, maar bewolking voert de boventoon. In Zeeland wordt het op sommige plekken niet warmer dan 15 graden terwijl in Groningen, in de warmere lucht, nog 20 graden wordt gehaald. In eerste instantie waait het nog stevig door. Op de Wadden kan zelfs een kracht 7 komen te staan, maar in de loop van de dag wordt het steeds rustiger.In het weekeinde is het meest droog en zijn er perioden met zon. Alleen op zaterdag kan lokaal nog een bui tot ontwikkeling komen. Zaterdag wordt het 19 graden en zondag loopt de middagtemperatuur op naar gemiddeld een graad of 20. Maandag is het vrij zonnig met maxima rond 23 graden. In het zuiden wordt het dan weer zomers warm!
+            </tekst>
+            <formattedtekst>
+Na de tropische eendagsvlieg is het weer even gedaan met de hitte en de zon. Hogedruk is verruild voor een actief lagedrukgebied dat rakelings langs ons land trekt. Toch lijkt Nederland qua regen goeddeels de dans te ontspringen.Vannacht is het wisselend bewolkt en het ziet er naar uit dat het op de meeste plekken droog is. Het koelt af naar een graad of 13. De meeste regen valt op zee, rondom de kern van het lagedrukgebied, maar wellicht dat de kustprovincies hier toch nog een (onweers)bui van meekrijgen. Ook in het oosten kan er een lichte bui vallen. Verder waait het flink. Aan zee komt zelfs een krachtige wind te staan.Vrijdag is het vrijwel overal droog. Het oosten blijft wel gevoelig voor wat regen. Zo af en toe komt de zon tevoorschijn, maar bewolking voert de boventoon. In Zeeland wordt het op sommige plekken niet warmer dan 15 graden terwijl in Groningen, in de warmere lucht, nog 20 graden wordt gehaald. In eerste instantie waait het nog stevig door. Op de Wadden kan zelfs een kracht 7 komen te staan, maar in de loop van de dag wordt het steeds rustiger.In het weekeinde is het meest droog en zijn er perioden met zon. Alleen op zaterdag kan lokaal nog een bui tot ontwikkeling komen. Zaterdag wordt het 19 graden en zondag loopt de middagtemperatuur op naar gemiddeld een graad of 20. Maandag is het vrij zonnig met maxima rond 23 graden. In het zuiden wordt het dan weer zomers warm!
+            </formattedtekst>
+        </verwachting_vandaag>
+    </weergegevens>
+</buienradarnl>

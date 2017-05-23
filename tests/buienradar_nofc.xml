@@ -1,4 +1,4 @@
-<buienradarnl>
+<buienradarnl test="verwachting_meerdaags missing from xml">
     <script>
     </script>
     <weergegevens>
@@ -35,11 +35,11 @@ http://www.buienradar.nl/resources/images/logor.svg
                     <windsnelheidBF>2</windsnelheidBF>
                     <windrichtingGR>77</windrichtingGR>
                     <windrichting>ONO</windrichting>
-                    <luchtdruk>1021.23</luchtdruk>
-                    <zichtmeters>38400</zichtmeters>
+                    <luchtdruk>-</luchtdruk>
+                    <zichtmeters>-</zichtmeters>
                     <windstotenMS>4.4</windstotenMS>
-                    <regenMMPU>2</regenMMPU>
-                    <zonintensiteitWM2>614</zonintensiteitWM2>
+                    <regenMMPU>-</regenMMPU>
+                    <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                     </icoonactueel>
@@ -1109,17 +1109,17 @@ http://www.buienradar.nl/nederland/weerbericht/weergrafieken/6239
                     <lat>53.22</lat>
                     <lon>3.22</lon>
                     <datum>05/19/2017 00:20:00</datum>
-                    <luchtvochtigheid>47</luchtvochtigheid>
-                    <temperatuurGC>16.8</temperatuurGC>
+                    <luchtvochtigheid>-</luchtvochtigheid>
+                    <temperatuurGC>-</temperatuurGC>
                     <windsnelheidMS>8.16</windsnelheidMS>
                     <windsnelheidBF>5</windsnelheidBF>
                     <windrichtingGR>59</windrichtingGR>
-                    <windrichting>O</windrichting>
-                    <luchtdruk>1004.95</luchtdruk>
-                    <zichtmeters>6200</zichtmeters>
-                    <windstotenMS>14</windstotenMS>
+                    <windrichting>-</windrichting>
+                    <luchtdruk>-</luchtdruk>
+                    <zichtmeters>-</zichtmeters>
+                    <windstotenMS>-</windstotenMS>
                     <regenMMPU>-</regenMMPU>
-                    <zonintensiteitWM2>614</zonintensiteitWM2>
+                    <zonintensiteitWM2>-</zonintensiteitWM2>
                     <icoonactueel ID="cc" zin="Zwaar bewolkt">
 https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                     </icoonactueel>
@@ -1155,110 +1155,6 @@ https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png
                 <aantalhagel>0</aantalhagel>
             </buienradar>
         </actueel_weer>
-        <verwachting_meerdaags>
-            <url>
-http://www.buienradar.nl/nederland/verwachtingen/5-daagse-verwachting
-            </url>
-            <urlbackup>
-http://www.buienradar.nl/nederland/verwachtingen/5-daagse-verwachting
-            </urlbackup>
-            <tekst_middellang periode="vrijdag 19 mei 2017 tot dinsdag 23 mei 2017">
-De eerste dagen zonnige perioden, overwegend droog en middagtemperaturen oplopend van ca. 17&#176;C op zaterdag naar ca. 22&#176;C begin volgende week. In de loop van dinsdag buien gevolgd door afkoeling.
-            </tekst_middellang>
-            <tekst_lang periode="woensdag 24 mei 2017 tot zondag 28 mei 2017">
-Grote kans (70%) op een licht wisselvallig weertype met temperaturen rond de normale waarde voor de tijd van het jaar.
-            </tekst_lang>
-            <dag-plus1>
-                <datum>zaterdag 20 mei 2017</datum>
-                <dagweek>za</dagweek>
-                <kanszon>-</kanszon>
-                <kansregen>15</kansregen>
-                <minmmregen>-</minmmregen>
-                <maxmmregen>-</maxmmregen>
-                <mintemp>8</mintemp>
-                <mintempmax>8</mintempmax>
-                <maxtemp>16</maxtemp>
-                <maxtempmax>16</maxtempmax>
-                <windrichting>ZW</windrichting>
-                <windkracht>3</windkracht>
-                <icoon ID="j">
-https://www.buienradar.nl/resources/images/icons/weather/30x30/j.png
-                </icoon>
-                <sneeuwcms>0</sneeuwcms>
-            </dag-plus1>
-            <dag-plus2>
-                <datum>zondag 21 mei 2017</datum>
-                <dagweek>zo</dagweek>
-                <kanszon>43</kanszon>
-                <kansregen>1</kansregen>
-                <minmmregen>-</minmmregen>
-                <maxmmregen>-</maxmmregen>
-                <mintemp>8</mintemp>
-                <mintempmax>8</mintempmax>
-                <maxtemp>17</maxtemp>
-                <maxtempmax>17</maxtempmax>
-                <windrichting>ZW</windrichting>
-                <windkracht>3</windkracht>
-                <icoon ID="b">
-https://www.buienradar.nl/resources/images/icons/weather/30x30/b.png
-                </icoon>
-                <sneeuwcms>0</sneeuwcms>
-            </dag-plus2>
-            <dag-plus3>
-                <datum>maandag 22 mei 2017</datum>
-                <dagweek>ma</dagweek>
-                <kanszon>-</kanszon>
-                <kansregen>3</kansregen>
-                <minmmregen>-</minmmregen>
-                <maxmmregen>-</maxmmregen>
-                <mintemp>10</mintemp>
-                <mintempmax>10</mintempmax>
-                <maxtemp>22</maxtemp>
-                <maxtempmax>22</maxtempmax>
-                <windrichting>ZO</windrichting>
-                <windkracht>4</windkracht>
-                <icoon ID="r">
-https://www.buienradar.nl/resources/images/icons/weather/30x30/r.png
-                </icoon>
-                <sneeuwcms>0</sneeuwcms>
-            </dag-plus3>
-            <dag-plus4>
-                <datum>dinsdag 23 mei 2017</datum>
-                <dagweek>di</dagweek>
-                <kanszon>-</kanszon>
-                <kansregen>43</kansregen>
-                <minmmregen>1.8</minmmregen>
-                <maxmmregen>1.8</maxmmregen>
-                <mintemp>11</mintemp>
-                <mintempmax>11</mintempmax>
-                <maxtemp>18</maxtemp>
-                <maxtempmax>18</maxtempmax>
-                <windrichting>ZW</windrichting>
-                <windkracht>4</windkracht>
-                <icoon ID="m">
-https://www.buienradar.nl/resources/images/icons/weather/30x30/m.png
-                </icoon>
-                <sneeuwcms>0</sneeuwcms>
-            </dag-plus4>
-            <dag-plus5>
-                <datum>woensdag 24 mei 2017</datum>
-                <dagweek>wo</dagweek>
-                <kanszon>-</kanszon>
-                <kansregen>76</kansregen>
-                <minmmregen>4.4</minmmregen>
-                <maxmmregen>4.4</maxmmregen>
-                <mintemp>9</mintemp>
-                <mintempmax>9</mintempmax>
-                <maxtemp>15</maxtemp>
-                <maxtempmax>15</maxtempmax>
-                <windrichting>NW</windrichting>
-                <windkracht>4</windkracht>
-                <icoon ID="f">
-https://www.buienradar.nl/resources/images/icons/weather/30x30/f.png
-                </icoon>
-                <sneeuwcms>0</sneeuwcms>
-            </dag-plus5>
-        </verwachting_meerdaags>
         <verwachting_vandaag>
             <url>http://www.buienradar.nl/nederland/weerbericht</url>
             <urlbackup>http://www.buienradar.nl/nederland/weerbericht</urlbackup>
