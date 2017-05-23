@@ -32,8 +32,8 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/mj4791/python-buienradar',
-
+    url='https://github.com/mjj4791/python-buienradar',
+s
     # Author details
     author='mjj4791',
     author_email='mjj4791@gmail.com',
