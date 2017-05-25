@@ -1,5 +1,5 @@
 """testing xml parsing."""
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from buienradar.buienradar import (
     DATA,
@@ -32,13 +32,25 @@ def test_readdata1():
     assert(result[SUCCESS] and '(6391)' in result[DATA][STATIONNAME])
 
     # check the data:
+    fc1 = (datetime.today() + timedelta(days=1))
+    fc2 = (datetime.today() + timedelta(days=2))
+    fc3 = (datetime.today() + timedelta(days=3))
+    fc4 = (datetime.today() + timedelta(days=4))
+    fc5 = (datetime.today() + timedelta(days=5))
+    
+    fc1 = fc1.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc2 = fc2.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc3 = fc3.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc4 = fc4.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc5 = fc5.replace(hour=0, minute=0, second=0, microsecond=0)
+    
     # Expected result:
     expect = {
         'data': {
             'windgust': '4.4',
             'windspeed': '3.13',
             'temperature': '16.3',
-            'stationnaam': 'Meetstation Arcen (6391)',
+            'stationname': 'Meetstation Arcen (6391)',
             'windazimuth': 'ONO',
             'symbol': 'Zwaar bewolkt',
             'windforce': '2',
@@ -55,11 +67,12 @@ def test_readdata1():
         'success': True,
         'msg': None,
         'forecast': [
-            {'temperature': 16.0, 'datetime': datetime(2017, 5, 24, 0, 0)},
-            {'temperature': 17.0, 'datetime': datetime(2017, 5, 25, 0, 0)},
-            {'temperature': 22.0, 'datetime': datetime(2017, 5, 26, 0, 0)},
-            {'temperature': 18.0, 'datetime': datetime(2017, 5, 27, 0, 0)},
-            {'temperature': 15.0, 'datetime': datetime(2017, 5, 28, 0, 0)}],
+            {'temperature': 16.0, 'datetime': fc1},
+            {'temperature': 17.0, 'datetime': fc2},
+            {'temperature': 22.0, 'datetime': fc3},
+            {'temperature': 18.0, 'datetime': fc4},
+            {'temperature': 15.0, 'datetime': fc5}
+        ],
         'distance': 0.0
     }
     assert(expect == result)
@@ -85,6 +98,18 @@ def test_readdata2():
     assert(result[SUCCESS] and '(6260)' in result[DATA][STATIONNAME])
 
     # check the data:
+    fc1 = (datetime.today() + timedelta(days=1))
+    fc2 = (datetime.today() + timedelta(days=2))
+    fc3 = (datetime.today() + timedelta(days=3))
+    fc4 = (datetime.today() + timedelta(days=4))
+    fc5 = (datetime.today() + timedelta(days=5))
+    
+    fc1 = fc1.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc2 = fc2.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc3 = fc3.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc4 = fc4.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc5 = fc5.replace(hour=0, minute=0, second=0, microsecond=0)
+    
     # Expected result:
     expect = {
         'data': {
@@ -100,7 +125,7 @@ def test_readdata2():
             'groundtemperature': '15.4',
             'pressure': '1008.72',
             'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png',
-            'stationnaam': 'Meetstation De Bilt (6260)',
+            'stationname': 'Meetstation De Bilt (6260)',
             'precipitation': '-',
             'windazimuth': 'ONO',
             'irradiance': '-'
@@ -108,11 +133,11 @@ def test_readdata2():
         'success': True,
         'distance': 1.306732,
         'forecast': [
-            {'datetime': datetime(2017, 5, 24, 0, 0), 'temperature': 16.0},
-            {'datetime': datetime(2017, 5, 25, 0, 0), 'temperature': 17.0},
-            {'datetime': datetime(2017, 5, 26, 0, 0), 'temperature': 22.0},
-            {'datetime': datetime(2017, 5, 27, 0, 0), 'temperature': 18.0},
-            {'datetime': datetime(2017, 5, 28, 0, 0), 'temperature': 15.0}
+            {'datetime': fc1, 'temperature': 16.0},
+            {'datetime': fc2, 'temperature': 17.0},
+            {'datetime': fc3, 'temperature': 22.0},
+            {'datetime': fc4, 'temperature': 18.0},
+            {'datetime': fc5, 'temperature': 15.0}
         ],
         'msg': None}
     assert(expect == result)
@@ -138,6 +163,18 @@ def test_readdata3():
     assert(result[SUCCESS] and '(6252)' in result[DATA][STATIONNAME])
 
     # check the data:
+    fc1 = (datetime.today() + timedelta(days=1))
+    fc2 = (datetime.today() + timedelta(days=2))
+    fc3 = (datetime.today() + timedelta(days=3))
+    fc4 = (datetime.today() + timedelta(days=4))
+    fc5 = (datetime.today() + timedelta(days=5))
+    
+    fc1 = fc1.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc2 = fc2.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc3 = fc3.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc4 = fc4.replace(hour=0, minute=0, second=0, microsecond=0)
+    fc5 = fc5.replace(hour=0, minute=0, second=0, microsecond=0)
+    
     # Expected result:
     expect = {
         'msg': None,
@@ -154,7 +191,7 @@ def test_readdata3():
             'pressure': '1004.95',
             'symbol': 'Zwaar bewolkt',
             'winddirection': '59',
-            'stationnaam': 'Meetstation Zeeplatform K13 (6252)',
+            'stationname': 'Meetstation Zeeplatform K13 (6252)',
             'temperature': '16.8',
             'visibility': '6200',
             'irradiance': '614',
@@ -162,11 +199,11 @@ def test_readdata3():
             'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png'
         },
         'forecast': [
-            {'datetime': datetime(2017, 5, 24, 0, 0), 'temperature': 16.0},
-            {'datetime': datetime(2017, 5, 25, 0, 0), 'temperature': 17.0},
-            {'datetime': datetime(2017, 5, 26, 0, 0), 'temperature': 22.0},
-            {'datetime': datetime(2017, 5, 27, 0, 0), 'temperature': 18.0},
-            {'datetime': datetime(2017, 5, 28, 0, 0), 'temperature': 15.0}
+            {'datetime': fc1, 'temperature': 16.0},
+            {'datetime': fc2, 'temperature': 17.0},
+            {'datetime': fc3, 'temperature': 22.0},
+            {'datetime': fc4, 'temperature': 18.0},
+            {'datetime': fc5, 'temperature': 15.0}
             ]
         }
     assert(expect == result)

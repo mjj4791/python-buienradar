@@ -48,7 +48,7 @@ WEERSTATION = 'weerstation'
 LAT = 'lat'
 LON = 'lon'
 STATIONCODE = 'stationcode'
-STATIONNAME = 'stationnaam'
+STATIONNAAM = 'stationnaam'
 TEXT = '#text'
 ZIN = '@zin'
 VERWACHTING = 'verwachting_meerdaags'
@@ -246,7 +246,7 @@ def __select_nearest_ws(xmldata, latitude, longitude):
             log.debug("Selected weatherstation: code='%s', "
                       "name='%s', lat='%s', lon='%s'.",
                       loc_data[STATIONCODE],
-                      loc_data[STATIONNAME][TEXT],
+                      loc_data[STATIONNAAM][TEXT],
                       loc_data[LAT],
                       loc_data[LON])
         except KeyError:
