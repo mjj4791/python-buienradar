@@ -49,6 +49,7 @@ Usage
 Example python code:
 
 .. code-block:: python
+
     from buienradar import buienradar as br
 
     result = br.get_data()
