@@ -61,8 +61,8 @@ Example python code:
                 print(result.get(br.DATA))
             else:
                 print("Unable to parse data from Buienradar. (Msg: %s)",
-                            result.get(br.MESSAGE))
+                      result.get(br.MESSAGE))
         else:
             print("Unable to retrieve data from Buienradar. (Msg: %s, status: %s,)",
-                            result.get(br.MESSAGE),
-                            result.get(br.STATUS_CODE))
+                  result.get(br.MESSAGE),
+                  result.get(br.STATUS_CODE))
