@@ -45,3 +45,21 @@ Usage
       --version                 Show version.
       --longitude=<longitude>   Longitude to use [default: 5.119734]
       --latitude=<latitude>     Latitude to use [default: 52.091579]
+
+.. code-block:: bash
+    from buienradar import buienradar as br
+
+    result = br.get_data()
+        if result.get(br.SUCCESS):
+            result = br.parse_data(result.get(br.CONTENT),
+                                   latitude=<your latitude>,
+                                   longitude=<your longitude>)
+            if result.get(br.SUCCESS):
+                print(result.get(br.DATA))
+            else:
+                print("Unable to parse data from Buienradar. (Msg: %s)",
+                            result.get(br.MESSAGE))
+        else:
+            print("Unable to retrieve data from Buienradar. (Msg: %s, status: %s,)",
+                            result.get(br.MESSAGE),
+                            result.get(br.STATUS_CODE))
