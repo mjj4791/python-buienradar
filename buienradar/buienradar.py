@@ -40,21 +40,21 @@ WINDSPEED = 'windspeed'
 
 
 # key names in buienradar xml:
-ROOT = 'buienradarnl'
-WEERGEGEVENS = 'weergegevens'
-ACTUEELWEER = 'actueel_weer'
-WEERSTATIONS = 'weerstations'
-WEERSTATION = 'weerstation'
-LAT = 'lat'
-LON = 'lon'
-STATIONCODE = 'stationcode'
-STATIONNAAM = 'stationnaam'
-TEXT = '#text'
-ZIN = '@zin'
-VERWACHTING = 'verwachting_meerdaags'
-DAYFC = "dag-plus%d"
-MINTEMP = 'maxtemp'
-MAXTEMP = 'maxtempmax'
+BRROOT = 'buienradarnl'
+BRWEERGEGEVENS = 'weergegevens'
+BRACTUEELWEER = 'actueel_weer'
+BRWEERSTATIONS = 'weerstations'
+BRWEERSTATION = 'weerstation'
+BRLAT = 'lat'
+BRLON = 'lon'
+BRSTATIONCODE = 'stationcode'
+BRSTATIONNAAM = 'stationnaam'
+BRTEXT = '#text'
+BRZIN = '@zin'
+BRVERWACHTING = 'verwachting_meerdaags'
+BRDAYFC = "dag-plus%d"
+BRMINTEMP = 'maxtemp'
+BRMAXTEMP = 'maxtempmax'
 
 # Sensor types are defined like so:
 # SENSOR_TYPES = { 'key': 'key in buienradar xml', }
@@ -100,11 +100,12 @@ def get_data():
 def parse_data(content, latitude=52.091579, longitude=5.119734):
     """Parse the buienradar xml data."""
     log.debug("parse: latitude: %s, longitude: %s", latitude, longitude)
-    result = {SUCCESS: False, MESSAGE: None, DATA: None, FORECAST: []}
-
+    result = {SUCCESS: False, MESSAGE: None, DATA: None}
+    #, FORECAST: []
+    
     # convert the xml data into a dictionary:
     try:
-        xmldata = xmltodict.parse(content)[ROOT]
+        xmldata = xmltodict.parse(content)[BRROOT]
     except (xmltodict.expat.ExpatError, KeyError) as err:
         result[MESSAGE] = "Unable to parse content as xml."
         log.exception(result[MESSAGE])
@@ -119,26 +120,26 @@ def parse_data(content, latitude=52.091579, longitude=5.119734):
 
         result = __parse_loc_data(loc_data, result)
         log.debug("Extracted weather-data: %s", result[DATA])
+        
+        # extract weather forecast
+        try:
+            fc_data = xmldata[BRWEERGEGEVENS][BRVERWACHTING]
+        except (xmltodict.expat.ExpatError, KeyError) as err:
+            result[MESSAGE] = 'Unable to extract forecast data.'
+            log.exception(result[MESSAGE])
+            return result
+
+        if fc_data:
+            result = __parse_fc_data(fc_data, result)
     else:
         result[MESSAGE] = 'No location selected.'
-
-    # extract weather forecast
-    try:
-        fc_data = xmldata[WEERGEGEVENS][VERWACHTING]
-    except (xmltodict.expat.ExpatError, KeyError) as err:
-        result[MESSAGE] = 'Unable to extract forecast data.'
-        log.exception(result[MESSAGE])
-        return result
-
-    if fc_data:
-        result = __parse_fc_data(fc_data, result)
-
+    
     return result
 
 
 def __parse_loc_data(loc_data, result):
     """Parse the xml data from selected weatherstation."""
-    result[DATA] = {ATTRIBUTION: ATTRIBUTION_INFO}
+    result[DATA] = {ATTRIBUTION: ATTRIBUTION_INFO, FORECAST: []}
 
     for key, value in SENSOR_TYPES.items():
         result[DATA][key] = None
@@ -146,12 +147,12 @@ def __parse_loc_data(loc_data, result):
             sens_data = loc_data[value]
             if key == SYMBOL:
                 # update weather symbol & status text
-                result[DATA][key] = sens_data[ZIN]
-                result[DATA][IMAGE] = sens_data[TEXT]
+                result[DATA][key] = sens_data[BRZIN]
+                result[DATA][IMAGE] = sens_data[BRTEXT]
             else:
                 if key == STATIONNAME:
-                    result[DATA][key] = sens_data[TEXT]
-                    result[DATA][key] += " (%s)" % loc_data[STATIONCODE]
+                    result[DATA][key] = sens_data[BRTEXT]
+                    result[DATA][key] += " (%s)" % loc_data[BRSTATIONCODE]
                 else:
                     # update all other data
                     result[DATA][key] = sens_data
@@ -168,7 +169,7 @@ def __parse_loc_data(loc_data, result):
 def __parse_fc_data(fc_data, result):
     """Parse the forecast data from the xml section."""
     for daycnt in range(1, 6):
-        daysection = DAYFC % daycnt
+        daysection = BRDAYFC % daycnt
         if daysection in fc_data:
             tmpsect = fc_data[daysection]
             fcdatetime = datetime.today()
@@ -178,15 +179,15 @@ def __parse_fc_data(fc_data, result):
 
             fcdata = {TEMPERATURE: __get_temp(tmpsect),
                       DATETIME: fcdatetime}
-            result[FORECAST].append(fcdata)
+            result[DATA][FORECAST].append(fcdata)
     return result
 
 
 def __get_temp(section):
     """Get the forecasted temp from xml section."""
     try:
-        return (float(section[MINTEMP]) +
-                float(section[MAXTEMP])) / 2
+        return (float(section[BRMINTEMP]) +
+                float(section[BRMAXTEMP])) / 2
     except (ValueError, TypeError, KeyError):
         return None
 
@@ -201,8 +202,8 @@ def __get_ws_distance(wstation, latitude, longitude):
     """
     if wstation:
         try:
-            wslat = float(wstation[LAT])
-            wslon = float(wstation[LON])
+            wslat = float(wstation[BRLAT])
+            wslon = float(wstation[BRLON])
 
             dist = vincenty((latitude, longitude), (wslat, wslon))
             log.debug("calc distance: %s (latitude: %s, longitude: %s, wslat: %s, wslon: %s)",
@@ -223,11 +224,11 @@ def __select_nearest_ws(xmldata, latitude, longitude):
     loc_data = None
 
     try:
-        ws_xml = xmldata[WEERGEGEVENS][ACTUEELWEER][WEERSTATIONS][WEERSTATION]
+        ws_xml = xmldata[BRWEERGEGEVENS][BRACTUEELWEER][BRWEERSTATIONS][BRWEERSTATION]
     except (KeyError, TypeError):
         log.warning("Missing section in Buienradar xmldata (%s)."
                     "Can happen 00:00-01:00 CE(S)T",
-                    WEERSTATION)
+                    BRWEERSTATION)
         return None
 
     for wstation in ws_xml:
@@ -245,10 +246,10 @@ def __select_nearest_ws(xmldata, latitude, longitude):
         try:
             log.debug("Selected weatherstation: code='%s', "
                       "name='%s', lat='%s', lon='%s'.",
-                      loc_data[STATIONCODE],
-                      loc_data[STATIONNAAM][TEXT],
-                      loc_data[LAT],
-                      loc_data[LON])
+                      loc_data[BRSTATIONCODE],
+                      loc_data[BRSTATIONNAAM][BRTEXT],
+                      loc_data[BRLAT],
+                      loc_data[BRLON])
         except KeyError:
             log.debug("Selected weatherstation")
         return loc_data

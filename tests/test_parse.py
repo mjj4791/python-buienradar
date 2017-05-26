@@ -62,17 +62,17 @@ def test_readdata1():
             'groundtemperature': '15.9',
             'precipitation': '2',
             'irradiance': '614',
-            'visibility': '38400'
+            'visibility': '38400',
+            'forecast': [
+                {'temperature': 16.0, 'datetime': fc1},
+                {'temperature': 17.0, 'datetime': fc2},
+                {'temperature': 22.0, 'datetime': fc3},
+                {'temperature': 18.0, 'datetime': fc4},
+                {'temperature': 15.0, 'datetime': fc5}
+                ],
             },
         'success': True,
         'msg': None,
-        'forecast': [
-            {'temperature': 16.0, 'datetime': fc1},
-            {'temperature': 17.0, 'datetime': fc2},
-            {'temperature': 22.0, 'datetime': fc3},
-            {'temperature': 18.0, 'datetime': fc4},
-            {'temperature': 15.0, 'datetime': fc5}
-        ],
         'distance': 0.0
     }
     assert(expect == result)
@@ -128,17 +128,17 @@ def test_readdata2():
             'stationname': 'Meetstation De Bilt (6260)',
             'precipitation': '-',
             'windazimuth': 'ONO',
-            'irradiance': '-'
+            'irradiance': '-',
+            'forecast': [
+                {'datetime': fc1, 'temperature': 16.0},
+                {'datetime': fc2, 'temperature': 17.0},
+                {'datetime': fc3, 'temperature': 22.0},
+                {'datetime': fc4, 'temperature': 18.0},
+                {'datetime': fc5, 'temperature': 15.0}
+            ],
         },
         'success': True,
         'distance': 1.306732,
-        'forecast': [
-            {'datetime': fc1, 'temperature': 16.0},
-            {'datetime': fc2, 'temperature': 17.0},
-            {'datetime': fc3, 'temperature': 22.0},
-            {'datetime': fc4, 'temperature': 18.0},
-            {'datetime': fc5, 'temperature': 15.0}
-        ],
         'msg': None}
     assert(expect == result)
 
@@ -196,15 +196,15 @@ def test_readdata3():
             'visibility': '6200',
             'irradiance': '614',
             'windgust': '14',
-            'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png'
-        },
-        'forecast': [
-            {'datetime': fc1, 'temperature': 16.0},
-            {'datetime': fc2, 'temperature': 17.0},
-            {'datetime': fc3, 'temperature': 22.0},
-            {'datetime': fc4, 'temperature': 18.0},
-            {'datetime': fc5, 'temperature': 15.0}
-            ]
+            'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png',
+            'forecast': [
+                    {'datetime': fc1, 'temperature': 16.0},
+                    {'datetime': fc2, 'temperature': 17.0},
+                    {'datetime': fc3, 'temperature': 22.0},
+                    {'datetime': fc4, 'temperature': 18.0},
+                    {'datetime': fc5, 'temperature': 15.0}
+                ]
+            },
         }
     assert(expect == result)
 
@@ -273,7 +273,7 @@ def test_nows():
     result = parse_data(data)
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] is False and result[MESSAGE] == 'Unable to extract forecast data.')
+    assert (result[SUCCESS] is False and result[MESSAGE] == 'No location selected.')
 
     file = open('tests/buienradar_nows5.xml', 'r')
     data = file.read()
@@ -317,7 +317,7 @@ def test_nofc2():
 
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] and len(result[FORECAST]) == 0)
+    assert (result[SUCCESS] and len(result[DATA][FORECAST]) == 0)
 
 
 def test_missing_data():
@@ -417,11 +417,11 @@ def test_invalid_data():
     print(result)
     assert(result[SUCCESS] and result[MESSAGE] is None)
     # test missing maxtemp:
-    assert(len(result[FORECAST]) == 5 and result[FORECAST][0][TEMPERATURE] is None)
+    assert(len(result[DATA][FORECAST]) == 5 and result[DATA][FORECAST][0][TEMPERATURE] is None)
     # test missing maxtempmax:
-    assert(len(result[FORECAST]) == 5 and result[FORECAST][1][TEMPERATURE] is None)
+    assert(len(result[DATA][FORECAST]) == 5 and result[DATA][FORECAST][1][TEMPERATURE] is None)
     # test missing maxgtemp and maxtempmax:
-    assert(len(result[FORECAST]) == 5 and result[FORECAST][2][TEMPERATURE] is None)
+    assert(len(result[DATA][FORECAST]) == 5 and result[DATA][FORECAST][2][TEMPERATURE] is None)
 
     # read xml with invalid ws coordinates
     file = open('tests/buienradar_invalidws1.xml', 'r')
