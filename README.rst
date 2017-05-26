@@ -47,6 +47,7 @@ Usage
       --latitude=<latitude>     Latitude to use [default: 52.091579]
 
 Example python code:
+
 .. code-block:: python
     from buienradar import buienradar as br
 
