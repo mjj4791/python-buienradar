@@ -88,7 +88,6 @@ def get_data():
     """Get buienradar xml data and return results."""
     result = {SUCCESS: False, MESSAGE: None}
 
-    log.info('Retrieving xml weather data...')
     try:
         r = __get_data('https://xml.buienradar.nl/')
 
