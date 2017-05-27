@@ -22,7 +22,8 @@ Changes that did not make it into a new release are marked with [unreleased].
 
 **changed**
 
-- fixed 'stationname' key in result[data]
+- fixed 'stationname'-key in result[data]
+- forecast moved into data-section
 
 
 [0.2] - 2017-05-21
