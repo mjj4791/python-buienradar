@@ -37,13 +37,13 @@ def test_readdata1():
     fc3 = (datetime.today() + timedelta(days=3))
     fc4 = (datetime.today() + timedelta(days=4))
     fc5 = (datetime.today() + timedelta(days=5))
-    
+
     fc1 = fc1.replace(hour=0, minute=0, second=0, microsecond=0)
     fc2 = fc2.replace(hour=0, minute=0, second=0, microsecond=0)
     fc3 = fc3.replace(hour=0, minute=0, second=0, microsecond=0)
     fc4 = fc4.replace(hour=0, minute=0, second=0, microsecond=0)
     fc5 = fc5.replace(hour=0, minute=0, second=0, microsecond=0)
-    
+
     # Expected result:
     expect = {
         'data': {
@@ -103,13 +103,13 @@ def test_readdata2():
     fc3 = (datetime.today() + timedelta(days=3))
     fc4 = (datetime.today() + timedelta(days=4))
     fc5 = (datetime.today() + timedelta(days=5))
-    
+
     fc1 = fc1.replace(hour=0, minute=0, second=0, microsecond=0)
     fc2 = fc2.replace(hour=0, minute=0, second=0, microsecond=0)
     fc3 = fc3.replace(hour=0, minute=0, second=0, microsecond=0)
     fc4 = fc4.replace(hour=0, minute=0, second=0, microsecond=0)
     fc5 = fc5.replace(hour=0, minute=0, second=0, microsecond=0)
-    
+
     # Expected result:
     expect = {
         'data': {
@@ -168,13 +168,13 @@ def test_readdata3():
     fc3 = (datetime.today() + timedelta(days=3))
     fc4 = (datetime.today() + timedelta(days=4))
     fc5 = (datetime.today() + timedelta(days=5))
-    
+
     fc1 = fc1.replace(hour=0, minute=0, second=0, microsecond=0)
     fc2 = fc2.replace(hour=0, minute=0, second=0, microsecond=0)
     fc3 = fc3.replace(hour=0, minute=0, second=0, microsecond=0)
     fc4 = fc4.replace(hour=0, minute=0, second=0, microsecond=0)
     fc5 = fc5.replace(hour=0, minute=0, second=0, microsecond=0)
-    
+
     # Expected result:
     expect = {
         'msg': None,

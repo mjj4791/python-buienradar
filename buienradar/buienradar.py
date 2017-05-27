@@ -78,18 +78,32 @@ SENSOR_TYPES = {
 log = logging.getLogger(__name__)
 
 
+def __get_data(url):
+    """Load data from url and return result."""
+    log.info("Retrieving xml weather data (%s)...", url)
+    return requests.get(url)
+
+
 def get_data():
     """Get buienradar xml data and return results."""
     result = {SUCCESS: False, MESSAGE: None}
 
-    log.info("Retrieving xml weather data...")
+    log.info('Retrieving xml weather data...')
     try:
-        r = requests.get("https://xml.buienradar.nl/")
+        r = __get_data('https://xml.buienradar.nl/')
 
-        result[SUCCESS] = (200 == r.status_code)
-        result[STATUS_CODE] = r.status_code
-        result[HEADERS] = r.headers
-        result[CONTENT] = r.content
+        if (200 == r.status_code):
+            result[SUCCESS] = (200 == r.status_code)
+            result[STATUS_CODE] = r.status_code
+            result[HEADERS] = r.headers
+            result[CONTENT] = r.content
+        else:
+            r = __get_data('https://api.buienradar.nl/')
+
+            result[SUCCESS] = (200 == r.status_code)
+            result[STATUS_CODE] = r.status_code
+            result[HEADERS] = r.headers
+            result[CONTENT] = r.content
     except requests.RequestException as ose:
         result[MESSAGE] = 'Error getting xml data. %s' % ose
         log.error(result[MESSAGE])
@@ -101,8 +115,7 @@ def parse_data(content, latitude=52.091579, longitude=5.119734):
     """Parse the buienradar xml data."""
     log.debug("parse: latitude: %s, longitude: %s", latitude, longitude)
     result = {SUCCESS: False, MESSAGE: None, DATA: None}
-    #, FORECAST: []
-    
+
     # convert the xml data into a dictionary:
     try:
         xmldata = xmltodict.parse(content)[BRROOT]
@@ -120,7 +133,7 @@ def parse_data(content, latitude=52.091579, longitude=5.119734):
 
         result = __parse_loc_data(loc_data, result)
         log.debug("Extracted weather-data: %s", result[DATA])
-        
+
         # extract weather forecast
         try:
             fc_data = xmldata[BRWEERGEGEVENS][BRVERWACHTING]
@@ -133,7 +146,7 @@ def parse_data(content, latitude=52.091579, longitude=5.119734):
             result = __parse_fc_data(fc_data, result)
     else:
         result[MESSAGE] = 'No location selected.'
-    
+
     return result
 
 
