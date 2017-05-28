@@ -3,8 +3,8 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
-[unreleased]
-""""""""""""
+[0.4] - 2017-05-28
+""""""""""""""""""
 **added**
 
 - when call to primary url fails, use secondary url
