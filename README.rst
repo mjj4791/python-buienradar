@@ -155,6 +155,7 @@ Use the constants defined in the buienradar component to get the data from the r
   - IRRADIANCE:  sun intensity in Watt per square meter (W/m2)
   - SYMBOL: a text describing for the current weather.
   - FORECAST: array of forcasted days
+  
     - RAIN: the expected rain in mm/h
     - DATETIME: date for the forcasted data
     - WINDFORCE: the wind speed/force in Bft
