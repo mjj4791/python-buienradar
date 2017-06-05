@@ -64,8 +64,10 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
     install_requires=[
+        'aiohttp',
+        'asyncio',
+        'async_timeout',
         'docopt',
-        'requests',
         'xmltodict',
         'vincenty',
     ],

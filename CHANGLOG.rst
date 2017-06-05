@@ -3,6 +3,15 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
+[unreleased]
+**added**
+
+- measured date/time added to data section
+
+**changed**
+
+- fixed linting
+
 [0.4] - 2017-05-28
 """"""""""""""""""
 **added**
