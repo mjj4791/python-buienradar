@@ -8,7 +8,7 @@ Library and CLI tools for interacting with buienradar xml/api.
 
 and precipitation forecase from: 
 
-- https://gpsgadget.buienradar.nl/data/raintext?lat=,latitude>&lon=<longitude>
+- https://gpsgadget.buienradar.nl/data/raintext?lat=<latitude>&lon=<longitude>
 
 
 Requirements
