@@ -1,12 +1,8 @@
-"""
-Buienradar library to get parsed weather data from buienradar.nl.
-"""
-import asyncio
+"""Buienradar library to get parsed weather data from buienradar.nl."""
 import logging
 from datetime import datetime, timedelta
 
-import aiohttp
-import async_timeout
+import requests
 import xmltodict
 from vincenty import vincenty
 
@@ -14,6 +10,7 @@ SUCCESS = 'success'
 STATUS_CODE = 'status_code'
 HEADERS = 'headers'
 CONTENT = 'content'
+RAINCONTENT = 'raincontent'
 MESSAGE = 'msg'
 DATA = 'data'
 
@@ -99,137 +96,103 @@ SENSOR_TYPES = {
 log = logging.getLogger(__name__)
 
 
-@asyncio.coroutine
-def async_get_data(latitude=52.091579, longitude=5.119734, timeframe=3600):
+def get_data(latitude=52.091579, longitude=5.119734):
     """Get buienradar xml data and return results."""
-    result = yield from __async_get_ws_data(latitude, longitude)
+    final_result = {SUCCESS: False, MESSAGE: None,
+                    CONTENT: None, RAINCONTENT: None}
+
+    log.info("Getting buienradar data for latitude=%s, longitude=%s",
+             latitude, longitude)
+    result = __get_ws_data()
 
     if result[SUCCESS]:
-        # load forecasted precipitation:
-        fc_data = yield from __async_get_precipfc_data(latitude,
-                                                       longitude,
-                                                       timeframe)
-        result[DATA][PRECIPITATION_FORECAST] = fc_data
+        # store xml data:
+        final_result[CONTENT] = result[CONTENT]
+        final_result[SUCCESS] = True
+    else:
+        msg = "Status: %d, Msg: %s" % (result[STATUS_CODE], result[MESSAGE])
+        log.warning(msg)
+        final_result[MESSAGE] = msg
+
+    # load forecasted precipitation:
+    result = __get_precipfc_data(latitude,
+                                 longitude)
+    if result[SUCCESS]:
+        final_result[RAINCONTENT] = result[CONTENT]
+    else:
+        msg = "Status: %d, Msg: %s" % (result[STATUS_CODE], result[MESSAGE])
+        log.warning(msg)
+        final_result[MESSAGE] = msg
+
+    return final_result
+
+
+def parse_data(content, raincontent, latitude=52.091579,
+               longitude=5.119734, timeframe=60):
+    """Parse the raw data and return as data dictionary."""
+    result = {SUCCESS: False, MESSAGE: None, DATA: None}
+
+    if timeframe < 5 or timeframe > 120:
+        raise ValueError("Timeframe must be >=5 and <=120.")
+
+    if content is not None:
+        result = __parse_ws_data(content, latitude, longitude)
+
+        if result[SUCCESS] and raincontent is not None:
+            data = __parse_precipfc_data(raincontent, timeframe)
+            result[DATA][PRECIPITATION_FORECAST] = data
+
+    log.debug("Extracted weather-data: %s", result[DATA])
     return result
 
 
-def get_data(latitude=52.091579, longitude=5.119734, timeframe=3600):
-    """Get buienradar xml data and return results."""
-    loop = asyncio.get_event_loop()
-    result = loop.run_until_complete(async_get_data(
-                                                    latitude,
-                                                    longitude,
-                                                    timeframe,
-                                                   )
-                                     )
-    return result
-
-
-@asyncio.coroutine
-def __async_get_url(url):
+def __get_url(url):
     """Load data from url and return result."""
     log.info("Retrieving xml weather data (%s)...", url)
-    resp = None
-    with async_timeout.timeout(10):
-        try:
-            resp = yield from aiohttp.request('GET', url)
-            return resp
-        except (asyncio.TimeoutError, asyncio.CancelledError,
-                aiohttp.ClientError) as err:
-            return None
-        finally:
-            if resp is not None:
-                yield from resp.release()
-
-
-@asyncio.coroutine
-def __async_get_ws_data(latitude=52.091579, longitude=5.119734):
-    """Get buienradar xml data and return results."""
     result = {SUCCESS: False, MESSAGE: None}
-    r = None
+    try:
+        r = requests.get(url)
+        result[STATUS_CODE] = r.status_code
+        result[HEADERS] = r.headers
+        result[CONTENT] = r.text
+        if (200 == r.status_code):
+            result[SUCCESS] = True
+        else:
+            result[MESSAGE] = "Got http statuscode: %d." % (r.status_code)
+        return result
+    except requests.RequestException as ose:
+        result[MESSAGE] = 'Error getting url data. %s' % ose
+        log.error(result[MESSAGE])
 
+    return result
+
+
+def __get_ws_data():
+    """Get buienradar xml data and return results."""
     url = 'https://xml.buienradar.nl/'
-    r = yield from __async_get_url(url)
 
-    if (r is not None and 200 == r.status):
-        result[SUCCESS] = (200 == r.status)
-        result[STATUS_CODE] = r.status
-        result[HEADERS] = r.headers
-        result[CONTENT] = yield from r.text()
-    else:
-        url = 'https://api.buienradar.nl/'
-        r = yield from __async_get_url(url)
-
-        result[SUCCESS] = (200 == r.status)
-        result[STATUS_CODE] = r.status
-        result[HEADERS] = r.headers
-        result[CONTENT] = yield from r.text()
-
+    result = __get_url(url)
     if result[SUCCESS]:
-        result = __parse_data(result[CONTENT])
+        return result
+
+    # try secondary url:
+    url = 'https://api.buienradar.nl/'
+    result = __get_url(url)
 
     return result
 
 
-def __parse_precipfc_data(data, timeframe):
-    """Parse the forecasted precipitation data."""
-    result = {AVERAGE: None, TOTAL: None, TIMEFRAME: None}
-    forecast = {}
-
-    for line in data.splitlines():
-        (val, key) = line.split("|")
-        # See buienradar documentation for this api, attribution
-        # https://www.buienradar.nl/overbuienradar/gratis-weerdata
-        #
-        # Op basis van de door u gewenste coördinaten (latitude en longitude)
-        # kunt u de neerslag tot twee uur vooruit ophalen in tekstvorm. De
-        # data wordt iedere 5 minuten geüpdatet. Op deze pagina kunt u de
-        # neerslag in tekst vinden. De waarde 0 geeft geen neerslag aan (droog)
-        # de waarde 255 geeft zware neerslag aan. Gebruik de volgende formule
-        # voor het omrekenen naar de neerslagintensiteit in de eenheid
-        # millimeter per uur (mm/u):
-        #
-        # Neerslagintensiteit = 10^((waarde-109)/32)
-        #
-        # Ter controle: een waarde van 77 is gelijk aan een neerslagintensiteit van 0,1 mm/u.
-        mmu = 10**((int(val) - 109)/32)
-        forecast[(key)] = mmu
-
-        totalrain = 0
-        numberoflines = 0
-        for key, value in forecast.items():
-            tdelta = datetime.strptime(key, '%H:%M') - datetime.now()
-            if tdelta.days < 0:
-                tdelta = timedelta(days=0, seconds=tdelta.seconds,
-                                   microseconds=tdelta.microseconds)
-            if tdelta.seconds > 0 and tdelta.seconds <= timeframe:
-                totalrain = totalrain + float(value)
-                numberoflines = numberoflines + 1
-
-        if numberoflines > 0:
-            result[AVERAGE] = round((totalrain / numberoflines), 2)
-        result[TOTAL] = round(totalrain/12, 2)
-        result[TIMEFRAME] = timeframe
-
-    return result
-
-
-@asyncio.coroutine
-def __async_get_precipfc_data(latitude, longitude, timeframe):
+def __get_precipfc_data(latitude, longitude):
     """Get buienradar forecasted precipitation."""
     format = "http://gadgets.buienradar.nl/data/raintext/?lat=%s&lon=%s"
     url = format % (latitude, longitude)
-    r = yield from __async_get_url(url)
-    if (r is not None and 200 == r.status):
-        data = yield from r.text()
 
-        return __parse_precipfc_data(data, timeframe)
-
-    return None
+    result = __get_url(url)
+    return result
 
 
-def __parse_data(content, latitude=52.091579, longitude=5.119734):
-    """Parse the buienradar xml data."""
+def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
+    """Parse the buienradar xml and rain data."""
     log.debug("parse: latitude: %s, longitude: %s", latitude, longitude)
     result = {SUCCESS: False, MESSAGE: None, DATA: None}
 
@@ -247,9 +210,7 @@ def __parse_data(content, latitude=52.091579, longitude=5.119734):
     if loc_data:
         # add distance to weatherstation
         result[DISTANCE] = __get_ws_distance(loc_data, latitude, longitude)
-
         result = __parse_loc_data(loc_data, result)
-        log.debug("Extracted weather-data: %s", result[DATA])
 
         # extract weather forecast
         try:
@@ -267,9 +228,55 @@ def __parse_data(content, latitude=52.091579, longitude=5.119734):
     return result
 
 
+def __parse_precipfc_data(data, timeframe):
+    """Parse the forecasted precipitation data."""
+    result = {AVERAGE: None, TOTAL: None, TIMEFRAME: None}
+
+    lines = data.splitlines()
+    index = 1
+    totalrain = 0
+    numberoflines = 0
+    nrlines = min(len(lines), round(float(timeframe)/5) + 1)
+    # looping through lines of forecasted precipitation data and
+    # not using the time data (HH:MM) int the data. This is to allow for
+    # correct data in case we are running in a different timezone.
+    while index < nrlines:
+        line = lines[index]
+        log.debug("__parse_precipfc_data: line: %s", line)
+        (val, key) = line.split("|")
+        # See buienradar documentation for this api, attribution
+        # https://www.buienradar.nl/overbuienradar/gratis-weerdata
+        #
+        # Op basis van de door u gewenste coördinaten (latitude en longitude)
+        # kunt u de neerslag tot twee uur vooruit ophalen in tekstvorm. De
+        # data wordt iedere 5 minuten geüpdatet. Op deze pagina kunt u de
+        # neerslag in tekst vinden. De waarde 0 geeft geen neerslag aan (droog)
+        # de waarde 255 geeft zware neerslag aan. Gebruik de volgende formule
+        # voor het omrekenen naar de neerslagintensiteit in de eenheid
+        # millimeter per uur (mm/u):
+        #
+        # Neerslagintensiteit = 10^((waarde-109)/32)
+        #
+        # Ter controle: een waarde van 77 is gelijk aan een neerslagintensiteit
+        # van 0,1 mm/u.
+        mmu = 10**((int(val) - 109)/32)
+        totalrain = totalrain + float(mmu)
+        numberoflines = numberoflines + 1
+        index += 1
+
+    if numberoflines > 0:
+        result[AVERAGE] = round((totalrain / numberoflines), 2)
+    result[TOTAL] = round(totalrain/12, 2)
+    result[TIMEFRAME] = timeframe
+
+    return result
+
+
 def __parse_loc_data(loc_data, result):
     """Parse the xml data from selected weatherstation."""
-    result[DATA] = {ATTRIBUTION: ATTRIBUTION_INFO, FORECAST: []}
+    result[DATA] = {ATTRIBUTION: ATTRIBUTION_INFO,
+                    FORECAST: [],
+                    PRECIPITATION_FORECAST: None}
 
     for key, value in SENSOR_TYPES.items():
         result[DATA][key] = None
@@ -281,8 +288,9 @@ def __parse_loc_data(loc_data, result):
                 result[DATA][IMAGE] = sens_data[BRTEXT]
             else:
                 if key == STATIONNAME:
-                    result[DATA][key] = sens_data[BRTEXT]
-                    result[DATA][key] += " (%s)" % loc_data[BRSTATIONCODE]
+                    name = sens_data[BRTEXT].replace("Meetstation", "").strip()
+                    name += " (%s)" % loc_data[BRSTATIONCODE]
+                    result[DATA][key] = name
                 else:
                     # update all other data
                     result[DATA][key] = sens_data

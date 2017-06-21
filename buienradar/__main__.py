@@ -12,8 +12,8 @@ Usage:
   --version                 Show version.
   --longitude=<longitude>   Longitude to use [default: 5.119734]
   --latitude=<latitude>     Latitude to use [default: 52.091579]
-  --timeframe=<timeframe>   Seconds to look ahead for
-                            precipitation [default: 3600]
+  --timeframe=<timeframe>   Minutes to look ahead for
+                            precipitation (5..120) [default: 60]
 """
 import logging
 import sys
@@ -21,7 +21,14 @@ import sys
 import pkg_resources
 from docopt import docopt
 
-from .buienradar import MESSAGE, SUCCESS, get_data
+from .buienradar import (
+    CONTENT,
+    MESSAGE,
+    RAINCONTENT,
+    SUCCESS,
+    get_data,
+    parse_data
+)
 
 
 def main(argv=sys.argv[1:]):
@@ -39,14 +46,18 @@ def main(argv=sys.argv[1:]):
     log = logging.getLogger(__name__)
     log.info("Start...")
 
-    result = get_data(
-                      latitude=float(args['--latitude']),
-                      longitude=float(args['--longitude']),
-                      timeframe=int(args['--timeframe']),
-                     )
+    latitude = float(args['--latitude'])
+    longitude = float(args['--longitude'])
+    timeframe = int(args['--timeframe'])
 
+    result = get_data(latitude, longitude)
     if result[SUCCESS]:
-        log.info("Retrieved data:\n%s", result)
+        log.debug("Retrieved data:\n%s", result)
+
+        result = parse_data(result[CONTENT], result[RAINCONTENT],
+                            latitude, longitude, timeframe)
+        log.info("result: %s", result)
+        print(result)
     else:
         log.error("Retrieving xml weather data was not successfull (%s)",
                   result[MESSAGE])

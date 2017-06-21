@@ -36,7 +36,7 @@ setup(
 
     # Author details
     author='mjj4791',
-    author_email='mjj4791@gmail.com',
+    author_email='',
 
     # Choose your license
     license='MIT',
@@ -64,10 +64,8 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
     install_requires=[
-        'aiohttp',
-        'asyncio',
-        'async_timeout',
         'docopt',
+        'requests',
         'xmltodict',
         'vincenty',
     ],
