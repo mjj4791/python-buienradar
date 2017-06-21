@@ -150,12 +150,8 @@ Use the constants defined in the buienradar component to get the data from the r
 - SUCCESS: Boolean indicating if data was retrieved ok
 - *STATUS_CODE: Sometimes present in data, if a http-get was not successful*
 - *HEADERS: Sometimes present in data, if a http-get was not successful*
-- *CONTENT: Sometimes present in data, if a http-get was not successful*
-- PRECIPITATION_FORECAST: information on forecasted precipitation
-
-  - AVERAGE: the average expected precipitation mm/h)
-  - TOTAL: the total expected precipitation (mm)
-  - TIMEFRAME: the time-frame for the forecasted precipitation (s)
+- CONTENT: get the weather data returned from get_data request
+- RAINCONTENT: get the rain forcast data returned from get_data request
 - DATA: weather data for the selected weather-station
 
   - MEASURED: the time the data was retrieved
@@ -185,3 +181,8 @@ Use the constants defined in the buienradar component to get the data from the r
 - WINDDIRECTION: where the wind is coming from in degrees, with true north at 0° and progressing clockwise
 - WINDFORCE: the wind speed/force in Bft
 - PRECIPITATION: the amount of precipitation/rain in mm/h
+- PRECIPITATION_FORECAST: information on forecasted precipitation
+
+  - AVERAGE: the average expected precipitation mm/h)
+  - TOTAL: the total expected precipitation (mm)
+  - TIMEFRAME: the time-frame for the forecasted precipitation (s)
