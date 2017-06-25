@@ -104,23 +104,23 @@ def test_xml_data():
     assert(weerstation[BRSTATIONCODE] is not None)
     assert(weerstation[BRSTATIONNAAM] is not None)
     assert(weerstation[BRSTATIONNAAM][BRTEXT] is not None)
-    assert(weerstation[SENSOR_TYPES[HUMIDITY]] is not None)
-    assert(weerstation[SENSOR_TYPES[GROUNDTEMP]] is not None)
-    assert(weerstation[SENSOR_TYPES[IRRADIANCE]] is not None)
-    assert(weerstation[SENSOR_TYPES[MEASURED]] is not None)
-    assert(weerstation[SENSOR_TYPES[PRECIPITATION]] is not None)
-    assert(weerstation[SENSOR_TYPES[PRESSURE]] is not None)
-    assert(weerstation[SENSOR_TYPES[STATIONNAME]] is not None)
-    assert(weerstation[SENSOR_TYPES[SYMBOL]] is not None)
-    assert(weerstation[SENSOR_TYPES[SYMBOL]][BRZIN] is not None)
-    assert(weerstation[SENSOR_TYPES[SYMBOL]][BRTEXT] is not None)
-    assert(weerstation[SENSOR_TYPES[TEMPERATURE]] is not None)
-    assert(weerstation[SENSOR_TYPES[VISIBILITY]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDSPEED]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDFORCE]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDDIRECTION]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDAZIMUTH]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDGUST]] is not None)
+    assert(weerstation[SENSOR_TYPES[HUMIDITY][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[GROUNDTEMP][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[IRRADIANCE][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[MEASURED][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[PRECIPITATION][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[PRESSURE][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[STATIONNAME][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[SYMBOL][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[SYMBOL][0]][BRZIN] is not None)
+    assert(weerstation[SENSOR_TYPES[SYMBOL][0]][BRTEXT] is not None)
+    assert(weerstation[SENSOR_TYPES[TEMPERATURE][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[VISIBILITY][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[WINDSPEED][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[WINDFORCE][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[WINDDIRECTION][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[WINDAZIMUTH][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[WINDGUST][0]] is not None)
 
 
 def test_precip_fc():
@@ -187,6 +187,33 @@ def test_precip_fc4():
     assert (expect == result)
 
 
+def test_precip_fc5():
+    """Test parsing precipitation forecast data."""
+
+    data = ""
+    data += "000|%s\n" % (datetime.now() +
+                          timedelta(minutes=0)).strftime("%H:%M")
+    data += "217|%s\n" % (datetime.now() +
+                          timedelta(minutes=5)).strftime("%H:%M")
+    data += "208|%s\n" % (datetime.now() +
+                          timedelta(minutes=15)).strftime("%H:%M")
+    data += "145|%s\n" % (datetime.now() +
+                          timedelta(minutes=20)).strftime("%H:%M")
+    data += "131|%s\n" % (datetime.now() +
+                          timedelta(minutes=25)).strftime("%H:%M")
+    data += "00|%s\n" % (datetime.now() +
+                         timedelta(minutes=30)).strftime("%H:%M")
+    data += "00|%s\n" % (datetime.now() +
+                         timedelta(minutes=35)).strftime("%H:%M")
+
+    result = __parse_precipfc_data(data, 30)
+    expect = {'total': 302.54, 'timeframe': 30, 'average': 605.09}
+
+    # test calling results in the loop close cleanly
+    print(result)
+    assert (expect == result)
+
+
 def test_readdata1():
     """Test loading and parsing xml file."""
     # load buienradar.xml
@@ -226,41 +253,41 @@ def test_readdata1():
     # Expected result:
     expect = {
         'data': {
-            'windgust': '4.4',
-            'windspeed': '3.13',
-            'temperature': '16.3',
+            'windgust': 4.4,
+            'windspeed': 3.13,
+            'temperature': 16.3,
             'stationname': 'Arcen (6391)',
             'windazimuth': 'ONO',
             'symbol': 'Zwaar bewolkt',
-            'windforce': '2',
-            'pressure': '1021.23',
-            'winddirection': '77',
-            'humidity': '95',
+            'windforce': 2,
+            'pressure': 1021.23,
+            'winddirection': 77,
+            'humidity': 95,
             'image': get_imageurl(),
             'attribution': 'Data provided by buienradar.nl',
-            'groundtemperature': '15.9',
-            'precipitation': '2',
+            'groundtemperature': 15.9,
+            'precipitation': 2.0,
             'precipitation_forecast': {'average': 0.0,
                                        'timeframe': 60,
                                        'total': 0.0},
             'measured': '05/19/2017 00:20:00',
-            'irradiance': '614',
-            'visibility': '38400',
+            'irradiance': 614,
+            'visibility': 38400,
             'forecast': [
                 {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': None,
-                 'rain': None, 'windforce': 3},
+                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
+                 'rain': 0.0, 'windforce': 3},
                 {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
                  'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                 'rain': None, 'windforce': 3},
+                 'rain': 0.0, 'windforce': 3},
                 {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': None,
-                 'rain': None, 'windforce': 4},
+                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
+                 'rain': 0.0, 'windforce': 4},
                 {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': None,
+                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
                  'rain': 1.8, 'windforce': 4},
                 {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': None,
+                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
                  'rain': 4.4, 'windforce': 4}
                 ],
             },
@@ -280,41 +307,41 @@ def test_readdata1():
 
     expect = {
         'data': {
-            'windgust': '4.4',
-            'windspeed': '3.13',
-            'temperature': '16.3',
+            'windgust': 4.4,
+            'windspeed': 3.13,
+            'temperature': 16.3,
             'stationname': 'Arcen (6391)',
             'windazimuth': 'ONO',
             'symbol': 'Zwaar bewolkt',
-            'windforce': '2',
-            'pressure': '1021.23',
-            'winddirection': '77',
-            'humidity': '95',
+            'windforce': 2,
+            'pressure': 1021.23,
+            'winddirection': 77,
+            'humidity': 95,
             'image': get_imageurl(),
             'attribution': 'Data provided by buienradar.nl',
-            'groundtemperature': '15.9',
-            'precipitation': '2',
+            'groundtemperature': 15.9,
+            'precipitation': 2,
             'precipitation_forecast': {'average': 0.0,
                                        'timeframe': 30,
                                        'total': 0.0},
             'measured': '05/19/2017 00:20:00',
-            'irradiance': '614',
-            'visibility': '38400',
+            'irradiance': 614,
+            'visibility': 38400,
             'forecast': [
                 {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': None,
-                 'rain': None, 'windforce': 3},
+                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
+                 'rain': 0.0, 'windforce': 3},
                 {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
                  'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                 'rain': None, 'windforce': 3},
+                 'rain': 0.0, 'windforce': 3},
                 {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': None,
-                 'rain': None, 'windforce': 4},
+                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
+                 'rain': 0.0, 'windforce': 4},
                 {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': None,
+                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
                  'rain': 1.8, 'windforce': 4},
                 {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': None,
+                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
                  'rain': 4.4, 'windforce': 4}
                 ],
             },
@@ -366,41 +393,41 @@ def test_readdata2():
     # Expected result:
     expect = {
         'data': {
-            'humidity': '88',
-            'windforce': '3',
-            'windgust': '6.4',
-            'windspeed': '4.64',
-            'winddirection': '72',
-            'visibility': '14800',
+            'humidity': 88,
+            'windforce': 3,
+            'windgust': 6.4,
+            'windspeed': 4.64,
+            'winddirection': 72,
+            'visibility': 14800,
             'attribution': 'Data provided by buienradar.nl',
             'symbol': 'Zwaar bewolkt',
-            'temperature': '16.0',
+            'temperature': 16.0,
             'measured': '05/19/2017 00:20:00',
-            'groundtemperature': '15.4',
-            'pressure': '1008.72',
+            'groundtemperature': 15.4,
+            'pressure': 1008.72,
             'image': get_imageurl(),
             'stationname': 'De Bilt (6260)',
-            'precipitation': '-',
+            'precipitation': 0.0,
             'precipitation_forecast':  {'average': 0.1,
                                         'timeframe': 60,
                                         'total': 0.1},
             'windazimuth': 'ONO',
-            'irradiance': '-',
+            'irradiance': 0,
             'forecast': [
                 {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': None,
-                 'rain': None, 'windforce': 3},
+                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
+                 'rain': 0.0, 'windforce': 3},
                 {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
                  'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                 'rain': None, 'windforce': 3},
+                 'rain': 0.0, 'windforce': 3},
                 {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': None,
-                 'rain': None, 'windforce': 4},
+                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
+                 'rain': 0.0, 'windforce': 4},
                 {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': None,
+                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
                  'rain': 1.8, 'windforce': 4},
                 {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': None,
+                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
                  'rain': 4.4, 'windforce': 4}
             ],
         },
@@ -420,41 +447,41 @@ def test_readdata2():
 
     expect = {
         'data': {
-            'humidity': '88',
-            'windforce': '3',
-            'windgust': '6.4',
-            'windspeed': '4.64',
-            'winddirection': '72',
-            'visibility': '14800',
+            'humidity': 88,
+            'windforce': 3,
+            'windgust': 6.4,
+            'windspeed': 4.64,
+            'winddirection': 72,
+            'visibility': 14800,
             'attribution': 'Data provided by buienradar.nl',
             'symbol': 'Zwaar bewolkt',
-            'temperature': '16.0',
+            'temperature': 16.0,
             'measured': '05/19/2017 00:20:00',
-            'groundtemperature': '15.4',
-            'pressure': '1008.72',
+            'groundtemperature': 15.4,
+            'pressure': 1008.72,
             'image': get_imageurl(),
             'stationname': 'De Bilt (6260)',
-            'precipitation': '-',
+            'precipitation': 0.0,
             'precipitation_forecast':  {'average': 0.1,
                                         'timeframe': 30,
                                         'total': 0.05},
             'windazimuth': 'ONO',
-            'irradiance': '-',
+            'irradiance': 0,
             'forecast': [
                 {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': None,
-                 'rain': None, 'windforce': 3},
+                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
+                 'rain': 0.0, 'windforce': 3},
                 {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
                  'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                 'rain': None, 'windforce': 3},
+                 'rain': 0.0, 'windforce': 3},
                 {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': None,
-                 'rain': None, 'windforce': 4},
+                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
+                 'rain': 0.0, 'windforce': 4},
                 {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': None,
+                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
                  'rain': 1.8, 'windforce': 4},
                 {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': None,
+                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
                  'rain': 4.4, 'windforce': 4}
             ],
         },
@@ -505,38 +532,38 @@ def test_readdata3():
         'distance': 1.297928,
         'data': {
             'attribution': 'Data provided by buienradar.nl',
-            'windspeed': '8.16',
+            'windspeed': 8.16,
             'windazimuth': 'O',
-            'groundtemperature': '-',
-            'windforce': '5',
-            'precipitation': '-',
+            'groundtemperature': 0.0,
+            'windforce': 5,
+            'precipitation': 0.0,
             'precipitation_forecast': None,
-            'humidity': '47',
-            'pressure': '1004.95',
+            'humidity': 47,
+            'pressure': 1004.95,
             'symbol': 'Zwaar bewolkt',
             'measured': '05/19/2017 00:20:00',
-            'winddirection': '59',
+            'winddirection': 59,
             'stationname': 'Zeeplatform K13 (6252)',
-            'temperature': '16.8',
-            'visibility': '6200',
-            'irradiance': '614',
-            'windgust': '14',
+            'temperature': 16.8,
+            'visibility': 6200,
+            'irradiance': 614,
+            'windgust': 14.0,
             'image': get_imageurl(),
             'forecast': [
                     {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                     'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': None,
-                     'rain': None, 'windforce': 3},
+                     'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
+                     'rain': 0.0, 'windforce': 3},
                     {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
                      'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                     'rain': None, 'windforce': 3},
+                     'rain': 0.0, 'windforce': 3},
                     {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                     'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': None,
-                     'rain': None, 'windforce': 4},
+                     'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
+                     'rain': 0.0, 'windforce': 4},
                     {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                     'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': None,
+                     'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
                      'rain': 1.8, 'windforce': 4},
                     {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                     'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': None,
+                     'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
                      'rain': 4.4, 'windforce': 4}
                 ]
             },
@@ -776,10 +803,10 @@ def test_invalid_data():
            result[MESSAGE] is None)
     # test missing maxtemp:
     assert(len(result[DATA][FORECAST]) == 5 and
-           result[DATA][FORECAST][0][TEMPERATURE] is None)
+           result[DATA][FORECAST][0][TEMPERATURE] == 0.0)
     # test missing maxgtemp and maxtempmax:
     assert(len(result[DATA][FORECAST]) == 5 and
-           result[DATA][FORECAST][2][TEMPERATURE] is None)
+           result[DATA][FORECAST][2][TEMPERATURE] == 0.0)
 
     # read xml with invalid ws coordinates
     file = open('tests/buienradar_invalidws1.xml', 'r')

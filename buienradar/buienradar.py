@@ -73,24 +73,47 @@ BRMAXMMREGEN = 'maxmmregen'
 BRMINMMREGEN = 'minmmregen'
 BRWINDKRACHT = 'windkracht'
 
+
+def to_int(val):
+    try:
+        return int(val)
+    except ValueError:
+        return 0
+
+
+def to_float(val, digits):
+    try:
+        return round(float(val), digits)
+    except ValueError:
+        return float(0)
+
+
+def to_float2(val):
+    return to_float(val, 2)
+
+
+def to_float1(val):
+    return to_float(val, 1)
+
+
 # Sensor types are defined like so:
 # SENSOR_TYPES = { 'key': 'key in buienradar xml', }
 SENSOR_TYPES = {
-    HUMIDITY: 'luchtvochtigheid',
-    GROUNDTEMP: 'temperatuur10cm',
-    IRRADIANCE: 'zonintensiteitWM2',
-    MEASURED: 'datum',
-    PRECIPITATION: 'regenMMPU',
-    PRESSURE: 'luchtdruk',
-    STATIONNAME: 'stationnaam',
-    SYMBOL: 'icoonactueel',
-    TEMPERATURE: 'temperatuurGC',
-    VISIBILITY: 'zichtmeters',
-    WINDSPEED: 'windsnelheidMS',
-    WINDFORCE: 'windsnelheidBF',
-    WINDDIRECTION: 'windrichtingGR',
-    WINDAZIMUTH: 'windrichting',
-    WINDGUST: 'windstotenMS',
+    HUMIDITY: ['luchtvochtigheid', to_int],
+    GROUNDTEMP: ['temperatuur10cm', to_float1],
+    IRRADIANCE: ['zonintensiteitWM2', to_int],
+    MEASURED: ['datum', None],
+    PRECIPITATION: ['regenMMPU', to_float1],
+    PRESSURE: ['luchtdruk', to_float2],
+    STATIONNAME: ['stationnaam', None],
+    SYMBOL: ['icoonactueel', None],
+    TEMPERATURE: ['temperatuurGC', to_float1],
+    VISIBILITY: ['zichtmeters', to_int],
+    WINDSPEED: ['windsnelheidMS', to_float2],
+    WINDFORCE: ['windsnelheidBF', to_int],
+    WINDDIRECTION: ['windrichtingGR', to_int],
+    WINDAZIMUTH: ['windrichting', None],
+    WINDGUST: ['windstotenMS', to_float2],
 }
 
 log = logging.getLogger(__name__)
@@ -231,7 +254,7 @@ def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
 def __parse_precipfc_data(data, timeframe):
     """Parse the forecasted precipitation data."""
     result = {AVERAGE: None, TOTAL: None, TIMEFRAME: None}
-
+    log.debug("precip data: %s", data)
     lines = data.splitlines()
     index = 1
     totalrain = 0
@@ -259,13 +282,15 @@ def __parse_precipfc_data(data, timeframe):
         #
         # Ter controle: een waarde van 77 is gelijk aan een neerslagintensiteit
         # van 0,1 mm/u.
-        mmu = 10**((int(val) - 109)/32)
+        mmu = 10**(float((int(val) - 109))/32)
         totalrain = totalrain + float(mmu)
         numberoflines = numberoflines + 1
         index += 1
 
     if numberoflines > 0:
         result[AVERAGE] = round((totalrain / numberoflines), 2)
+    else:
+        result[AVERAGE] = 0
     result[TOTAL] = round(totalrain/12, 2)
     result[TIMEFRAME] = timeframe
 
@@ -278,7 +303,7 @@ def __parse_loc_data(loc_data, result):
                     FORECAST: [],
                     PRECIPITATION_FORECAST: None}
 
-    for key, value in SENSOR_TYPES.items():
+    for key, [value, func] in SENSOR_TYPES.items():
         result[DATA][key] = None
         try:
             sens_data = loc_data[value]
@@ -293,7 +318,10 @@ def __parse_loc_data(loc_data, result):
                     result[DATA][key] = name
                 else:
                     # update all other data
-                    result[DATA][key] = sens_data
+                    if func is not None:
+                        result[DATA][key] = func(sens_data)
+                    else:
+                        result[DATA][key] = sens_data
         except KeyError:
             if result[MESSAGE] is None:
                 result[MESSAGE] = "Missing key(s) in br data: "
@@ -335,7 +363,7 @@ def __get_float(section, name):
     try:
         return float(section[name])
     except (ValueError, TypeError, KeyError):
-        return None
+        return float(0)
 
 
 def __get_int(section, name):
@@ -343,7 +371,7 @@ def __get_int(section, name):
     try:
         return int(section[name])
     except (ValueError, TypeError, KeyError):
-        return None
+        return 0
 
 
 def __get_ws_distance(wstation, latitude, longitude):
