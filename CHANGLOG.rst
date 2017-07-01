@@ -3,13 +3,28 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
-[unreleased]
+[unreleased/0.6]
 **added**
 
-- measured date/time added to data section
+- example usage
+- detect api respone with all "0"s or "-"s
+- return all values a numbers (also - as 0 or 0.0)
 
 **changed**
+- improved precipitation forecast calculation
+- improved/added unit tests
+- windirection and windazimuth are now reversed
+  - winddirection: N/O/Z etc
+  - windazimuth: is measured in degrees
+- removed 'Meetstation ' from station name
 
+[0.5] - 2017-06-10
+""""""""""""""""""
+- measured date/time added to data section
+- added precipitation forecast
+- add secondary url for buienradar api
+
+**changed**
 - fixed linting
 
 [0.4] - 2017-05-28
