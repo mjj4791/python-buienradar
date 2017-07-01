@@ -24,6 +24,7 @@ Changes that did not make it into a new release are marked with [unreleased].
 
 [0.5] - 2017-06-10
 """"""""""""""""""
+This version is non-functional / should not be used.
 **added**
 
 - measured date/time added to data section
