@@ -791,6 +791,17 @@ def test_missing_data():
 
 def test_invalid_data():
     """Test loading and parsing xml file with data that cannot be parsed."""
+    file = open('tests/buienradar_invalid.xml', 'r')
+    data = file.read()
+    file.close()
+
+    latitude = 51.50
+    longitude = 6.20
+    result = parse_data(data, None, latitude, longitude)
+    print(result)
+    assert(result[SUCCESS] is False)
+    assert(result[MESSAGE] == 'Location data is invalid.')
+
     file = open('tests/buienradar_invalidfc1.xml', 'r')
     data = file.read()
     file.close()

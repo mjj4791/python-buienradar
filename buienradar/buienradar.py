@@ -77,14 +77,14 @@ BRWINDKRACHT = 'windkracht'
 def to_int(val):
     try:
         return int(val)
-    except ValueError:
+    except (ValueError, TypeError):
         return 0
 
 
 def to_float(val, digits):
     try:
         return round(float(val), digits)
-    except ValueError:
+    except (ValueError, TypeError):
         return float(0)
 
 
@@ -124,7 +124,7 @@ def get_data(latitude=52.091579, longitude=5.119734):
     final_result = {SUCCESS: False, MESSAGE: None,
                     CONTENT: None, RAINCONTENT: None}
 
-    log.info("Getting buienradar data for latitude=%s, longitude=%s",
+    log.debug("Getting buienradar data for latitude=%s, longitude=%s",
              latitude, longitude)
     result = __get_ws_data()
 
@@ -171,7 +171,7 @@ def parse_data(content, raincontent, latitude=52.091579,
 
 def __get_url(url):
     """Load data from url and return result."""
-    log.info("Retrieving xml weather data (%s)...", url)
+    log.debug("Retrieving xml weather data (%s)...", url)
     result = {SUCCESS: False, MESSAGE: None}
     try:
         r = requests.get(url)
@@ -230,23 +230,31 @@ def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
     # select the nearest weather station
     loc_data = __select_nearest_ws(xmldata, latitude, longitude)
     # process current weather data from selected weatherstation
-    if loc_data:
-        # add distance to weatherstation
-        result[DISTANCE] = __get_ws_distance(loc_data, latitude, longitude)
-        result = __parse_loc_data(loc_data, result)
-
-        # extract weather forecast
-        try:
-            fc_data = xmldata[BRWEERGEGEVENS][BRVERWACHTING]
-        except (xmltodict.expat.ExpatError, KeyError) as err:
-            result[MESSAGE] = 'Unable to extract forecast data.'
-            log.exception(result[MESSAGE])
-            return result
-
-        if fc_data:
-            result = __parse_fc_data(fc_data, result)
-    else:
+    if not loc_data:
         result[MESSAGE] = 'No location selected.'
+        return result
+
+    if not __is_valid(loc_data):
+        result[MESSAGE] = 'Location data is invalid.'
+        return result
+
+    # add distance to weatherstation
+    log.debug("Raw location data: %s", loc_data)
+    result[DISTANCE] = __get_ws_distance(loc_data, latitude, longitude)
+    result = __parse_loc_data(loc_data, result)
+
+    # extract weather forecast
+    try:
+        fc_data = xmldata[BRWEERGEGEVENS][BRVERWACHTING]
+    except (xmltodict.expat.ExpatError, KeyError) as err:
+        result[MESSAGE] = 'Unable to extract forecast data.'
+        log.exception(result[MESSAGE])
+        return result
+
+    if fc_data:
+        # result = __parse_fc_data(fc_data, result)
+        log.debug("Raw forecast data: %s", fc_data)
+        result[DATA][FORECAST] = __parse_fc_data(fc_data)
 
     return result
 
@@ -254,7 +262,7 @@ def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
 def __parse_precipfc_data(data, timeframe):
     """Parse the forecasted precipitation data."""
     result = {AVERAGE: None, TOTAL: None, TIMEFRAME: None}
-    log.debug("precip data: %s", data)
+    log.debug("Precipitation data: %s", data)
     lines = data.splitlines()
     index = 1
     totalrain = 0
@@ -270,9 +278,9 @@ def __parse_precipfc_data(data, timeframe):
         # See buienradar documentation for this api, attribution
         # https://www.buienradar.nl/overbuienradar/gratis-weerdata
         #
-        # Op basis van de door u gewenste coördinaten (latitude en longitude)
+        # Op basis van de door u gewenste coordinaten (latitude en longitude)
         # kunt u de neerslag tot twee uur vooruit ophalen in tekstvorm. De
-        # data wordt iedere 5 minuten geüpdatet. Op deze pagina kunt u de
+        # data wordt iedere 5 minuten geupdatet. Op deze pagina kunt u de
         # neerslag in tekst vinden. De waarde 0 geeft geen neerslag aan (droog)
         # de waarde 255 geeft zware neerslag aan. Gebruik de volgende formule
         # voor het omrekenen naar de neerslagintensiteit in de eenheid
@@ -295,6 +303,15 @@ def __parse_precipfc_data(data, timeframe):
     result[TIMEFRAME] = timeframe
 
     return result
+
+
+def __is_valid(loc_data):
+    """Determine if this can be valid data (not all 0's)."""
+    for key, [value, func] in SENSOR_TYPES.items():
+        if (key != SYMBOL and key != STATIONNAME and func is not None):
+            sens_data = loc_data.get(value)
+            if func(sens_data) != 0:
+                return True
 
 
 def __parse_loc_data(loc_data, result):
@@ -332,8 +349,9 @@ def __parse_loc_data(loc_data, result):
     return result
 
 
-def __parse_fc_data(fc_data, result):
+def __parse_fc_data(fc_data):
     """Parse the forecast data from the xml section."""
+    fc = []
     for daycnt in range(1, 6):
         daysection = BRDAYFC % daycnt
         if daysection in fc_data:
@@ -354,8 +372,8 @@ def __parse_fc_data(fc_data, result):
                       WINDFORCE: __get_int(tmpsect, BRWINDKRACHT),
                       DATETIME: fcdatetime
                      }
-            result[DATA][FORECAST].append(fcdata)
-    return result
+            fc.append(fcdata)
+    return fc
 
 
 def __get_float(section, name):
