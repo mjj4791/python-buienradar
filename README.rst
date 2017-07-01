@@ -104,19 +104,19 @@ Example of returned data:
     {
         'distance': 4.235064,
         'data': {
-            'winddirection': '120',
-            'irradiance': '-',
+            'winddirection': OZO,
+            'irradiance': 0,
             'attribution': 'Data provided by buienradar.nl',
-            'groundtemperature': '18.1',
+            'groundtemperature': 18.1,
             'symbol': 'Vrijwel onbewolkt (zonnig/helder)',
-            'windforce': '1',
+            'windforce': 1,
             'stationname': 'De Bilt (6260)',
             'precipitation_forecast': {
                 'total': 0.0,
                 'timeframe': 60,
                 'average': 0.0
             },
-            'pressure': '1014.51',
+            'pressure': 1014.51,
             'forecast': [
                 {'datetime': datetime.datetime(2017, 6, 22, 0, 0),
                 'temperature': 29.0,
@@ -129,15 +129,15 @@ Example of returned data:
                 },
             ...
             ],
-            'windspeed': '1.34',
-            'precipitation': '-',
-            'temperature': '21.0',
+            'windspeed': 1.34,
+            'precipitation': 0.0,
+            'temperature': 21.0,
             'measured': '06/21/2017 22:30:00',
             'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/aa.png',
-            'visibility': '32000',
-            'humidity': '81',
-            'windazimuth': 'OZO',
-            'windgust': '1.9'
+            'visibility': 32000,
+            'humidity': 81,
+            'windazimuth': 120,
+            'windgust': 1.9
         },
         'success': True,
         'msg': None

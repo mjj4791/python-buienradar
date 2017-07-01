@@ -3,12 +3,19 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
-[unreleased/0.6]
-""""""""""""""""
+[0.7] - 2017-06-02
+""""""""""""""""""
+**changed**
+
+- updated readme & changelog
+- bumped ersion to 0.7
+
+[0.6] - 2017-06-01
+""""""""""""""""""
 **added**
 
 - example usage
-- detect api respone with all "0"s or "-"s
+- detect api response with all "0"s or "-"s
 - return all values a numbers (also - as 0 or 0.0)
 
 **changed**
