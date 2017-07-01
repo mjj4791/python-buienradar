@@ -16,8 +16,10 @@ Changes that did not make it into a new release are marked with [unreleased].
 - improved precipitation forecast calculation
 - improved/added unit tests
 - windirection and windazimuth are now reversed
+
   - winddirection: N/O/Z etc
   - windazimuth: is measured in degrees
+  
 - removed 'Meetstation ' from station name
 
 [0.5] - 2017-06-10
