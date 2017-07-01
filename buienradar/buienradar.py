@@ -262,7 +262,7 @@ def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
 def __parse_precipfc_data(data, timeframe):
     """Parse the forecasted precipitation data."""
     result = {AVERAGE: None, TOTAL: None, TIMEFRAME: None}
-    
+
     log.debug("Precipitation data: %s", data)
     lines = data.splitlines()
     index = 1
