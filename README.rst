@@ -104,7 +104,7 @@ Example of returned data:
     {
         'distance': 4.235064,
         'data': {
-            'winddirection': OZO,
+            'winddirection': 'OZO',
             'irradiance': 0,
             'attribution': 'Data provided by buienradar.nl',
             'groundtemperature': 18.1,
