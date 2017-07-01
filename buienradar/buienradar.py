@@ -111,8 +111,8 @@ SENSOR_TYPES = {
     VISIBILITY: ['zichtmeters', to_int],
     WINDSPEED: ['windsnelheidMS', to_float2],
     WINDFORCE: ['windsnelheidBF', to_int],
-    WINDDIRECTION: ['windrichtingGR', to_int],
-    WINDAZIMUTH: ['windrichting', None],
+    WINDDIRECTION: ['windrichting', None],
+    WINDAZIMUTH: ['windrichtingGR', to_int],
     WINDGUST: ['windstotenMS', to_float2],
 }
 
