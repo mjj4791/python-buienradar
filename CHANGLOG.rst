@@ -9,6 +9,7 @@ Changes that did not make it into a new release are marked with [unreleased].
 
 - all datetimes are now real datetimes
 - datetimes contain tzinfo (Europe/Amsterdam)
+- prevent unnecessary http-redirects when fetching raindata
 
 [0.7] - 2017-06-02
 """"""""""""""""""
@@ -16,7 +17,6 @@ Changes that did not make it into a new release are marked with [unreleased].
 
 - updated readme & changelog
 - bumped version to 0.7
-- prevent unnecessary http-redirects when fetching raindata
 
 [0.6] - 2017-06-01
 """"""""""""""""""
