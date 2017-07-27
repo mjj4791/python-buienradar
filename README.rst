@@ -185,6 +185,6 @@ Use the constants defined in the buienradar component to get the data from the r
 - PRECIPITATION: the amount of precipitation/rain in mm/h
 - PRECIPITATION_FORECAST: information on forecasted precipitation
 
-  - AVERAGE: the average expected precipitation mm/h)
+  - AVERAGE: the average expected precipitation (mm/h)
   - TOTAL: the total expected precipitation (mm)
-  - TIMEFRAME: the time-frame for the forecasted precipitation (s)
+  - TIMEFRAME: the time-frame for the forecasted precipitation (min)
