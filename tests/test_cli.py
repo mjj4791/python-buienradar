@@ -3,6 +3,7 @@ from buienradar.__main__ import main
 
 
 def test_main_info():
+    """Test if we can call the main function."""
     # use simulation interface
     args = ['-v']
 
@@ -11,6 +12,7 @@ def test_main_info():
 
 
 def test_main_debug():
+    """Test if we can call the main function."""
     # use simulation interface
     args = ['-vv']
 

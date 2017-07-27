@@ -1,3 +1,4 @@
+"""Example usage."""
 from buienradar.buienradar import (
     CONTENT,
     RAINCONTENT,

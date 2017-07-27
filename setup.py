@@ -65,6 +65,7 @@ setup(
 
     install_requires=[
         'docopt',
+        'pytz',
         'requests',
         'xmltodict',
         'vincenty',

@@ -2,6 +2,7 @@
 import logging
 from datetime import datetime, timedelta
 
+import pytz
 import requests
 import xmltodict
 from vincenty import vincenty
@@ -52,29 +53,34 @@ TIMEFRAME = 'timeframe'
 TOTAL = 'total'
 
 # key names in buienradar xml:
-BRROOT = 'buienradarnl'
-BRWEERGEGEVENS = 'weergegevens'
-BRACTUEELWEER = 'actueel_weer'
-BRWEERSTATIONS = 'weerstations'
-BRWEERSTATION = 'weerstation'
-BRLAT = 'lat'
-BRLON = 'lon'
-BRSTATIONCODE = 'stationcode'
-BRSTATIONNAAM = 'stationnaam'
-BRTEXT = '#text'
-BRZIN = '@zin'
-BRVERWACHTING = 'verwachting_meerdaags'
-BRDAYFC = "dag-plus%d"
-BRMINTEMP = 'mintemp'
-BRMAXTEMP = 'maxtemp'
-BRKANSZON = 'kanszon'
-BRKANSREGEN = 'kansregen'
-BRMAXMMREGEN = 'maxmmregen'
-BRMINMMREGEN = 'minmmregen'
-BRWINDKRACHT = 'windkracht'
+__BRROOT = 'buienradarnl'
+__BRWEERGEGEVENS = 'weergegevens'
+__BRACTUEELWEER = 'actueel_weer'
+__BRWEERSTATIONS = 'weerstations'
+__BRWEERSTATION = 'weerstation'
+__BRLAT = 'lat'
+__BRLON = 'lon'
+__BRSTATIONCODE = 'stationcode'
+__BRSTATIONNAAM = 'stationnaam'
+__BRTEXT = '#text'
+__BRZIN = '@zin'
+__BRVERWACHTING = 'verwachting_meerdaags'
+__BRDAYFC = "dag-plus%d"
+__BRMINTEMP = 'mintemp'
+__BRMAXTEMP = 'maxtemp'
+__BRKANSZON = 'kanszon'
+__BRKANSREGEN = 'kansregen'
+__BRMAXMMREGEN = 'maxmmregen'
+__BRMINMMREGEN = 'minmmregen'
+__BRWINDKRACHT = 'windkracht'
+
+# buienradat date format: '07/26/2017 15:50:00'
+__DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
+__TIMEZONE = 'Europe/Amsterdam'
 
 
 def to_int(val):
+    """Convert val into an integer value."""
     try:
         return int(val)
     except (ValueError, TypeError):
@@ -82,6 +88,7 @@ def to_int(val):
 
 
 def to_float(val, digits):
+    """Convert val into float with digits decimal."""
     try:
         return round(float(val), digits)
     except (ValueError, TypeError):
@@ -89,11 +96,23 @@ def to_float(val, digits):
 
 
 def to_float2(val):
+    """Convert val into float with 2 decimals."""
     return to_float(val, 2)
 
 
 def to_float1(val):
+    """Convert val into float with 1 decimal."""
     return to_float(val, 1)
+
+
+def to_localdatetime(val):
+    """Convert val into a local datetime for tz Europe/Amsterdam."""
+    try:
+        dt = datetime.strptime(val, __DATE_FORMAT)
+        dt = pytz.timezone(__TIMEZONE).localize(dt)
+        return dt
+    except (ValueError, TypeError):
+        return None
 
 
 # Sensor types are defined like so:
@@ -102,7 +121,7 @@ SENSOR_TYPES = {
     HUMIDITY: ['luchtvochtigheid', to_int],
     GROUNDTEMP: ['temperatuur10cm', to_float1],
     IRRADIANCE: ['zonintensiteitWM2', to_int],
-    MEASURED: ['datum', None],
+    MEASURED: ['datum', to_localdatetime],
     PRECIPITATION: ['regenMMPU', to_float1],
     PRESSURE: ['luchtdruk', to_float2],
     STATIONNAME: ['stationnaam', None],
@@ -207,9 +226,12 @@ def __get_ws_data():
 
 def __get_precipfc_data(latitude, longitude):
     """Get buienradar forecasted precipitation."""
-    format = "http://gadgets.buienradar.nl/data/raintext/?lat=%s&lon=%s"
-    url = format % (latitude, longitude)
-
+    url = 'http://gadgets.buienradar.nl/data/raintext/?lat={}&lon={}'
+    # rounding coordinates prevents unnecessary redirects/calls
+    url = url.format(
+        round(latitude, 2),
+        round(longitude, 2)
+        )
     result = __get_url(url)
     return result
 
@@ -221,7 +243,7 @@ def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
 
     # convert the xml data into a dictionary:
     try:
-        xmldata = xmltodict.parse(content)[BRROOT]
+        xmldata = xmltodict.parse(content)[__BRROOT]
     except (xmltodict.expat.ExpatError, KeyError) as err:
         result[MESSAGE] = "Unable to parse content as xml."
         log.exception(result[MESSAGE])
@@ -245,7 +267,7 @@ def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
 
     # extract weather forecast
     try:
-        fc_data = xmldata[BRWEERGEGEVENS][BRVERWACHTING]
+        fc_data = xmldata[__BRWEERGEGEVENS][__BRVERWACHTING]
     except (xmltodict.expat.ExpatError, KeyError) as err:
         result[MESSAGE] = 'Unable to extract forecast data.'
         log.exception(result[MESSAGE])
@@ -309,10 +331,11 @@ def __parse_precipfc_data(data, timeframe):
 def __is_valid(loc_data):
     """Determine if this can be valid data (not all 0's)."""
     for key, [value, func] in SENSOR_TYPES.items():
-        if (key != SYMBOL and key != STATIONNAME and func is not None):
-            sens_data = loc_data.get(value)
-            if func(sens_data) != 0:
-                return True
+        if (key != SYMBOL and key != STATIONNAME and key != MEASURED):
+            if (func is not None):
+                sens_data = loc_data.get(value)
+                if func(sens_data) != 0:
+                    return True
 
 
 def __parse_loc_data(loc_data, result):
@@ -327,12 +350,13 @@ def __parse_loc_data(loc_data, result):
             sens_data = loc_data[value]
             if key == SYMBOL:
                 # update weather symbol & status text
-                result[DATA][key] = sens_data[BRZIN]
-                result[DATA][IMAGE] = sens_data[BRTEXT]
+                result[DATA][key] = sens_data[__BRZIN]
+                result[DATA][IMAGE] = sens_data[__BRTEXT]
             else:
                 if key == STATIONNAME:
-                    name = sens_data[BRTEXT].replace("Meetstation", "").strip()
-                    name += " (%s)" % loc_data[BRSTATIONCODE]
+                    name = sens_data[__BRTEXT].replace("Meetstation", "")
+                    name = name.strip()
+                    name += " (%s)" % loc_data[__BRSTATIONCODE]
                     result[DATA][key] = name
                 else:
                     # update all other data
@@ -354,23 +378,24 @@ def __parse_fc_data(fc_data):
     """Parse the forecast data from the xml section."""
     fc = []
     for daycnt in range(1, 6):
-        daysection = BRDAYFC % daycnt
+        daysection = __BRDAYFC % daycnt
         if daysection in fc_data:
             tmpsect = fc_data[daysection]
-            fcdatetime = datetime.today()
+            fcdatetime = datetime.now(pytz.timezone(__TIMEZONE))
+            fcdatetime = fcdatetime.replace(hour=12,
+                                            minute=0,
+                                            second=0,
+                                            microsecond=0)
             # add daycnt days
-            fcdatetime += timedelta(days=daycnt)
-            fcdatetime = fcdatetime.replace(hour=0, minute=0,
-                                            second=0, microsecond=0)
-
+            fcdatetime = fcdatetime + timedelta(days=daycnt)
             fcdata = {
-                      TEMPERATURE: __get_float(tmpsect, BRMAXTEMP),
-                      MIN_TEMP: __get_float(tmpsect, BRMINTEMP),
-                      MAX_TEMP: __get_float(tmpsect, BRMAXTEMP),
-                      SUN_CHANCE: __get_int(tmpsect, BRKANSZON),
-                      RAIN_CHANCE: __get_int(tmpsect, BRKANSREGEN),
-                      RAIN: __get_float(tmpsect, BRMAXMMREGEN),
-                      WINDFORCE: __get_int(tmpsect, BRWINDKRACHT),
+                      TEMPERATURE: __get_float(tmpsect, __BRMAXTEMP),
+                      MIN_TEMP: __get_float(tmpsect, __BRMINTEMP),
+                      MAX_TEMP: __get_float(tmpsect, __BRMAXTEMP),
+                      SUN_CHANCE: __get_int(tmpsect, __BRKANSZON),
+                      RAIN_CHANCE: __get_int(tmpsect, __BRKANSREGEN),
+                      RAIN: __get_float(tmpsect, __BRMAXMMREGEN),
+                      WINDFORCE: __get_int(tmpsect, __BRWINDKRACHT),
                       DATETIME: fcdatetime
                      }
             fc.append(fcdata)
@@ -402,8 +427,8 @@ def __get_ws_distance(wstation, latitude, longitude):
     """
     if wstation:
         try:
-            wslat = float(wstation[BRLAT])
-            wslon = float(wstation[BRLON])
+            wslat = float(wstation[__BRLAT])
+            wslon = float(wstation[__BRLON])
 
             dist = vincenty((latitude, longitude), (wslat, wslon))
             log.debug("calc distance: %s (latitude: %s, longitude: "
@@ -426,12 +451,12 @@ def __select_nearest_ws(xmldata, latitude, longitude):
     loc_data = None
 
     try:
-        ws_xml = xmldata[BRWEERGEGEVENS][BRACTUEELWEER]
-        ws_xml = ws_xml[BRWEERSTATIONS][BRWEERSTATION]
+        ws_xml = xmldata[__BRWEERGEGEVENS][__BRACTUEELWEER]
+        ws_xml = ws_xml[__BRWEERSTATIONS][__BRWEERSTATION]
     except (KeyError, TypeError):
         log.warning("Missing section in Buienradar xmldata (%s)."
                     "Can happen 00:00-01:00 CE(S)T",
-                    BRWEERSTATION)
+                    __BRWEERSTATION)
         return None
 
     for wstation in ws_xml:
@@ -449,10 +474,10 @@ def __select_nearest_ws(xmldata, latitude, longitude):
         try:
             log.debug("Selected weatherstation: code='%s', "
                       "name='%s', lat='%s', lon='%s'.",
-                      loc_data[BRSTATIONCODE],
-                      loc_data[BRSTATIONNAAM][BRTEXT],
-                      loc_data[BRLAT],
-                      loc_data[BRLON])
+                      loc_data[__BRSTATIONCODE],
+                      loc_data[__BRSTATIONNAAM][__BRTEXT],
+                      loc_data[__BRLAT],
+                      loc_data[__BRLON])
         except KeyError:
             log.debug("Selected weatherstation")
         return loc_data

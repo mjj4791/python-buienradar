@@ -3,12 +3,20 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
+[0.8] - 2017-07-27
+""""""""""""""""""
+**changed**
+
+- all datetimes are now real datetimes
+- datetimes contain tzinfo (Europe/Amsterdam)
+
 [0.7] - 2017-06-02
 """"""""""""""""""
 **changed**
 
 - updated readme & changelog
-- bumped ersion to 0.7
+- bumped version to 0.7
+- prevent unnecessary http-redirects when fetching raindata
 
 [0.6] - 2017-06-01
 """"""""""""""""""
@@ -16,7 +24,7 @@ Changes that did not make it into a new release are marked with [unreleased].
 
 - example usage
 - detect api response with all "0"s or "-"s
-- return all values a numbers (also - as 0 or 0.0)
+- return all values a numbers (also '-' as 0 or 0.0)
 
 **changed**
 
@@ -24,7 +32,7 @@ Changes that did not make it into a new release are marked with [unreleased].
 - improved/added unit tests
 - windirection and windazimuth are now reversed
 
-  - winddirection: N/O/Z etc
+  - winddirection: N/O/Z etc.
   - windazimuth: is measured in degrees
   
 - removed 'Meetstation ' from station name

@@ -53,21 +53,25 @@ Usage
                                 precipitation (5..120) [default: 60]
 
     $ python -m buienradar
-    {'distance': 4.235064, 'data': {'winddirection': '120', 'irradiance': '-', 'attribution': 'Data provided by buienradar.nl', 'groundtemperature': '18.1', 'symbol': 'Vrijwel onbewolkt (zonnig/helder)', 'windforce': '1', 'stationname': 'De Bilt (6260)', 'precipitation_forecast': {'total': 0.0, 'timeframe': 60, 'average': 0.0}, 'pressure': '1014.51', 'forecast': [{'datetime': datetime.datetime(2017, 6, 22, 0, 0), 'temperature': 29.0, 'min_temp': 20.0, 'windforce': 4, 'sun_chance': 68, 'max_temp': 29.0, 'rain_chance': 47, 'rain': 1.6}, {'datetime': datetime.datetime(2017, 6, 23, 0, 0), 'temperature': 24.0, 'min_temp': 15.0, 'windforce': 4, 'sun_chance': 63, 'max_temp': 24.0, 'rain_chance': 3, 'rain': None}, {'datetime': datetime.datetime(2017, 6, 24, 0, 0), 'temperature': 20.0, 'min_temp': 17.0, 'windforce': 4, 'sun_chance': None, 'max_temp': 20.0, 'rain_chance': 38, 'rain': 0.7}, {'datetime': datetime.datetime(2017, 6, 25, 0, 0), 'temperature': 19.0, 'min_temp': 14.0, 'windforce': 3, 'sun_chance': None, 'max_temp': 19.0, 'rain_chance': 25, 'rain': None}, {'datetime': datetime.datetime(2017, 6, 26, 0, 0), 'temperature': 21.0, 'min_temp': 12.0, 'windforce': 3, 'sun_chance': 94, 'max_temp': 21.0, 'rain_chance': 11, 'rain': None}], 'windspeed': '1.34', 'precipitation': '-', 'temperature': '21.0', 'measured': '06/21/2017 22:30:00', 'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/aa.png', 'visibility': '32000', 'humidity': '81', 'windazimuth': 'OZO', 'windgust': '1.9'}, 'success': True, 'msg': None}
+    {'data': {'irradiance': 0, 'symbol': 'Zwaar bewolkt', 'measured': datetime.datetime(2017, 7, 26, 22, 20, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'groundtemperature': 18.1, 'winddirection': 'ZW', 'windgust': 6.8, 'humidity': 91, 'forecast': [{'min_temp': 16.0, 'rain': 0.0, 'datetime': datetime.datetime(2017, 7, 27, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'temperature': 21.0, 'rain_chance': 24, 'windforce': 3, 'sun_chance': 0, 'max_temp': 21.0}, {'min_temp': 14.0, 'rain': 1.6, 'datetime': datetime.datetime(2017, 7, 28, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'temperature': 21.0, 'rain_chance': 56, 'windforce': 4, 'sun_chance': 0, 'max_temp': 21.0}, {'min_temp': 15.0, 'rain': 4.1, 'datetime': datetime.datetime(2017, 7, 29, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'temperature': 21.0, 'rain_chance': 52, 'windforce': 4, 'sun_chance': 0, 'max_temp': 21.0}, {'min_temp': 16.0, 'rain': 3.4, 'datetime': datetime.datetime(2017, 7, 30, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'temperature': 22.0, 'rain_chance': 49, 'windforce': 3, 'sun_chance': 29, 'max_temp': 22.0}, {'min_temp': 13.0, 'rain': 0.0, 'datetime': datetime.datetime(2017, 7, 31, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'temperature': 24.0, 'rain_chance': 20, 'windforce': 3, 'sun_chance': 0, 'max_temp': 24.0}], 'precipitation': 0.0, 'pressure': 1007.21, 'attribution': 'Data provided by buienradar.nl', 'stationname': 'De Bilt (6260)', 'windspeed': 3.63, 'temperature': 18.1, 'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png', 'windforce': 3, 'visibility': 6110, 'precipitation_forecast': {'average': 0.0, 'total': 0.0, 'timeframe': 60}, 'windazimuth': 229}, 'msg': None, 'distance': 4.235064, 'success': True}
 
     $ python -m buienradar -v
     INFO:__main__:Start...
     INFO:buienradar.buienradar:Getting buienradar data for latitude=52.091579, longitude=5.119734
     INFO:buienradar.buienradar:Retrieving xml weather data (https://xml.buienradar.nl/)...
     INFO:buienradar.buienradar:Retrieving xml weather data (http://gadgets.buienradar.nl/data/raintext/?lat=52.091579&lon=5.119734)...
-    INFO:__main__:result: {'success': True, 'distance': 4.235064, 'msg': None, 'data': {'windspeed': '1.01', 'irradiance': '-', 'temperature': '20.7', 'pressure': '1014.51', 'winddirection': '111', 'humidity': '82', 'windgust': '1.9', 'visibility': '31500', 'forecast': [{'min_temp': 20.0, 'rain_chance': 47, 'sun_chance': 42, 'temperature': 29.0, 'rain': 1.6, 'windforce': 4, 'datetime': datetime.datetime(2017, 6, 22, 0, 0), 'max_temp': 29.0}, {'min_temp': 15.0, 'rain_chance': 3, 'sun_chance': None, 'temperature': 24.0, 'rain': None, 'windforce': 4, 'datetime': datetime.datetime(2017, 6, 23, 0, 0), 'max_temp': 24.0}, {'min_temp': 17.0, 'rain_chance': 38, 'sun_chance': None, 'temperature': 20.0, 'rain': 0.7, 'windforce': 4, 'datetime': datetime.datetime(2017, 6, 24, 0, 0), 'max_temp': 20.0}, {'min_temp': 14.0, 'rain_chance': 25, 'sun_chance': None, 'temperature': 19.0, 'rain': None, 'windforce': 3, 'datetime': datetime.datetime(2017, 6, 25, 0, 0), 'max_temp': 19.0}, {'min_temp': 12.0, 'rain_chance': 11, 'sun_chance': 21, 'temperature': 21.0, 'rain': None, 'windforce': 3, 'datetime': datetime.datetime(2017, 6, 26, 0, 0), 'max_temp': 21.0}], 'precipitation': '-', 'attribution': 'Data provided by buienradar.nl', 'windforce': '1', 'stationname': 'De Bilt (6260)', 'groundtemperature': '18.1', 'precipitation_forecast': {'total': 0.0, 'average': 0.0, 'timeframe': 60}, 'windazimuth': 'OZO', 'symbol': 'Vrijwel onbewolkt (zonnig/helder)', 'measured': '06/21/2017 22:40:00', 'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/aa.png'}}
+    INFO:buienradar.buienradar:Parse ws data: latitude: 52.091579, longitude: 5.119734
+    INFO:__main__:result: {'data': {'irradiance': 0, 'precipitation': 0.0, 'visibility': 6110, 'humidity': 91, 'measured': datetime.datetime(2017, 7, 26, 22, 20, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'symbol': 'Zwaar bewolkt', 'groundtemperature': 18.1, 'forecast': [{'sun_chance': 0, 'windforce': 3, 'min_temp': 16.0, 'temperature': 21.0, 'rain': 0.0, 'datetime': datetime.datetime(2017, 7, 27, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain_chance': 24}, {'sun_chance': 0, 'windforce': 4, 'min_temp': 14.0, 'temperature': 21.0, 'rain': 1.6, 'datetime': datetime.datetime(2017, 7, 28, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain_chance': 56}, {'sun_chance': 0, 'windforce': 4, 'min_temp': 15.0, 'temperature': 21.0, 'rain': 4.1, 'datetime': datetime.datetime(2017, 7, 29, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain_chance': 52}, {'sun_chance': 29, 'windforce': 3, 'min_temp': 16.0, 'temperature': 22.0, 'rain': 3.4, 'datetime': datetime.datetime(2017, 7, 30, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 22.0, 'rain_chance': 49}, {'sun_chance': 0, 'windforce': 3, 'min_temp': 13.0, 'temperature': 24.0, 'rain': 0.0, 'datetime': datetime.datetime(2017, 7, 31, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 24.0, 'rain_chance': 20}], 'temperature': 18.1, 'windforce': 3, 'windazimuth': 229, 'windgust': 6.8, 'precipitation_forecast': {'total': 0.0, 'timeframe': 60, 'average': 0.0}, 'windspeed': 3.63, 'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png', 'winddirection': 'ZW', 'pressure': 1007.21, 'attribution': 'Data provided by buienradar.nl', 'stationname': 'De Bilt (6260)'}, 'distance': 4.235064, 'msg': None, 'success': True}
+    {'data': {'irradiance': 0, 'precipitation': 0.0, 'visibility': 6110, 'humidity': 91, 'measured': datetime.datetime(2017, 7, 26, 22, 20, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'symbol': 'Zwaar bewolkt', 'groundtemperature': 18.1, 'forecast': [{'sun_chance': 0, 'windforce': 3, 'min_temp': 16.0, 'temperature': 21.0, 'rain': 0.0, 'datetime': datetime.datetime(2017, 7, 27, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain_chance': 24}, {'sun_chance': 0, 'windforce': 4, 'min_temp': 14.0, 'temperature': 21.0, 'rain': 1.6, 'datetime': datetime.datetime(2017, 7, 28, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain_chance': 56}, {'sun_chance': 0, 'windforce': 4, 'min_temp': 15.0, 'temperature': 21.0, 'rain': 4.1, 'datetime': datetime.datetime(2017, 7, 29, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain_chance': 52}, {'sun_chance': 29, 'windforce': 3, 'min_temp': 16.0, 'temperature': 22.0, 'rain': 3.4, 'datetime': datetime.datetime(2017, 7, 30, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 22.0, 'rain_chance': 49}, {'sun_chance': 0, 'windforce': 3, 'min_temp': 13.0, 'temperature': 24.0, 'rain': 0.0, 'datetime': datetime.datetime(2017, 7, 31, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 24.0, 'rain_chance': 20}], 'temperature': 18.1, 'windforce': 3, 'windazimuth': 229, 'windgust': 6.8, 'precipitation_forecast': {'total': 0.0, 'timeframe': 60, 'average': 0.0}, 'windspeed': 3.63, 'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png', 'winddirection': 'ZW', 'pressure': 1007.21, 'attribution': 'Data provided by buienradar.nl', 'stationname': 'De Bilt (6260)'}, 'distance': 4.235064, 'msg': None, 'success': True}
 
     $ python -m buienradar -v --longitude=5.10 --latitude=52.1 --timeframe=45
     INFO:__main__:Start...
     INFO:buienradar.buienradar:Getting buienradar data for latitude=52.1, longitude=5.1
     INFO:buienradar.buienradar:Retrieving xml weather data (https://xml.buienradar.nl/)...
     INFO:buienradar.buienradar:Retrieving xml weather data (http://gadgets.buienradar.nl/data/raintext/?lat=52.1&lon=5.1)...
-    INFO:__main__:result: {'msg': None, 'distance': 5.48199, 'success': True, 'data': {'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/aa.png', 'symbol': 'Vrijwel onbewolkt (zonnig/helder)', 'temperature': '20.7', 'humidity': '82', 'windazimuth': 'OZO', 'attribution': 'Data provided by buienradar.nl', 'visibility': '31500', 'groundtemperature': '18.1', 'precipitation_forecast': {'average': 0.0, 'timeframe': 45, 'total': 0.0}, 'precipitation': '-', 'windforce': '1', 'pressure': '1014.51', 'windgust': '1.9', 'irradiance': '-', 'forecast': [{'max_temp': 29.0, 'rain': 1.6, 'rain_chance': 47, 'sun_chance': 42, 'temperature': 29.0, 'min_temp': 20.0, 'windforce': 4, 'datetime': datetime.datetime(2017, 6, 22, 0, 0)}, {'max_temp': 24.0, 'rain': None, 'rain_chance': 3, 'sun_chance': None, 'temperature': 24.0, 'min_temp': 15.0, 'windforce': 4, 'datetime': datetime.datetime(2017, 6, 23, 0, 0)}, {'max_temp': 20.0, 'rain': 0.7, 'rain_chance': 38, 'sun_chance': None, 'temperature': 20.0, 'min_temp': 17.0, 'windforce': 4, 'datetime': datetime.datetime(2017, 6, 24, 0, 0)}, {'max_temp': 19.0, 'rain': None, 'rain_chance': 25, 'sun_chance': None, 'temperature': 19.0, 'min_temp': 14.0, 'windforce': 3, 'datetime': datetime.datetime(2017, 6, 25, 0, 0)}, {'max_temp': 21.0, 'rain': None, 'rain_chance': 11, 'sun_chance': 21, 'temperature': 21.0, 'min_temp': 12.0, 'windforce': 3, 'datetime': datetime.datetime(2017, 6, 26, 0, 0)}], 'measured': '06/21/2017 22:40:00', 'stationname': 'De Bilt (6260)', 'winddirection': '111', 'windspeed': '1.01'}}
+    INFO:buienradar.buienradar:Parse ws data: latitude: 52.1, longitude: 5.1
+    INFO:__main__:result: {'distance': 5.48199, 'data': {'attribution': 'Data provided by buienradar.nl', 'windspeed': 4.0, 'humidity': 90, 'precipitation': 0.0, 'pressure': 1007.21, 'stationname': 'De Bilt (6260)', 'groundtemperature': 18.0, 'temperature': 18.2, 'visibility': 10300, 'irradiance': 0, 'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png', 'windforce': 3, 'forecast': [{'rain_chance': 24, 'min_temp': 16.0, 'temperature': 21.0, 'sun_chance': 0, 'datetime': datetime.datetime(2017, 7, 27, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain': 0.0, 'windforce': 3}, {'rain_chance': 56, 'min_temp': 14.0, 'temperature': 21.0, 'sun_chance': 0, 'datetime': datetime.datetime(2017, 7, 28, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain': 1.6, 'windforce': 4}, {'rain_chance': 52, 'min_temp': 15.0, 'temperature': 21.0, 'sun_chance': 0, 'datetime': datetime.datetime(2017, 7, 29, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain': 4.1, 'windforce': 4}, {'rain_chance': 49, 'min_temp': 16.0, 'temperature': 22.0, 'sun_chance': 29, 'datetime': datetime.datetime(2017, 7, 30, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 22.0, 'rain': 3.4, 'windforce': 3}, {'rain_chance': 20, 'min_temp': 13.0, 'temperature': 24.0, 'sun_chance': 0, 'datetime': datetime.datetime(2017, 7, 31, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 24.0, 'rain': 0.0, 'windforce': 3}], 'windgust': 7.4, 'measured': datetime.datetime(2017, 7, 26, 22, 30, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'winddirection': 'ZW', 'symbol': 'Zwaar bewolkt', 'windazimuth': 219, 'precipitation_forecast': {'total': 0.0, 'average': 0.0, 'timeframe': 45}}, 'success': True, 'msg': None}
+    {'distance': 5.48199, 'data': {'attribution': 'Data provided by buienradar.nl', 'windspeed': 4.0, 'humidity': 90, 'precipitation': 0.0, 'pressure': 1007.21, 'stationname': 'De Bilt (6260)', 'groundtemperature': 18.0, 'temperature': 18.2, 'visibility': 10300, 'irradiance': 0, 'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png', 'windforce': 3, 'forecast': [{'rain_chance': 24, 'min_temp': 16.0, 'temperature': 21.0, 'sun_chance': 0, 'datetime': datetime.datetime(2017, 7, 27, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain': 0.0, 'windforce': 3}, {'rain_chance': 56, 'min_temp': 14.0, 'temperature': 21.0, 'sun_chance': 0, 'datetime': datetime.datetime(2017, 7, 28, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain': 1.6, 'windforce': 4}, {'rain_chance': 52, 'min_temp': 15.0, 'temperature': 21.0, 'sun_chance': 0, 'datetime': datetime.datetime(2017, 7, 29, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 21.0, 'rain': 4.1, 'windforce': 4}, {'rain_chance': 49, 'min_temp': 16.0, 'temperature': 22.0, 'sun_chance': 29, 'datetime': datetime.datetime(2017, 7, 30, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 22.0, 'rain': 3.4, 'windforce': 3}, {'rain_chance': 20, 'min_temp': 13.0, 'temperature': 24.0, 'sun_chance': 0, 'datetime': datetime.datetime(2017, 7, 31, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'max_temp': 24.0, 'rain': 0.0, 'windforce': 3}], 'windgust': 7.4, 'measured': datetime.datetime(2017, 7, 26, 22, 30, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 'winddirection': 'ZW', 'symbol': 'Zwaar bewolkt', 'windazimuth': 219, 'precipitation_forecast': {'total': 0.0, 'average': 0.0, 'timeframe': 45}}, 'success': True, 'msg': None}
 
 
 Example python code:
@@ -79,11 +83,11 @@ Example python code:
 
     # minutes to look ahead for precipitation forecast
     # (5..120)
-    timeframe = 60
+    timeframe = 45
 
     # gps-coordinates for the weather data
-    latitude = 51.50
-    longitude = 6.20
+    latitude = 52.1
+    longitude = 5.10
 
     result = get_data(latitude=latitude,
                       longitude=longitude,
@@ -102,44 +106,42 @@ Example of returned data:
 .. code-block:: python
 
     {
-        'distance': 4.235064,
+        'distance': 5.48199, 
         'data': {
-            'winddirection': 'OZO',
-            'irradiance': 0,
-            'attribution': 'Data provided by buienradar.nl',
-            'groundtemperature': 18.1,
-            'symbol': 'Vrijwel onbewolkt (zonnig/helder)',
-            'windforce': 1,
-            'stationname': 'De Bilt (6260)',
-            'precipitation_forecast': {
-                'total': 0.0,
-                'timeframe': 60,
-                'average': 0.0
-            },
-            'pressure': 1014.51,
+            'attribution': 'Data provided by buienradar.nl', 
+            'windspeed': 4.0, 
+            'humidity': 90, 
+            'precipitation': 0.0, 
+            'pressure': 1007.21, 
+            'stationname': 'De Bilt (6260)', 
+            'groundtemperature': 18.0, 
+            'temperature': 18.2, 
+            'visibility': 10300, 
+            'irradiance': 0, 
+            'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png', 
+            'windforce': 3, 
             'forecast': [
-                {'datetime': datetime.datetime(2017, 6, 22, 0, 0),
-                'temperature': 29.0,
-                'min_temp': 20.0,
-                'windforce': 4,
-                'sun_chance': 68,
-                'max_temp': 29.0,
-                'rain_chance': 47,
-                'rain': 1.6
-                },
-            ...
-            ],
-            'windspeed': 1.34,
-            'precipitation': 0.0,
-            'temperature': 21.0,
-            'measured': '06/21/2017 22:30:00',
-            'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/aa.png',
-            'visibility': 32000,
-            'humidity': 81,
-            'windazimuth': 120,
-            'windgust': 1.9
-        },
-        'success': True,
+                {'rain_chance': 24, 
+                'min_temp': 16.0, 
+                'temperature': 21.0, 
+                'sun_chance': 0, 
+                'datetime': datetime.datetime(2017, 7, 27, 12, 0, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 
+                'max_temp': 21.0, 
+                'rain': 0.0, 
+                'windforce': 3}, 
+                ...
+                ], 
+            'windgust': 7.4, 
+            'measured': datetime.datetime(2017, 7, 26, 22, 30, tzinfo=<DstTzInfo 'Europe/Amsterdam' CEST+2:00:00 DST>), 
+            'winddirection': 'ZW', 
+            'symbol': 'Zwaar bewolkt', 
+            'windazimuth': 219, 
+            'precipitation_forecast': {
+                'total': 0.0, 
+                'average': 0.0, 
+                'timeframe': 45}
+            }, 
+        'success': True, 
         'msg': None
     }
 
