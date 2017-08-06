@@ -16,6 +16,7 @@ from buienradar.buienradar import (
     __BRWEERSTATION,
     __BRWEERSTATIONS,
     __BRZIN,
+    CONDITION,
     CONTENT,
     DATA,
     FORECAST,
@@ -30,7 +31,6 @@ from buienradar.buienradar import (
     SENSOR_TYPES,
     STATIONNAME,
     SUCCESS,
-    SYMBOL,
     TEMPERATURE,
     VISIBILITY,
     WINDAZIMUTH,
@@ -40,135 +40,137 @@ from buienradar.buienradar import (
     WINDSPEED,
     __get_ws_distance,
     __parse_precipfc_data,
+    __to_localdatetime,
     get_data,
-    parse_data,
-    to_localdatetime
+    parse_data
 )
 
 __TIMEZONE = 'Europe/Amsterdam'
 __DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
 
 
-def get_imageurl():
+def get_imageurl(img):
     """Get the image url helper function."""
     result = 'https://www.buienradar.nl/'
-    result += 'resources/images/icons/weather/30x30/cc.png'
+    result += 'resources/images/icons/weather/30x30/'
+    result += img
+    result += '.png'
     return result
 
 
 def test_to_localdatetime():
     """Check he workign of the to_localdatetime function."""
     # check invalid dates:
-    dt = to_localdatetime('')
+    dt = __to_localdatetime('')
     assert(dt is None)
 
-    dt = to_localdatetime(None)
+    dt = __to_localdatetime(None)
     assert(dt is None)
 
-    dt = to_localdatetime('01/02/2017 03:04:05')
+    dt = __to_localdatetime('01/02/2017 03:04:05')
     assert(("%s" % dt) == '2017-01-02 03:04:05+01:00')
 
     # (invalid) month:
-    dt = to_localdatetime('00/02/2017 03:04:05')
+    dt = __to_localdatetime('00/02/2017 03:04:05')
     assert(dt is None)
 
-    dt = to_localdatetime('12/02/2017 03:04:05')
+    dt = __to_localdatetime('12/02/2017 03:04:05')
     assert(("%s" % dt) == '2017-12-02 03:04:05+01:00')
 
-    dt = to_localdatetime('13/02/2017 03:04:05')
+    dt = __to_localdatetime('13/02/2017 03:04:05')
     assert(dt is None)
 
     # (invalid) day:
-    dt = to_localdatetime('01/00/2017 03:04:05')
+    dt = __to_localdatetime('01/00/2017 03:04:05')
     assert(dt is None)
 
-    dt = to_localdatetime('01/31/2017 03:04:05')
+    dt = __to_localdatetime('01/31/2017 03:04:05')
     assert(("%s" % dt) == '2017-01-31 03:04:05+01:00')
 
-    dt = to_localdatetime('01/32/2017 03:04:05')
+    dt = __to_localdatetime('01/32/2017 03:04:05')
     assert(dt is None)
 
-    dt = to_localdatetime('02/28/2017 03:04:05')
+    dt = __to_localdatetime('02/28/2017 03:04:05')
     assert(("%s" % dt) == '2017-02-28 03:04:05+01:00')
 
-    dt = to_localdatetime('02/29/2017 03:04:05')
+    dt = __to_localdatetime('02/29/2017 03:04:05')
     assert(dt is None)
 
     # (invalid) year:
-    dt = to_localdatetime('01/01/17 03:04:05')
+    dt = __to_localdatetime('01/01/17 03:04:05')
     assert(dt is None)
 
-    dt = to_localdatetime('01/1/017 03:04:05')
+    dt = __to_localdatetime('01/1/017 03:04:05')
     assert(dt is None)
 
     # (invalid) hour:
-    dt = to_localdatetime('01/31/2017 00:04:05')
+    dt = __to_localdatetime('01/31/2017 00:04:05')
     assert(("%s" % dt) == '2017-01-31 00:04:05+01:00')
 
-    dt = to_localdatetime('01/31/2017 03:04:05')
+    dt = __to_localdatetime('01/31/2017 03:04:05')
     assert(("%s" % dt) == '2017-01-31 03:04:05+01:00')
 
-    dt = to_localdatetime('01/31/2017 23:04:05')
+    dt = __to_localdatetime('01/31/2017 23:04:05')
     assert(("%s" % dt) == '2017-01-31 23:04:05+01:00')
 
-    dt = to_localdatetime('01/1/2017 24:04:05')
+    dt = __to_localdatetime('01/1/2017 24:04:05')
     assert(dt is None)
 
-    dt = to_localdatetime('01/1/2017 25:04:05')
+    dt = __to_localdatetime('01/1/2017 25:04:05')
     assert(dt is None)
 
-    dt = to_localdatetime('01/1/2017 01:04:05 PM')
+    dt = __to_localdatetime('01/1/2017 01:04:05 PM')
     assert(dt is None)
 
-    dt = to_localdatetime('01/1/2017 01:04:05 AM')
+    dt = __to_localdatetime('01/1/2017 01:04:05 AM')
     assert(dt is None)
 
     # (invalid) minute:
-    dt = to_localdatetime('01/31/2017 03:00:05')
+    dt = __to_localdatetime('01/31/2017 03:00:05')
     assert(("%s" % dt) == '2017-01-31 03:00:05+01:00')
 
-    dt = to_localdatetime('01/31/2017 03:04:05')
+    dt = __to_localdatetime('01/31/2017 03:04:05')
     assert(("%s" % dt) == '2017-01-31 03:04:05+01:00')
 
-    dt = to_localdatetime('01/31/2017 03:59:05')
+    dt = __to_localdatetime('01/31/2017 03:59:05')
     assert(("%s" % dt) == '2017-01-31 03:59:05+01:00')
 
-    dt = to_localdatetime('01/01/2017 03:60:05')
+    dt = __to_localdatetime('01/01/2017 03:60:05')
     assert(dt is None)
 
-    dt = to_localdatetime('01/1/2017 25:-4:05')
+    dt = __to_localdatetime('01/1/2017 25:-4:05')
     assert(dt is None)
 
     # (invalid) second:
-    dt = to_localdatetime('01/31/2017 03:04:00')
+    dt = __to_localdatetime('01/31/2017 03:04:00')
     assert(("%s" % dt) == '2017-01-31 03:04:00+01:00')
 
-    dt = to_localdatetime('01/31/2017 03:04:01')
+    dt = __to_localdatetime('01/31/2017 03:04:01')
     assert(("%s" % dt) == '2017-01-31 03:04:01+01:00')
 
-    dt = to_localdatetime('01/31/2017 03:04:59')
+    dt = __to_localdatetime('01/31/2017 03:04:59')
     assert(("%s" % dt) == '2017-01-31 03:04:59+01:00')
 
-    dt = to_localdatetime('01/1/2017 24:04:60')
+    dt = __to_localdatetime('01/1/2017 24:04:60')
     assert(dt is None)
 
-    dt = to_localdatetime('01/1/2017 25:04:-5')
+    dt = __to_localdatetime('01/1/2017 25:04:-5')
     assert(dt is None)
 
-    dt = to_localdatetime('01/31/2017 03:04:05')
+    dt = __to_localdatetime('01/31/2017 03:04:05')
     assert(("%s" % dt) == '2017-01-31 03:04:05+01:00')
 
     # check DST/tz offset:
-    dt = to_localdatetime('01/02/2017 01:02:03')
+    dt = __to_localdatetime('01/02/2017 01:02:03')
     assert(("%s" % dt) == '2017-01-02 01:02:03+01:00')
 
-    dt = to_localdatetime('02/28/2017 13:31:11')
+    dt = __to_localdatetime('02/28/2017 13:31:11')
     assert(("%s" % dt) == '2017-02-28 13:31:11+01:00')
 
-    dt = to_localdatetime('12/31/2017 13:31:11')
+    dt = __to_localdatetime('12/31/2017 13:31:11')
     assert(("%s" % dt) == '2017-12-31 13:31:11+01:00')
 
-    dt = to_localdatetime('07/10/2017 13:31:11')
+    dt = __to_localdatetime('07/10/2017 13:31:11')
     assert(("%s" % dt) == '2017-07-10 13:31:11+02:00')
 
 
@@ -235,9 +237,9 @@ def test_xml_data():
     assert(weerstation[SENSOR_TYPES[PRECIPITATION][0]] is not None)
     assert(weerstation[SENSOR_TYPES[PRESSURE][0]] is not None)
     assert(weerstation[SENSOR_TYPES[STATIONNAME][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[SYMBOL][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[SYMBOL][0]][__BRZIN] is not None)
-    assert(weerstation[SENSOR_TYPES[SYMBOL][0]][__BRTEXT] is not None)
+    assert(weerstation[SENSOR_TYPES[CONDITION][0]] is not None)
+    assert(weerstation[SENSOR_TYPES[CONDITION][0]][__BRZIN] is not None)
+    assert(weerstation[SENSOR_TYPES[CONDITION][0]][__BRTEXT] is not None)
     assert(weerstation[SENSOR_TYPES[TEMPERATURE][0]] is not None)
     assert(weerstation[SENSOR_TYPES[VISIBILITY][0]] is not None)
     assert(weerstation[SENSOR_TYPES[WINDSPEED][0]] is not None)
@@ -421,12 +423,16 @@ def test_readdata1():
             'temperature': 16.3,
             'stationname': 'Arcen (6391)',
             'windazimuth': 77,
-            'symbol': 'Zwaar bewolkt',
+            'condition': {'condcode': 'c',
+                          'condition': 'cloudy',
+                          'detailed': 'cloudy',
+                          'exact': 'Heavily clouded',
+                          'exact_nl': 'Zwaar bewolkt',
+                          'image': get_imageurl('cc')},
             'windforce': 2,
             'pressure': 1021.23,
             'winddirection': 'ONO',
             'humidity': 95,
-            'image': get_imageurl(),
             'attribution': 'Data provided by buienradar.nl',
             'groundtemperature': 15.9,
             'precipitation': 2.0,
@@ -437,21 +443,53 @@ def test_readdata1():
             'irradiance': 614,
             'visibility': 38400,
             'forecast': [
-                {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
-                 'rain': 0.0, 'windforce': 3},
-                {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
-                 'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                 'rain': 0.0, 'windforce': 3},
-                {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
-                 'rain': 0.0, 'windforce': 4},
-                {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
-                 'rain': 1.8, 'windforce': 4},
-                {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
-                 'rain': 4.4, 'windforce': 4}
+                {'datetime': fc1, 'temperature': 16.0, 'maxtemp': 16.0,
+                 'mintemp': 8.0, 'rainchance': 15, 'sunchance': 0,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                 'condition': {'condcode': 'j', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': 'Mix of clear and high clouds',
+                               'exact_nl': ('Mix van opklaringen en hoge '
+                                            'bewolking'),
+                               'image': get_imageurl('j')}},
+                {'datetime': fc2, 'temperature': 17.0, 'maxtemp': 17.0,
+                 'mintemp': 8.0, 'rainchance': 1, 'sunchance': 43,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                 'condition': {'condcode': 'b', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': ('Mix of clear and medium or low '
+                                         'clouds'),
+                               'exact_nl': ('Mix van opklaringen en middelbare'
+                                            ' of lage bewolking'),
+                               'image': get_imageurl('b')}},
+                {'datetime': fc3, 'temperature': 22.0, 'maxtemp': 22.0,
+                 'mintemp': 10.0, 'rainchance': 3, 'sunchance': 0,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'r', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': '?? Partly cloudy ??',
+                               'exact_nl': '?? Partly cloudy ??',
+                               'image': get_imageurl('r')}},
+                {'datetime': fc4, 'temperature': 18.0, 'maxtemp': 18.0,
+                 'mintemp': 11.0, 'rainchance': 43, 'sunchance': 0,
+                 'rain': 1.8, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'm', 'condition': 'rainy',
+                               'detailed': 'light-rain',
+                               'exact': ('Heavily clouded with some light '
+                                         'rain'),
+                               'exact_nl': ('Zwaar bewolkt met wat lichte '
+                                            'regen'),
+                               'image': get_imageurl('m')}},
+                {'datetime': fc5, 'temperature': 15.0, 'maxtemp': 15.0,
+                 'mintemp': 9.0, 'rainchance': 76, 'sunchance': 0,
+                 'rain': 4.4, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'f', 'condition': 'rainy',
+                               'detailed': 'partlycloudy-light-rain',
+                               'exact': ('Alternatingly cloudy with some '
+                                         'light rain'),
+                               'exact_nl': ('Afwisselend bewolkt met '
+                                            '(mogelijk) wat lichte regen'),
+                               'image': get_imageurl('f')}}
                 ],
             },
         'success': True,
@@ -475,12 +513,16 @@ def test_readdata1():
             'temperature': 16.3,
             'stationname': 'Arcen (6391)',
             'windazimuth': 77,
-            'symbol': 'Zwaar bewolkt',
+            'condition': {'condcode': 'c',
+                          'condition': 'cloudy',
+                          'detailed': 'cloudy',
+                          'exact': 'Heavily clouded',
+                          'exact_nl': 'Zwaar bewolkt',
+                          'image': get_imageurl('cc')},
             'windforce': 2,
             'pressure': 1021.23,
             'winddirection': 'ONO',
             'humidity': 95,
-            'image': get_imageurl(),
             'attribution': 'Data provided by buienradar.nl',
             'groundtemperature': 15.9,
             'precipitation': 2,
@@ -491,21 +533,53 @@ def test_readdata1():
             'irradiance': 614,
             'visibility': 38400,
             'forecast': [
-                {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
-                 'rain': 0.0, 'windforce': 3},
-                {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
-                 'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                 'rain': 0.0, 'windforce': 3},
-                {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
-                 'rain': 0.0, 'windforce': 4},
-                {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
-                 'rain': 1.8, 'windforce': 4},
-                {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
-                 'rain': 4.4, 'windforce': 4}
+                {'datetime': fc1, 'temperature': 16.0, 'maxtemp': 16.0,
+                 'mintemp': 8.0, 'rainchance': 15, 'sunchance': 0,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                 'condition': {'condcode': 'j', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': 'Mix of clear and high clouds',
+                               'exact_nl': ('Mix van opklaringen en hoge '
+                                            'bewolking'),
+                               'image': get_imageurl('j')}},
+                {'datetime': fc2, 'temperature': 17.0, 'maxtemp': 17.0,
+                 'mintemp': 8.0, 'rainchance': 1, 'sunchance': 43,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                 'condition': {'condcode': 'b', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': ('Mix of clear and medium or low '
+                                         'clouds'),
+                               'exact_nl': ('Mix van opklaringen en '
+                                            'middelbare of lage bewolking'),
+                               'image': get_imageurl('b')}},
+                {'datetime': fc3, 'temperature': 22.0, 'maxtemp': 22.0,
+                 'mintemp': 10.0, 'rainchance': 3, 'sunchance': 0,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'r', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': '?? Partly cloudy ??',
+                               'exact_nl': '?? Partly cloudy ??',
+                               'image': get_imageurl('r')}},
+                {'datetime': fc4, 'temperature': 18.0, 'maxtemp': 18.0,
+                 'mintemp': 11.0, 'rainchance': 43, 'sunchance': 0,
+                 'rain': 1.8, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'm', 'condition': 'rainy',
+                               'detailed': 'light-rain',
+                               'exact': ('Heavily clouded with some light '
+                                         'rain'),
+                               'exact_nl': ('Zwaar bewolkt met wat lichte '
+                                            'regen'),
+                               'image': get_imageurl('m')}},
+                {'datetime': fc5, 'temperature': 15.0, 'maxtemp': 15.0,
+                 'mintemp': 9.0, 'rainchance': 76, 'sunchance': 0,
+                 'rain': 4.4, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'f', 'condition': 'rainy',
+                               'detailed': 'partlycloudy-light-rain',
+                               'exact': ('Alternatingly cloudy with some '
+                                         'light rain'),
+                               'exact_nl': ('Afwisselend bewolkt met '
+                                            '(mogelijk) wat lichte regen'),
+                               'image': get_imageurl('f')}}
                 ],
             },
         'success': True,
@@ -567,12 +641,14 @@ def test_readdata2():
             'winddirection': 'ONO',
             'visibility': 14800,
             'attribution': 'Data provided by buienradar.nl',
-            'symbol': 'Zwaar bewolkt',
+            'condition': {'condcode': 'c', 'condition': 'cloudy',
+                          'detailed': 'cloudy', 'exact': 'Heavily clouded',
+                          'exact_nl': 'Zwaar bewolkt',
+                          'image': get_imageurl('cc')},
             'temperature': 16.0,
             'measured': measured,
             'groundtemperature': 15.4,
             'pressure': 1008.72,
-            'image': get_imageurl(),
             'stationname': 'De Bilt (6260)',
             'precipitation': 0.0,
             'precipitation_forecast':  {'average': 0.1,
@@ -581,21 +657,52 @@ def test_readdata2():
             'windazimuth': 72,
             'irradiance': 0,
             'forecast': [
-                {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
-                 'rain': 0.0, 'windforce': 3},
-                {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
-                 'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                 'rain': 0.0, 'windforce': 3},
-                {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
-                 'rain': 0.0, 'windforce': 4},
-                {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
-                 'rain': 1.8, 'windforce': 4},
-                {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
-                 'rain': 4.4, 'windforce': 4}
+                {'datetime': fc1, 'temperature': 16.0, 'maxtemp': 16.0,
+                 'mintemp': 8.0, 'rainchance': 15, 'sunchance': 0,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                 'condition': {'condcode': 'j', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': 'Mix of clear and high clouds',
+                               'exact_nl': ('Mix van opklaringen en hoge '
+                                            'bewolking'),
+                               'image': get_imageurl('j')}},
+                {'datetime': fc2, 'temperature': 17.0, 'maxtemp': 17.0,
+                 'mintemp': 8.0, 'rainchance': 1, 'sunchance': 43,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                 'condition': {'condcode': 'b', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': ('Mix of clear and medium or low '
+                                         'clouds'),
+                               'exact_nl': ('Mix van opklaringen en '
+                                            'middelbare of lage bewolking'),
+                               'image': get_imageurl('b')}},
+                {'datetime': fc3, 'temperature': 22.0, 'maxtemp': 22.0,
+                 'mintemp': 10.0, 'rainchance': 3, 'sunchance': 0,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'r', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': '?? Partly cloudy ??',
+                               'exact_nl': '?? Partly cloudy ??',
+                               'image': get_imageurl('r')}},
+                {'datetime': fc4, 'temperature': 18.0, 'maxtemp': 18.0,
+                 'mintemp': 11.0, 'rainchance': 43, 'sunchance': 0,
+                 'rain': 1.8, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'm', 'condition': 'rainy',
+                               'detailed': 'light-rain',
+                               'exact': 'Heavily clouded with some light rain',
+                               'exact_nl': ('Zwaar bewolkt met wat lichte '
+                                            'regen'),
+                               'image': get_imageurl('m')}},
+                {'datetime': fc5, 'temperature': 15.0, 'maxtemp': 15.0,
+                 'mintemp': 9.0, 'rainchance': 76, 'sunchance': 0,
+                 'rain': 4.4, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'f', 'condition': 'rainy',
+                               'detailed': 'partlycloudy-light-rain',
+                               'exact': ('Alternatingly cloudy with some '
+                                         'light rain'),
+                               'exact_nl': ('Afwisselend bewolkt met '
+                                            '(mogelijk) wat lichte regen'),
+                               'image': get_imageurl('f')}}
             ],
         },
         'success': True,
@@ -621,12 +728,16 @@ def test_readdata2():
             'winddirection': 'ONO',
             'visibility': 14800,
             'attribution': 'Data provided by buienradar.nl',
-            'symbol': 'Zwaar bewolkt',
+            'condition': {'condcode': 'c', 'condition': 'cloudy',
+                          'detailed': 'cloudy',
+                          'exact': 'Heavily clouded',
+                          'exact_nl': 'Zwaar bewolkt',
+                          'image': get_imageurl('cc')},
+
             'temperature': 16.0,
             'measured': measured,
             'groundtemperature': 15.4,
             'pressure': 1008.72,
-            'image': get_imageurl(),
             'stationname': 'De Bilt (6260)',
             'precipitation': 0.0,
             'precipitation_forecast':  {'average': 0.1,
@@ -635,21 +746,53 @@ def test_readdata2():
             'windazimuth': 72,
             'irradiance': 0,
             'forecast': [
-                {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                 'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
-                 'rain': 0.0, 'windforce': 3},
-                {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
-                 'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                 'rain': 0.0, 'windforce': 3},
-                {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                 'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
-                 'rain': 0.0, 'windforce': 4},
-                {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                 'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
-                 'rain': 1.8, 'windforce': 4},
-                {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                 'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
-                 'rain': 4.4, 'windforce': 4}
+                {'datetime': fc1, 'temperature': 16.0, 'maxtemp': 16.0,
+                 'mintemp': 8.0, 'rainchance': 15, 'sunchance': 0,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                 'condition': {'condcode': 'j', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': 'Mix of clear and high clouds',
+                               'exact_nl': ('Mix van opklaringen en hoge '
+                                            'bewolking'),
+                               'image': get_imageurl('j')}},
+                {'datetime': fc2, 'temperature': 17.0, 'maxtemp': 17.0,
+                 'mintemp': 8.0, 'rainchance': 1, 'sunchance': 43,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                 'condition': {'condcode': 'b', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': ('Mix of clear and medium or low '
+                                         'clouds'),
+                               'exact_nl': ('Mix van opklaringen en '
+                                            'middelbare of lage bewolking'),
+                               'image': get_imageurl('b')}},
+                {'datetime': fc3, 'temperature': 22.0, 'maxtemp': 22.0,
+                 'mintemp': 10.0, 'rainchance': 3, 'sunchance': 0,
+                 'rain': 0.0, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'r', 'condition': 'cloudy',
+                               'detailed': 'partlycloudy',
+                               'exact': '?? Partly cloudy ??',
+                               'exact_nl': '?? Partly cloudy ??',
+                               'image': get_imageurl('r')}},
+                {'datetime': fc4, 'temperature': 18.0, 'maxtemp': 18.0,
+                 'mintemp': 11.0, 'rainchance': 43, 'sunchance': 0,
+                 'rain': 1.8, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'm', 'condition': 'rainy',
+                               'detailed': 'light-rain',
+                               'exact': ('Heavily clouded with some light '
+                                         'rain'),
+                               'exact_nl': ('Zwaar bewolkt met wat lichte '
+                                            'regen'),
+                               'image': get_imageurl('m')}},
+                {'datetime': fc5, 'temperature': 15.0, 'maxtemp': 15.0,
+                 'mintemp': 9.0, 'rainchance': 76, 'sunchance': 0,
+                 'rain': 4.4, 'snow': 0.0, 'windforce': 4,
+                 'condition': {'condcode': 'f', 'condition': 'rainy',
+                               'detailed': 'partlycloudy-light-rain',
+                               'exact': ('Alternatingly cloudy with some '
+                                         'light rain'),
+                               'exact_nl': ('Afwisselend bewolkt met '
+                                            '(mogelijk) wat lichte regen'),
+                               'image': get_imageurl('f')}}
             ],
         },
         'success': True,
@@ -711,7 +854,11 @@ def test_readdata3():
             'precipitation_forecast': None,
             'humidity': 47,
             'pressure': 1004.95,
-            'symbol': 'Zwaar bewolkt',
+            'condition': {'condcode': 'c', 'condition': 'cloudy',
+                          'detailed': 'cloudy',
+                          'exact': 'Heavily clouded',
+                          'exact_nl': 'Zwaar bewolkt',
+                          'image': get_imageurl('cc')},
             'measured': measured,
             'winddirection': 'O',
             'stationname': 'Zeeplatform K13 (6252)',
@@ -719,23 +866,56 @@ def test_readdata3():
             'visibility': 6200,
             'irradiance': 614,
             'windgust': 14.0,
-            'image': get_imageurl(),
             'forecast': [
-                    {'datetime': fc1, 'temperature': 16.0, 'max_temp': 16.0,
-                     'min_temp': 8.0, 'rain_chance': 15, 'sun_chance': 0,
-                     'rain': 0.0, 'windforce': 3},
-                    {'datetime': fc2, 'temperature': 17.0, 'max_temp': 17.0,
-                     'min_temp': 8.0, 'rain_chance': 1, 'sun_chance': 43,
-                     'rain': 0.0, 'windforce': 3},
-                    {'datetime': fc3, 'temperature': 22.0, 'max_temp': 22.0,
-                     'min_temp': 10.0, 'rain_chance': 3, 'sun_chance': 0,
-                     'rain': 0.0, 'windforce': 4},
-                    {'datetime': fc4, 'temperature': 18.0, 'max_temp': 18.0,
-                     'min_temp': 11.0, 'rain_chance': 43, 'sun_chance': 0,
-                     'rain': 1.8, 'windforce': 4},
-                    {'datetime': fc5, 'temperature': 15.0, 'max_temp': 15.0,
-                     'min_temp': 9.0, 'rain_chance': 76, 'sun_chance': 0,
-                     'rain': 4.4, 'windforce': 4}
+                    {'datetime': fc1, 'temperature': 16.0, 'maxtemp': 16.0,
+                     'mintemp': 8.0, 'rainchance': 15, 'sunchance': 0,
+                     'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                     'condition': {'condcode': 'j', 'condition': 'cloudy',
+                                   'detailed': 'partlycloudy',
+                                   'exact': 'Mix of clear and high clouds',
+                                   'exact_nl': ('Mix van opklaringen en hoge '
+                                                'bewolking'),
+                                   'image': get_imageurl('j')}},
+                    {'datetime': fc2, 'temperature': 17.0, 'maxtemp': 17.0,
+                     'mintemp': 8.0, 'rainchance': 1, 'sunchance': 43,
+                     'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                     'condition': {'condcode': 'b', 'condition': 'cloudy',
+                                   'detailed': 'partlycloudy',
+                                   'exact': ('Mix of clear and medium or low '
+                                             'clouds'),
+                                   'exact_nl': ('Mix van opklaringen en '
+                                                'middelbare of lage '
+                                                'bewolking'),
+                                   'image': get_imageurl('b')}},
+                    {'datetime': fc3, 'temperature': 22.0, 'maxtemp': 22.0,
+                     'mintemp': 10.0, 'rainchance': 3, 'sunchance': 0,
+                     'rain': 0.0, 'snow': 0.0, 'windforce': 4,
+                     'condition': {'condcode': 'r', 'condition': 'cloudy',
+                                   'detailed': 'partlycloudy',
+                                   'exact': '?? Partly cloudy ??',
+                                   'exact_nl': '?? Partly cloudy ??',
+                                   'image': get_imageurl('r')}},
+                    {'datetime': fc4, 'temperature': 18.0, 'maxtemp': 18.0,
+                     'mintemp': 11.0, 'rainchance': 43, 'sunchance': 0,
+                     'rain': 1.8, 'snow': 0.0, 'windforce': 4,
+                     'condition': {'condcode': 'm', 'condition': 'rainy',
+                                   'detailed': 'light-rain',
+                                   'exact': ('Heavily clouded with some '
+                                             'light rain'),
+                                   'exact_nl': ('Zwaar bewolkt met wat lichte'
+                                                ' regen'),
+                                   'image': get_imageurl('m')}},
+                    {'datetime': fc5, 'temperature': 15.0, 'maxtemp': 15.0,
+                     'mintemp': 9.0, 'rainchance': 76, 'sunchance': 0,
+                     'rain': 4.4, 'snow': 0.0, 'windforce': 4,
+                     'condition': {'condcode': 'f', 'condition': 'rainy',
+                                   'detailed': 'partlycloudy-light-rain',
+                                   'exact': ('Alternatingly cloudy with some '
+                                             'light rain'),
+                                   'exact_nl': ('Afwisselend bewolkt met '
+                                                '(mogelijk) wat lichte '
+                                                'regen'),
+                                   'image': get_imageurl('f')}}
                 ]
             },
         }

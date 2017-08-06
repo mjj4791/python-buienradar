@@ -3,6 +3,18 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
+[0.9] - 2017-08-07
+""""""""""""""""""
+**changed**
+
+- removed symbol and image, replaced by condition element
+
+**new**
+
+- added detailed condition element
+- added snow to forecast
+- added condition to forecast
+
 [0.8] - 2017-07-27
 """"""""""""""""""
 **changed**

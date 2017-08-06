@@ -19,7 +19,12 @@ ATTRIBUTION_INFO = "Data provided by buienradar.nl"
 
 # key names as user in returned result
 ATTRIBUTION = "attribution"
+CONDCODE = 'condcode'
+CONDITION = 'condition'
 DATETIME = 'datetime'
+DETAILED = 'detailed'
+EXACT = 'exact'
+EXACTNL = 'exact_nl'
 DISTANCE = 'distance'
 FORECAST = 'forecast'
 GROUNDTEMP = 'groundtemperature'
@@ -31,7 +36,6 @@ PRECIPITATION = 'precipitation'
 PRECIPITATION_FORECAST = 'precipitation_forecast'
 PRESSURE = 'pressure'
 STATIONNAME = 'stationname'
-SYMBOL = 'symbol'
 TEMPERATURE = 'temperature'
 VISIBILITY = 'visibility'
 WINDAZIMUTH = 'windazimuth'
@@ -41,11 +45,12 @@ WINDGUST = 'windgust'
 WINDSPEED = 'windspeed'
 
 # keys in forcasted data:
-MAX_TEMP = 'max_temp'
-MIN_TEMP = 'min_temp'
+MAX_TEMP = 'maxtemp'
+MIN_TEMP = 'mintemp'
 RAIN = 'rain'
-RAIN_CHANCE = 'rain_chance'
-SUN_CHANCE = 'sun_chance'
+RAIN_CHANCE = 'rainchance'
+SUN_CHANCE = 'sunchance'
+SNOW = 'snow'
 
 # keys in forcasted precipitation data:
 AVERAGE = 'average'
@@ -62,8 +67,11 @@ __BRLAT = 'lat'
 __BRLON = 'lon'
 __BRSTATIONCODE = 'stationcode'
 __BRSTATIONNAAM = 'stationnaam'
+__BRSNEEUWCMS = 'sneeuwcms'
 __BRTEXT = '#text'
 __BRZIN = '@zin'
+__BRID = '@ID'
+__BRICOON = 'icoon'
 __BRVERWACHTING = 'verwachting_meerdaags'
 __BRDAYFC = "dag-plus%d"
 __BRMINTEMP = 'mintemp'
@@ -79,7 +87,7 @@ __DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
 __TIMEZONE = 'Europe/Amsterdam'
 
 
-def to_int(val):
+def __to_int(val):
     """Convert val into an integer value."""
     try:
         return int(val)
@@ -87,7 +95,7 @@ def to_int(val):
         return 0
 
 
-def to_float(val, digits):
+def __to_float(val, digits):
     """Convert val into float with digits decimal."""
     try:
         return round(float(val), digits)
@@ -95,17 +103,17 @@ def to_float(val, digits):
         return float(0)
 
 
-def to_float2(val):
+def __to_float2(val):
     """Convert val into float with 2 decimals."""
-    return to_float(val, 2)
+    return __to_float(val, 2)
 
 
-def to_float1(val):
+def __to_float1(val):
     """Convert val into float with 1 decimal."""
-    return to_float(val, 1)
+    return __to_float(val, 1)
 
 
-def to_localdatetime(val):
+def __to_localdatetime(val):
     """Convert val into a local datetime for tz Europe/Amsterdam."""
     try:
         dt = datetime.strptime(val, __DATE_FORMAT)
@@ -116,23 +124,81 @@ def to_localdatetime(val):
 
 
 # Sensor types are defined like so:
-# SENSOR_TYPES = { 'key': 'key in buienradar xml', }
+# SENSOR_TYPES = { 'key': ['key in buienradar xml', conversion function], }
 SENSOR_TYPES = {
-    HUMIDITY: ['luchtvochtigheid', to_int],
-    GROUNDTEMP: ['temperatuur10cm', to_float1],
-    IRRADIANCE: ['zonintensiteitWM2', to_int],
-    MEASURED: ['datum', to_localdatetime],
-    PRECIPITATION: ['regenMMPU', to_float1],
-    PRESSURE: ['luchtdruk', to_float2],
+    HUMIDITY: ['luchtvochtigheid', __to_int],
+    GROUNDTEMP: ['temperatuur10cm', __to_float1],
+    IRRADIANCE: ['zonintensiteitWM2', __to_int],
+    MEASURED: ['datum', __to_localdatetime],
+    PRECIPITATION: ['regenMMPU', __to_float1],
+    PRESSURE: ['luchtdruk', __to_float2],
     STATIONNAME: ['stationnaam', None],
-    SYMBOL: ['icoonactueel', None],
-    TEMPERATURE: ['temperatuurGC', to_float1],
-    VISIBILITY: ['zichtmeters', to_int],
-    WINDSPEED: ['windsnelheidMS', to_float2],
-    WINDFORCE: ['windsnelheidBF', to_int],
+    CONDITION: ['icoonactueel', None],
+    TEMPERATURE: ['temperatuurGC', __to_float1],
+    VISIBILITY: ['zichtmeters', __to_int],
+    WINDSPEED: ['windsnelheidMS', __to_float2],
+    WINDFORCE: ['windsnelheidBF', __to_int],
     WINDDIRECTION: ['windrichting', None],
-    WINDAZIMUTH: ['windrichtingGR', to_int],
-    WINDGUST: ['windstotenMS', to_float2],
+    WINDAZIMUTH: ['windrichtingGR', __to_int],
+    WINDGUST: ['windstotenMS', __to_float2],
+}
+
+# Condition codes are defined like so:
+# __BRCONDITIONS = { 'code': 'conditon', 'detailed', 'exact', 'exact_nl'}
+__BRCONDITIONS = {
+    'a': ['clear', 'clear', 'Almost fully clear (sunny/clear)',
+          'Vrijwel onbewolkt (zonnig/helder)'],
+    'b': ['cloudy', 'partlycloudy', 'Mix of clear and medium or low clouds',
+          'Mix van opklaringen en middelbare of lage bewolking'],
+    'j': ['cloudy', 'partlycloudy', 'Mix of clear and high clouds',
+          'Mix van opklaringen en hoge bewolking'],
+    'o': ['cloudy', 'partlycloudy', 'Partly cloudy',
+          'Half bewolkt'],
+    'r': ['cloudy', 'partlycloudy', '?? Partly cloudy ??',
+          '?? Partly cloudy ??'],
+    'c': ['cloudy', 'cloudy', 'Heavily clouded',
+          'Zwaar bewolkt'],
+    'p': ['cloudy', 'cloudy', '?? Cloudy ??',
+          '?? Cloudy ??'],
+    'd': ['fog', 'partlycloudy-fog',
+          'Alternating cloudy with local fog(banks)',
+          'Afwisselend bewolkt met lokaal mist(banken)'],
+    'n': ['fog', 'fog', 'Clear and local mist or fog',
+          'Opklaring en lokaal nevel of mist'],
+    'f': ['rainy', 'partlycloudy-light-rain',
+          'Alternatingly cloudy with some light rain',
+          'Afwisselend bewolkt met (mogelijk) wat lichte regen'],
+    'h': ['rainy', 'partlycloudy-rain', '?? partlycloudy-rain ??',
+          '?? partlycloudy-rain ??'],
+    'k': ['rainy', 'partlycloudy-light-rain', '??partlycloudy-light-rain ??',
+          '??partlycloudy-light-rain ??'],
+    'l': ['rainy', 'rainy', '?? rainy ??',
+          '?? rainy ??'],
+    'q': ['rainy', 'rainy', 'Heavily clouded with rain',
+          'Zwaar bewolkt en regen'],
+    'w': ['rainy', 'snowy-rainy',
+          'Heavily clouded with rain and winter precipitation',
+          'Zwaar bewolkt met regen en winterse neerslag'],
+    'm': ['rainy', 'light-rain', 'Heavily clouded with some light rain',
+          'Zwaar bewolkt met wat lichte regen'],
+    'u': ['snowy', 'partlycloudy-light-snow', 'Cloudy with light snow',
+          'Afwisselend bewolkt met lichte sneeuwval'],
+    'i': ['snowy', 'partlycloudy-snow', '?? partlycloudy-snow ??',
+          '?? partlycloudy-snow ??'],
+    'v': ['snowy', 'light-snow', 'Heavily clouded with light snowfall',
+          'Zwaar bewolkt met lichte sneeuwval'],
+    't': ['snowy', 'snowy', 'Heavy snowfall',
+          'Zware sneeuwval'],
+    'g': ['lightning', 'partlycloudy-lightning',
+          'Clear with (possibly) some heavy lightning',
+          'Opklaringen en kans op enkele pittige (onweers)buien'],
+    's': ['lightning', 'lightning',
+          'Cloudy with (possibly) some heavy (thunderstorms) showers',
+          'Bewolkt en kans op enkele pittige (onweers)buien'],
+    # 'e': ['N/A', 'N/A', 'N/A', 'N/A'],
+    # 'x': ['N/A', 'N/A', 'N/A', 'N/A'],
+    # 'y': ['N/A', 'N/A', 'N/A', 'N/A'],
+    # 'z': ['N/A', 'N/A', 'N/A', 'N/A'],
 }
 
 log = logging.getLogger(__name__)
@@ -186,6 +252,20 @@ def parse_data(content, raincontent, latitude=52.091579,
 
     log.debug("Extracted weather-data: %s", result[DATA])
     return result
+
+
+def condition_from_code(condcode):
+    """Get the condition name from the condition code."""
+    if condcode in __BRCONDITIONS:
+        cond_data = __BRCONDITIONS[condcode]
+
+        return {CONDCODE: condcode,
+                CONDITION: cond_data[0],
+                DETAILED: cond_data[1],
+                EXACT: cond_data[2],
+                EXACTNL: cond_data[3],
+                }
+    return None
 
 
 def __get_url(url):
@@ -331,7 +411,7 @@ def __parse_precipfc_data(data, timeframe):
 def __is_valid(loc_data):
     """Determine if this can be valid data (not all 0's)."""
     for key, [value, func] in SENSOR_TYPES.items():
-        if (key != SYMBOL and key != STATIONNAME and key != MEASURED):
+        if (key != CONDITION and key != STATIONNAME and key != MEASURED):
             if (func is not None):
                 sens_data = loc_data.get(value)
                 if func(sens_data) != 0:
@@ -348,10 +428,11 @@ def __parse_loc_data(loc_data, result):
         result[DATA][key] = None
         try:
             sens_data = loc_data[value]
-            if key == SYMBOL:
+            if key == CONDITION:
                 # update weather symbol & status text
-                result[DATA][key] = sens_data[__BRZIN]
-                result[DATA][IMAGE] = sens_data[__BRTEXT]
+                code = sens_data[__BRID][:1]
+                result[DATA][CONDITION] = condition_from_code(code)
+                result[DATA][CONDITION][IMAGE] = sens_data[__BRTEXT]
             else:
                 if key == STATIONNAME:
                     name = sens_data[__BRTEXT].replace("Meetstation", "")
@@ -388,16 +469,21 @@ def __parse_fc_data(fc_data):
                                             microsecond=0)
             # add daycnt days
             fcdatetime = fcdatetime + timedelta(days=daycnt)
+            code = tmpsect.get(__BRICOON, []).get(__BRID)
             fcdata = {
+                      CONDITION: condition_from_code(code),
                       TEMPERATURE: __get_float(tmpsect, __BRMAXTEMP),
                       MIN_TEMP: __get_float(tmpsect, __BRMINTEMP),
                       MAX_TEMP: __get_float(tmpsect, __BRMAXTEMP),
                       SUN_CHANCE: __get_int(tmpsect, __BRKANSZON),
                       RAIN_CHANCE: __get_int(tmpsect, __BRKANSREGEN),
                       RAIN: __get_float(tmpsect, __BRMAXMMREGEN),
+                      SNOW: __get_float(tmpsect, __BRSNEEUWCMS),
                       WINDFORCE: __get_int(tmpsect, __BRWINDKRACHT),
-                      DATETIME: fcdatetime
+                      DATETIME: fcdatetime,
                      }
+            fcdata[CONDITION][IMAGE] = tmpsect.get(__BRICOON, []).get(__BRTEXT)
+
             fc.append(fcdata)
     return fc
 
