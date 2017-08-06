@@ -165,28 +165,28 @@ Use the constants defined in the buienradar component to get the data from the r
 
     - CONDCODE: unique condition code (a-z)
     - CONDITION: condition
-        - clear
-        - cloudy
-        - fog
-        - rainy
-        - snowy
-        - lightning
+      - clear
+      - cloudy
+      - fog
+      - rainy
+      - snowy
+      - lightning
     - DETAILED: more detailed condition
-        - clear
-        - partlycloudy
-        - cloudy
-        - partlycloudy-fog
-        - partlycloudy-light-rain
-        - partlycloudy-rain
-        - light-rain
-        - rainy
-        - snowy-rainy
-        - partlycloudy-light-snow
-        - partlycloudy-snow
-        - light-snow
-        - snowy
-        - partlycloudy-lightning
-        - lightning
+      - clear
+      - partlycloudy
+      - cloudy
+      - partlycloudy-fog
+      - partlycloudy-light-rain
+      - partlycloudy-rain
+      - light-rain
+      - rainy
+      - snowy-rainy
+      - partlycloudy-light-snow
+      - partlycloudy-snow
+      - light-snow
+      - snowy
+      - partlycloudy-lightning
+      - lightning
     - EXACT: the exact condition as reported (translated to english)
     - EXACTNL: the exact condition as reported
     - IMAGE: A symbol for the current weather
