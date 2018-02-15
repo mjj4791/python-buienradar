@@ -3,6 +3,13 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
+[0.91] - 2018-02-15
+"""""""""""""""""""
+**changed**
+
+- fixed an unexpected exception in case the internet is down or DNS is unavailable
+
+
 [0.9] - 2017-08-07
 """"""""""""""""""
 **changed**
