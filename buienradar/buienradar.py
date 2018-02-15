@@ -52,7 +52,7 @@ RAIN_CHANCE = 'rainchance'
 SUN_CHANCE = 'sunchance'
 SNOW = 'snow'
 
-# keys in forcasted precipitation data:
+# keys in forecasted precipitation data:
 AVERAGE = 'average'
 TIMEFRAME = 'timeframe'
 TOTAL = 'total'
@@ -218,7 +218,14 @@ def get_data(latitude=52.091579, longitude=5.119734):
         final_result[CONTENT] = result[CONTENT]
         final_result[SUCCESS] = True
     else:
-        msg = "Status: %d, Msg: %s" % (result[STATUS_CODE], result[MESSAGE])
+        if STATUS_CODE in result and MESSAGE in result:
+            msg = "Status: %d, Msg: %s" % (result[STATUS_CODE],
+                                           result[MESSAGE])
+        elif MESSAGE in result:
+            msg = "Msg: %s" % (result[MESSAGE])
+        else:
+            msg = "Something went wrong (reason unknown)."
+
         log.warning(msg)
         final_result[MESSAGE] = msg
 
@@ -228,7 +235,14 @@ def get_data(latitude=52.091579, longitude=5.119734):
     if result[SUCCESS]:
         final_result[RAINCONTENT] = result[CONTENT]
     else:
-        msg = "Status: %d, Msg: %s" % (result[STATUS_CODE], result[MESSAGE])
+        if STATUS_CODE in result and MESSAGE in result:
+            msg = "Status: %d, Msg: %s" % (result[STATUS_CODE],
+                                           result[MESSAGE])
+        elif MESSAGE in result:
+            msg = "Msg: %s" % (result[MESSAGE])
+        else:
+            msg = "Something went wrong (reason unknown)."
+
         log.warning(msg)
         final_result[MESSAGE] = msg
 
