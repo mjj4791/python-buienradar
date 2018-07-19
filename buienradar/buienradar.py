@@ -554,9 +554,10 @@ def __select_nearest_ws(xmldata, latitude, longitude):
         ws_xml = xmldata[__BRWEERGEGEVENS][__BRACTUEELWEER]
         ws_xml = ws_xml[__BRWEERSTATIONS][__BRWEERSTATION]
     except (KeyError, TypeError):
-        log.warning("Missing section in Buienradar xmldata (%s)."
-                    "Can happen 00:00-01:00 CE(S)T",
-                    __BRWEERSTATION)
+        if (int(datetime.now().strftime('%H'))>0):
+            log.warning("Missing section in Buienradar xmldata (%s)."
+                        "Can happen 00:00-01:00 CE(S)T",
+                        __BRWEERSTATION)
         return None
 
     for wstation in ws_xml:
