@@ -1,0 +1,120 @@
+{
+    "buienradar": {
+      "copyright": "(C)opyright Buienradar / RTL. Alle rechten voorbehouden",
+      "terms": "Deze feed mag vrij worden gebruikt onder voorwaarde van bronvermelding buienradar.nl inclusief een hyperlink naar https://www.buienradar.nl. Aan de feed kunnen door gebruikers of andere personen geen rechten worden ontleend."
+    },
+    "actual": {
+      "stationmeasurements": [ ],
+      "actualradarurl": "https://api.buienradar.nl/image/1.0/RadarMapNL?w=500&h=512",
+      "sunrise": "2019-02-04T08:15:00",
+      "sunset": "2019-02-04T17:32:00"
+    },
+    "forecast": {
+      "weatherreport": {
+        "published": "2019-02-04T17:30:00",
+        "title": "Regenachtig",
+        "summary": "Er komt voorlopig een einde aan het koude kwakkelweer. De komende dagen wordt het een stuk zachter, maar dat gaat wel gepaard met bewolkt en nat weer.",
+        "text": "Het wordt de komende dagen zachter winterweer, dus even geen winterse perikelen meer. Vanavond valt lokaal nog wel wat natte sneeuw, maar vanaf morgen is het echt even gedaan met vorst, sneeuw en gladheid.Vanavond is het bewolkt en regenachtig. In het oosten en zuidoosten valt lokaal nog wat natte sneeuw en op de hogergelegen delen misschien nog wat sneeuw. Daar kan het nog even glad worden. In de rest van het land valt enkel nog (mot)regen. De wind is matig tot (vrij) krachtig en komt uit het zuidwesten.Vannacht wordt het geleidelijk droger, maar in het (zuid)oosten blijft het nog enige tijd druilerig. In het noorden kan het opklaren en wanneer dat gebeurt kan de temperatuur toch net even onder nul uitkomen. Daardoor kan het plaatselijk glad worden. In de bewolkte gebieden daalt de temperatur naar 1 of 2 graden (boven nul). De wind neemt in kracht af.Morgen is een dag met veel bewolking en soms een streepje zon. Het blijft vrijwel droog en de temperatuur komt in de middag uit op 6 graden. Er waait een zwakke tot matige zuidenwind.De dagen daarna verdwijnt de vorst en wordt het met regionaal 10 graden overdag een stuk zachter. We moeten het wel bekopen met wisselvallig en winderig weer, en de zon laat zich maar weinig zien.",
+        "author": "William Huizinga",
+        "authorbio": "Sinds 2013 meteoroloog en presentator bij RTL Nieuws en Buienradar. Voorheen 12 jaar als luchtvaartmeteoroloog gewerkt bij de Koninklijke Luchtmacht en als meteoroloog en coördinator gladheidsbestrijding bij Meteovista.",
+        "url": "https://www.buienradar.nl/nederland/weerbericht"
+      },
+      "shortterm": {
+        "startdate": "2019-02-05T00:00:00",
+        "enddate": "2019-02-09T00:00:00",
+        "forecast": "Wisselvallig met temperaturen boven het langjarig gemiddelde."
+      },
+      "longterm": {
+        "startdate": "2019-02-10T00:00:00",
+        "enddate": "2019-02-14T00:00:00",
+        "forecast": "Overgang naar een wat rustiger en minder wisselvallig weertype met temperaturen rond normaal."
+      },
+      "fivedayforecast": [
+        {
+          "day": "2019-02-05T00:00:00",
+          "mintemperature": "2",
+          "maxtemperature": "6",
+          "mintemperatureMax": 2,
+          "mintemperatureMin": 2,
+          "maxtemperatureMax": 6,
+          "maxtemperatureMin": 6,
+          "rainChance": 20,
+          "sunChance": 20,
+          "windDirection": "z",
+          "wind": 3,
+          "mmRainMin": 0.0,
+          "mmRainMax": 0.0,
+          "iconurl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/c.png",
+          "weatherdescription": "Zwaar bewolkt"
+        },
+        {
+          "day": "2019-02-06T00:00:00",
+          "mintemperature": "3/5",
+          "maxtemperature": "9/10",
+          "mintemperatureMax": 5,
+          "mintemperatureMin": 3,
+          "maxtemperatureMax": 10,
+          "maxtemperatureMin": 9,
+          "rainChance": 90,
+          "sunChance": 10,
+          "windDirection": "zw",
+          "wind": 4,
+          "mmRainMin": 5.0,
+          "mmRainMax": 11.0,
+          "iconurl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/q.png",
+          "weatherdescription": "Zwaar bewolkt en regen"
+        },
+        {
+          "day": "2019-02-07T00:00:00",
+          "mintemperature": "6/8",
+          "maxtemperature": "9/10",
+          "mintemperatureMax": 8,
+          "mintemperatureMin": 6,
+          "maxtemperatureMax": 10,
+          "maxtemperatureMin": 9,
+          "rainChance": 90,
+          "sunChance": 10,
+          "windDirection": "zw",
+          "wind": 4,
+          "mmRainMin": 3.0,
+          "mmRainMax": 8.0,
+          "iconurl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/q.png",
+          "weatherdescription": "Zwaar bewolkt en regen"
+        },
+        {
+          "day": "2019-02-08T00:00:00",
+          "mintemperature": "3/5",
+          "maxtemperature": "7/9",
+          "mintemperatureMax": 5,
+          "mintemperatureMin": 3,
+          "maxtemperatureMax": 9,
+          "maxtemperatureMin": 7,
+          "rainChance": 70,
+          "sunChance": 20,
+          "windDirection": "zw",
+          "wind": 4,
+          "mmRainMin": 1.0,
+          "mmRainMax": 5.0,
+          "iconurl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/q.png",
+          "weatherdescription": "Zwaar bewolkt en regen"
+        },
+        {
+          "day": "2019-02-09T00:00:00",
+          "mintemperature": "3/7",
+          "maxtemperature": "9/10",
+          "mintemperatureMax": 7,
+          "mintemperatureMin": 3,
+          "maxtemperatureMax": 10,
+          "maxtemperatureMin": 9,
+          "rainChance": 80,
+          "sunChance": 20,
+          "windDirection": "zw",
+          "wind": 5,
+          "mmRainMin": 3.0,
+          "mmRainMax": 7.0,
+          "iconurl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/q.png",
+          "weatherdescription": "Zwaar bewolkt en regen"
+        }
+      ]
+    }
+  }
