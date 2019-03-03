@@ -3,6 +3,20 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
+[1.0.0] - 2019-03-02
+""""""""""""""""""""
+**changed**
+
+- moved from old XML API to new json API
+
+**new**
+
+- New sensor types:
+
+  - added (json only): barometerfc, barometerfcname, feeltemperature, rainlast24hour, rainlasthour
+  - addef forecast for (json only): minrain, maxrain
+
+
 [0.91] - 2018-02-15
 """""""""""""""""""
 **changed**
@@ -53,7 +67,7 @@ Changes that did not make it into a new release are marked with [unreleased].
 
   - winddirection: N/O/Z etc.
   - windazimuth: is measured in degrees
-  
+
 - removed 'Meetstation ' from station name
 
 [0.5] - 2017-06-10

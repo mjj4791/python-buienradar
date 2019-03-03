@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 import pytz
 import xmltodict
 
-from buienradar.buienradar import (
+from buienradar.buienradar import get_data, parse_data
+from buienradar.buienradar_xml import (
     __BRACTUEELWEER,
     __BRLAT,
     __BRLON,
@@ -16,6 +17,12 @@ from buienradar.buienradar import (
     __BRWEERSTATION,
     __BRWEERSTATIONS,
     __BRZIN,
+    SENSOR_TYPES,
+    __get_ws_distance,
+    __parse_precipfc_data,
+    __to_localdatetime
+)
+from buienradar.constants import (
     CONDITION,
     CONTENT,
     DATA,
@@ -28,7 +35,6 @@ from buienradar.buienradar import (
     PRECIPITATION,
     PRESSURE,
     RAINCONTENT,
-    SENSOR_TYPES,
     STATIONNAME,
     SUCCESS,
     TEMPERATURE,
@@ -37,12 +43,7 @@ from buienradar.buienradar import (
     WINDDIRECTION,
     WINDFORCE,
     WINDGUST,
-    WINDSPEED,
-    __get_ws_distance,
-    __parse_precipfc_data,
-    __to_localdatetime,
-    get_data,
-    parse_data
+    WINDSPEED
 )
 
 __TIMEZONE = 'Europe/Amsterdam'
@@ -176,7 +177,7 @@ def test_to_localdatetime():
 
 def test_rain_data():
     """Test format of retrieved rain data."""
-    result = get_data()
+    result = get_data(usexml=True)
 
     # we must have content:
     assert(result[CONTENT] is not None)
@@ -203,7 +204,7 @@ def test_rain_data():
 
 def test_xml_data():
     """Check xml data elements/xsd."""
-    result = get_data()
+    result = get_data(usexml=True)
 
     # we must have content:
     assert(result[CONTENT] is not None)
@@ -253,8 +254,8 @@ def test_precip_fc():
     """Test parsing precipitation forecast data."""
     data = ""
     for n in range(0, 24):
-        data += "000|%s\n" % (datetime.now() +
-                              timedelta(minutes=n*5)).strftime("%H:%M")
+        data += "000|%s\n" % (datetime.now() +              # noqa: ignore=W504
+                              timedelta(minutes=n * 5)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 60)
     expect = {'average': 0.0, 'total': 0.0, 'timeframe': 60}
@@ -268,8 +269,8 @@ def test_precip_fc2():
     """Test parsing precipitation forecast data."""
     data = ""
     for n in range(0, 24):
-        data += "100|%s\n" % (datetime.now() +
-                              timedelta(minutes=n*5)).strftime("%H:%M")
+        data += "100|%s\n" % (datetime.now() +              # noqa: ignore=W504
+                              timedelta(minutes=n * 5)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 60)
     expect = {'average': 0.52, 'timeframe': 60, 'total': 0.52}
@@ -283,8 +284,8 @@ def test_precip_fc3():
     """Test parsing precipitation forecast data."""
     data = ""
     for n in range(0, 24):
-        data += "100|%s\n" % (datetime.now() +
-                              timedelta(minutes=n*5)).strftime("%H:%M")
+        data += "100|%s\n" % (datetime.now() +              # noqa: ignore=W504
+                              timedelta(minutes=n * 5)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 30)
     expect = {'average': 0.52, 'timeframe': 30, 'total': 0.26}
@@ -298,8 +299,8 @@ def test_precip_fc4():
     """Test parsing precipitation forecast data."""
     data = ""
     for n in range(0, 24):
-        data += "077|%s\n" % (datetime.now() +
-                              timedelta(minutes=n*5)).strftime("%H:%M")
+        data += "077|%s\n" % (datetime.now() +              # noqa: ignore=W504
+                              timedelta(minutes=n * 5)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 30)
     expect = {'average': 0.1, 'timeframe': 30, 'total': 0.05}
@@ -312,19 +313,19 @@ def test_precip_fc4():
 def test_precip_fc5():
     """Test parsing precipitation forecast data."""
     data = ""
-    data += "000|%s\n" % (datetime.now() +
+    data += "000|%s\n" % (datetime.now() +                  # noqa: ignore=W504
                           timedelta(minutes=0)).strftime("%H:%M")
-    data += "217|%s\n" % (datetime.now() +
+    data += "217|%s\n" % (datetime.now() +                  # noqa: ignore=W504
                           timedelta(minutes=5)).strftime("%H:%M")
-    data += "208|%s\n" % (datetime.now() +
+    data += "208|%s\n" % (datetime.now() +                  # noqa: ignore=W504
                           timedelta(minutes=15)).strftime("%H:%M")
-    data += "145|%s\n" % (datetime.now() +
+    data += "145|%s\n" % (datetime.now() +                  # noqa: ignore=W504
                           timedelta(minutes=20)).strftime("%H:%M")
-    data += "131|%s\n" % (datetime.now() +
+    data += "131|%s\n" % (datetime.now() +                  # noqa: ignore=W504
                           timedelta(minutes=25)).strftime("%H:%M")
-    data += "00|%s\n" % (datetime.now() +
+    data += "00|%s\n" % (datetime.now() +                   # noqa: ignore=W504
                          timedelta(minutes=30)).strftime("%H:%M")
-    data += "00|%s\n" % (datetime.now() +
+    data += "00|%s\n" % (datetime.now() +                   # noqa: ignore=W504
                          timedelta(minutes=35)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 30)
@@ -343,7 +344,8 @@ def test_parse_timeframe():
     latitude = 51.50
     longitude = 6.20
     try:
-        result = parse_data(data, raindata, latitude, longitude, 4)
+        result = parse_data(data, raindata,
+                            latitude, longitude, 4, usexml=True)
         # timeframe=4 should raise a ValueError, so:
         assert(False)
     except ValueError:
@@ -351,7 +353,8 @@ def test_parse_timeframe():
         assert(True)
 
     try:
-        result = parse_data(data, raindata, latitude, longitude, 5)
+        result = parse_data(data, raindata,
+                            latitude, longitude, 5, usexml=True)
         # timeframe=5 should NOT raise a ValueError, so:
         assert(True and result[SUCCESS] is False)
     except ValueError:
@@ -359,7 +362,8 @@ def test_parse_timeframe():
         assert(False)
 
     try:
-        result = parse_data(data, raindata, latitude, longitude, 121)
+        result = parse_data(data, raindata,
+                            latitude, longitude, 121, usexml=True)
         # timeframe=121 should raise a ValueError, so:
         assert(False)
     except ValueError:
@@ -367,7 +371,8 @@ def test_parse_timeframe():
         assert(True)
 
     try:
-        result = parse_data(data, raindata, latitude, longitude, 120)
+        result = parse_data(data, raindata,
+                            latitude, longitude, 120, usexml=True)
         # timeframe=120 should NOT raise a ValueError, so:
         assert(True and result[SUCCESS] is False)
     except ValueError:
@@ -378,7 +383,7 @@ def test_parse_timeframe():
 def test_readdata1():
     """Test loading and parsing xml file."""
     # load buienradar.xml
-    file = open('tests/buienradar.xml', 'r')
+    file = open('tests/xml/buienradar.xml', 'r')
     data = file.read()
     file.close()
 
@@ -390,12 +395,12 @@ def test_readdata1():
     # Meetstation Arcen (6391)
     latitude = 51.50
     longitude = 6.20
-    result = parse_data(data, raindata, latitude, longitude)
+    result = parse_data(data, raindata, latitude, longitude, usexml=True)
     print(result)
     assert(result[SUCCESS] and result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                              # noqa: ignore=W504
            '(6391)' in result[DATA][STATIONNAME])
 
     # check the data:
@@ -490,20 +495,20 @@ def test_readdata1():
                                'exact_nl': ('Afwisselend bewolkt met '
                                             '(mogelijk) wat lichte regen'),
                                'image': get_imageurl('f')}}
-                ],
-            },
+            ],
+        },
         'success': True,
         'msg': None,
         'distance': 0.0
     }
     assert(expect == result)
 
-    result = parse_data(data, raindata, latitude, longitude, 30)
+    result = parse_data(data, raindata, latitude, longitude, 30, usexml=True)
     print(result)
     assert(result[SUCCESS] and result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                              # noqa: ignore=W504
            '(6391)' in result[DATA][STATIONNAME])
 
     expect = {
@@ -580,8 +585,8 @@ def test_readdata1():
                                'exact_nl': ('Afwisselend bewolkt met '
                                             '(mogelijk) wat lichte regen'),
                                'image': get_imageurl('f')}}
-                ],
-            },
+            ],
+        },
         'success': True,
         'msg': None,
         'distance': 0.0
@@ -592,7 +597,7 @@ def test_readdata1():
 def test_readdata2():
     """Test loading and parsing xml file."""
     # load buienradar.xml
-    file = open('tests/buienradar.xml', 'r')
+    file = open('tests/xml/buienradar.xml', 'r')
     data = file.read()
     file.close()
 
@@ -605,13 +610,13 @@ def test_readdata2():
     # Meetstation De Bilt (6260)
     latitude = 52.11
     longitude = 5.19
-    result = parse_data(data, raindata, latitude, longitude)
+    result = parse_data(data, raindata, latitude, longitude, usexml=True)
     print(result)
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                              # noqa: ignore=W504
            result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                              # noqa: ignore=W504
            '(6260)' in result[DATA][STATIONNAME])
 
     # check the data:
@@ -651,9 +656,9 @@ def test_readdata2():
             'pressure': 1008.72,
             'stationname': 'De Bilt (6260)',
             'precipitation': 0.0,
-            'precipitation_forecast':  {'average': 0.1,
-                                        'timeframe': 60,
-                                        'total': 0.1},
+            'precipitation_forecast': {'average': 0.1,
+                                       'timeframe': 60,
+                                       'total': 0.1},
             'windazimuth': 72,
             'irradiance': 0,
             'forecast': [
@@ -710,13 +715,13 @@ def test_readdata2():
         'msg': None}
     assert(expect == result)
 
-    result = parse_data(data, raindata, latitude, longitude, 30)
+    result = parse_data(data, raindata, latitude, longitude, 30, usexml=True)
     print(result)
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                              # noqa: ignore=W504
            result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                              # noqa: ignore=W504
            '(6260)' in result[DATA][STATIONNAME])
 
     expect = {
@@ -740,9 +745,9 @@ def test_readdata2():
             'pressure': 1008.72,
             'stationname': 'De Bilt (6260)',
             'precipitation': 0.0,
-            'precipitation_forecast':  {'average': 0.1,
-                                        'timeframe': 30,
-                                        'total': 0.05},
+            'precipitation_forecast': {'average': 0.1,
+                                       'timeframe': 30,
+                                       'total': 0.05},
             'windazimuth': 72,
             'irradiance': 0,
             'forecast': [
@@ -804,7 +809,7 @@ def test_readdata2():
 def test_readdata3():
     """Test loading and parsing xml file."""
     # load buienradar.xml
-    file = open('tests/buienradar.xml', 'r')
+    file = open('tests/xml/buienradar.xml', 'r')
     data = file.read()
     file.close()
 
@@ -813,13 +818,13 @@ def test_readdata3():
     # Meetstation Zeeplatform K13 (6252)
     latitude = 53.23
     longitude = 3.23
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                              # noqa: ignore=W504
            result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                              # noqa: ignore=W504
            '(6252)' in result[DATA][STATIONNAME])
 
     # check the data:
@@ -867,141 +872,141 @@ def test_readdata3():
             'irradiance': 614,
             'windgust': 14.0,
             'forecast': [
-                    {'datetime': fc1, 'temperature': 16.0, 'maxtemp': 16.0,
-                     'mintemp': 8.0, 'rainchance': 15, 'sunchance': 0,
-                     'rain': 0.0, 'snow': 0.0, 'windforce': 3,
-                     'condition': {'condcode': 'j', 'condition': 'cloudy',
-                                   'detailed': 'partlycloudy',
-                                   'exact': 'Mix of clear and high clouds',
-                                   'exact_nl': ('Mix van opklaringen en hoge '
-                                                'bewolking'),
-                                   'image': get_imageurl('j')}},
-                    {'datetime': fc2, 'temperature': 17.0, 'maxtemp': 17.0,
-                     'mintemp': 8.0, 'rainchance': 1, 'sunchance': 43,
-                     'rain': 0.0, 'snow': 0.0, 'windforce': 3,
-                     'condition': {'condcode': 'b', 'condition': 'cloudy',
-                                   'detailed': 'partlycloudy',
-                                   'exact': ('Mix of clear and medium or low '
-                                             'clouds'),
-                                   'exact_nl': ('Mix van opklaringen en '
-                                                'middelbare of lage '
-                                                'bewolking'),
-                                   'image': get_imageurl('b')}},
-                    {'datetime': fc3, 'temperature': 22.0, 'maxtemp': 22.0,
-                     'mintemp': 10.0, 'rainchance': 3, 'sunchance': 0,
-                     'rain': 0.0, 'snow': 0.0, 'windforce': 4,
-                     'condition': {'condcode': 'r', 'condition': 'cloudy',
-                                   'detailed': 'partlycloudy',
-                                   'exact': '?? Partly cloudy ??',
-                                   'exact_nl': '?? Partly cloudy ??',
-                                   'image': get_imageurl('r')}},
-                    {'datetime': fc4, 'temperature': 18.0, 'maxtemp': 18.0,
-                     'mintemp': 11.0, 'rainchance': 43, 'sunchance': 0,
-                     'rain': 1.8, 'snow': 0.0, 'windforce': 4,
-                     'condition': {'condcode': 'm', 'condition': 'rainy',
-                                   'detailed': 'light-rain',
-                                   'exact': ('Heavily clouded with some '
-                                             'light rain'),
-                                   'exact_nl': ('Zwaar bewolkt met wat lichte'
-                                                ' regen'),
-                                   'image': get_imageurl('m')}},
-                    {'datetime': fc5, 'temperature': 15.0, 'maxtemp': 15.0,
-                     'mintemp': 9.0, 'rainchance': 76, 'sunchance': 0,
-                     'rain': 4.4, 'snow': 0.0, 'windforce': 4,
-                     'condition': {'condcode': 'f', 'condition': 'rainy',
-                                   'detailed': 'partlycloudy-light-rain',
-                                   'exact': ('Alternatingly cloudy with some '
-                                             'light rain'),
-                                   'exact_nl': ('Afwisselend bewolkt met '
-                                                '(mogelijk) wat lichte '
-                                                'regen'),
-                                   'image': get_imageurl('f')}}
-                ]
-            },
-        }
+                {'datetime': fc1, 'temperature': 16.0, 'maxtemp': 16.0,
+                    'mintemp': 8.0, 'rainchance': 15, 'sunchance': 0,
+                    'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                    'condition': {'condcode': 'j', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy',
+                                  'exact': 'Mix of clear and high clouds',
+                                  'exact_nl': ('Mix van opklaringen en hoge '
+                                               'bewolking'),
+                                  'image': get_imageurl('j')}},
+                {'datetime': fc2, 'temperature': 17.0, 'maxtemp': 17.0,
+                    'mintemp': 8.0, 'rainchance': 1, 'sunchance': 43,
+                    'rain': 0.0, 'snow': 0.0, 'windforce': 3,
+                    'condition': {'condcode': 'b', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy',
+                                  'exact': ('Mix of clear and medium or low '
+                                            'clouds'),
+                                  'exact_nl': ('Mix van opklaringen en '
+                                               'middelbare of lage '
+                                               'bewolking'),
+                                  'image': get_imageurl('b')}},
+                {'datetime': fc3, 'temperature': 22.0, 'maxtemp': 22.0,
+                    'mintemp': 10.0, 'rainchance': 3, 'sunchance': 0,
+                    'rain': 0.0, 'snow': 0.0, 'windforce': 4,
+                    'condition': {'condcode': 'r', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy',
+                                  'exact': '?? Partly cloudy ??',
+                                  'exact_nl': '?? Partly cloudy ??',
+                                  'image': get_imageurl('r')}},
+                {'datetime': fc4, 'temperature': 18.0, 'maxtemp': 18.0,
+                    'mintemp': 11.0, 'rainchance': 43, 'sunchance': 0,
+                    'rain': 1.8, 'snow': 0.0, 'windforce': 4,
+                    'condition': {'condcode': 'm', 'condition': 'rainy',
+                                  'detailed': 'light-rain',
+                                  'exact': ('Heavily clouded with some '
+                                            'light rain'),
+                                  'exact_nl': ('Zwaar bewolkt met wat lichte'
+                                               ' regen'),
+                                  'image': get_imageurl('m')}},
+                {'datetime': fc5, 'temperature': 15.0, 'maxtemp': 15.0,
+                    'mintemp': 9.0, 'rainchance': 76, 'sunchance': 0,
+                    'rain': 4.4, 'snow': 0.0, 'windforce': 4,
+                    'condition': {'condcode': 'f', 'condition': 'rainy',
+                                  'detailed': 'partlycloudy-light-rain',
+                                  'exact': ('Alternatingly cloudy with some '
+                                            'light rain'),
+                                  'exact_nl': ('Afwisselend bewolkt met '
+                                               '(mogelijk) wat lichte '
+                                               'regen'),
+                                  'image': get_imageurl('f')}}
+            ]
+        },
+    }
     assert(expect == result)
 
 
 def test_noxml():
     """Test loading and parsing invalid xml file."""
     # load noxml_file
-    file = open('tests/buienradar_noxml.xml', 'r')
+    file = open('tests/xml/buienradar_noxml.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
 
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] is False and
+    assert (result[SUCCESS] is False and              # noqa: ignore=W504
             result[MESSAGE] == 'Unable to parse content as xml.')
 
 
 def test_noroot():
     """Test loading and parsing invalid xml file."""
     # load noxml_file
-    file = open('tests/buienradar_noroot.xml', 'r')
+    file = open('tests/xml/buienradar_noroot.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
 
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] is False and
+    assert (result[SUCCESS] is False and               # noqa: ignore=W504
             result[MESSAGE] == 'Unable to parse content as xml.')
 
 
 def test_nows():
     """Test loading and parsing invalid xml file; no weatherstation."""
-    file = open('tests/buienradar_nows.xml', 'r')
+    file = open('tests/xml/buienradar_nows.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] is False and
+    assert (result[SUCCESS] is False and                # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
 
-    file = open('tests/buienradar_nows2.xml', 'r')
+    file = open('tests/xml/buienradar_nows2.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] is False and
+    assert (result[SUCCESS] is False and                # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
 
-    file = open('tests/buienradar_nows3.xml', 'r')
+    file = open('tests/xml/buienradar_nows3.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] is False and
+    assert (result[SUCCESS] is False and                # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
 
-    file = open('tests/buienradar_nows4.xml', 'r')
+    file = open('tests/xml/buienradar_nows4.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] is False and
+    assert (result[SUCCESS] is False and                # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
 
-    file = open('tests/buienradar_nows5.xml', 'r')
+    file = open('tests/xml/buienradar_nows5.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] is False and
+    assert (result[SUCCESS] is False and                # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
 
 
@@ -1016,162 +1021,162 @@ def test_wsdistancen_with_none():
 
 def test_nofc():
     """Test loading and parsing invalid xml file: no forecast data."""
-    file = open('tests/buienradar_nofc.xml', 'r')
+    file = open('tests/xml/buienradar_nofc.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
 
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == 'Unable to extract forecast data.')
 
 
 def test_nofc2():
     """Test loading and parsing invalid xml file; no forecast."""
-    file = open('tests/buienradar_nofc2.xml', 'r')
+    file = open('tests/xml/buienradar_nofc2.xml', 'r')
     data = file.read()
     file.close()
 
-    result = parse_data(data, None)
+    result = parse_data(data, None, usexml=True)
 
     # test calling results in the loop close cleanly
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             len(result[DATA][FORECAST]) == 0)
 
 
 def test_missing_data():
     """Test loading and parsing invalid xml file; missing data fields."""
-    file = open('tests/buienradar_missing.xml', 'r')
+    file = open('tests/xml/buienradar_missing.xml', 'r')
     data = file.read()
     file.close()
 
     latitude = 51.50
     longitude = 6.20
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: stationnaam ")
 
     latitude = 52.07
     longitude = 5.88
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: icoonactueel ")
 
     latitude = 52.65
     longitude = 4.98
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: luchtvochtigheid ")
 
     latitude = 52.10
     longitude = 5.18
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: temperatuurGC ")
 
     latitude = 52.92
     longitude = 4.78
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: temperatuur10cm ")
 
     latitude = 51.45
     longitude = 5.42
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: windsnelheidMS ")
 
     latitude = 51.20
     longitude = 5.77
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: windsnelheidBF ")
 
     latitude = 52.00
     longitude = 3.28
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: windrichtingGR ")
 
     latitude = 51.57
     longitude = 4.93
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: windrichting ")
 
     latitude = 52.07
     longitude = 6.65
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: luchtdruk ")
 
     latitude = 52.43
     longitude = 6.27
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: windstotenMS ")
 
     latitude = 51.87
     longitude = 5.15
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: regenMMPU ")
 
     latitude = 51.98
     longitude = 4.10
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert (result[SUCCESS] and
+    assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == "Missing key(s) in br data: zonintensiteitWM2 ")
 
 
 def test_invalid_data():
     """Test loading and parsing xml file with data that cannot be parsed."""
-    file = open('tests/buienradar_invalid.xml', 'r')
+    file = open('tests/xml/buienradar_invalid.xml', 'r')
     data = file.read()
     file.close()
 
     latitude = 51.50
     longitude = 6.20
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
     assert(result[SUCCESS] is False)
     assert(result[MESSAGE] == 'Location data is invalid.')
 
-    file = open('tests/buienradar_invalidfc1.xml', 'r')
+    file = open('tests/xml/buienradar_invalidfc1.xml', 'r')
     data = file.read()
     file.close()
 
     latitude = 51.98
     longitude = 4.10
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                                  # noqa: ignore=W504
            result[MESSAGE] is None)
     # test missing maxtemp:
-    assert(len(result[DATA][FORECAST]) == 5 and
+    assert(len(result[DATA][FORECAST]) == 5 and                 # noqa: ignore=W504
            result[DATA][FORECAST][0][TEMPERATURE] == 0.0)
     # test missing maxgtemp and maxtempmax:
-    assert(len(result[DATA][FORECAST]) == 5 and
+    assert(len(result[DATA][FORECAST]) == 5 and                 # noqa: ignore=W504
            result[DATA][FORECAST][2][TEMPERATURE] == 0.0)
 
     # read xml with invalid ws coordinates
-    file = open('tests/buienradar_invalidws1.xml', 'r')
+    file = open('tests/xml/buienradar_invalidws1.xml', 'r')
     data = file.read()
     file.close()
 
@@ -1179,25 +1184,23 @@ def test_invalid_data():
     # 'Meetstation Volkel' will be selected as alternative
     latitude = 51.50
     longitude = 6.20
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert(result[SUCCESS] and
+    assert(result[SUCCESS] and                                  # noqa: ignore=W504
            '(6375)' in result[DATA][STATIONNAME])
 
     # 'Meetstation Arnhem' contains invalid gps info,
     # 'Meetstation De Bilt' will be selected as alternative
     latitude = 52.07
     longitude = 5.88
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert(result[SUCCESS] and
-           '(6260)' in result[DATA][STATIONNAME])
+    assert(result[SUCCESS] and '(6260)' in result[DATA][STATIONNAME])
 
     # 'Meetstation Berkhout' contains invalid gps info,
     # 'Meetstation Wijdenes' will be selected as alternative
     latitude = 52.65
     longitude = 4.98
-    result = parse_data(data, None, latitude, longitude)
+    result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
-    assert(result[SUCCESS] and
-           '(6248)' in result[DATA][STATIONNAME])
+    assert(result[SUCCESS] and '(6248)' in result[DATA][STATIONNAME])

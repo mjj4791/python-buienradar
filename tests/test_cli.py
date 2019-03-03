@@ -18,3 +18,12 @@ def test_main_debug():
 
     # test calling results in the loop close cleanly
     assert main(args) is None
+
+
+def test_main_usexml():
+    """Test if we can call the main function."""
+    # use simulation interface
+    args = ['--usexml']
+
+    # test calling results in the loop close cleanly
+    assert main(args) is None
