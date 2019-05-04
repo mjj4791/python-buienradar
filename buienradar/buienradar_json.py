@@ -60,6 +60,10 @@ from buienradar.constants import (
     WINDSPEED
 )
 
+from buienradar.urls import (
+    json_precipitation_forecast_url, JSON_FEED_URL,
+)
+
 # buienradar date format: '07/26/2017 15:50:00'
 # "2019-02-03T19:20:00",
 __DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -266,23 +270,12 @@ def parse_json_data(content, raincontent, latitude=52.091579,
 
 def __get_ws_data():
     """Get buienradar json data and return results."""
-    url = 'https://data.buienradar.nl/2.0/feed/json'
-
-    result = __get_url(url)
-
-    return result
+    return __get_url(JSON_FEED_URL)
 
 
 def __get_precipfc_data(latitude, longitude):
     """Get buienradar forecasted precipitation."""
-    url = 'https://gpsgadget.buienradar.nl/data/raintext?lat={}&lon={}'
-    # rounding coordinates prevents unnecessary redirects/calls
-    url = url.format(
-        round(latitude, 2),
-        round(longitude, 2)
-    )
-    result = __get_url(url)
-    return result
+    return __get_url(json_precipitation_forecast_url(latitude, longitude))
 
 
 def __get_url(url):
