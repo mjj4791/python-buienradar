@@ -3,6 +3,13 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
+[1.0.1] - 2019-05-23
+""""""""""""""""""""
+**changed**
+
+- updated version logic in setup
+
+
 [1.0.0] - 2019-03-02
 """"""""""""""""""""
 **changed**
@@ -14,7 +21,7 @@ Changes that did not make it into a new release are marked with [unreleased].
 - New sensor types:
 
   - added (json only): barometerfc, barometerfcname, feeltemperature, rainlast24hour, rainlasthour
-  - addef forecast for (json only): minrain, maxrain
+  - added forecast for (json only): minrain, maxrain
 
 
 [0.91] - 2018-02-15
