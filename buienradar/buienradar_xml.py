@@ -47,11 +47,10 @@ from buienradar.constants import (
     WINDGUST,
     WINDSPEED
 )
-
 from buienradar.urls import (
-    xml_precipitation_forecast_url,
     XML_FEED_URL,
     XML_SECONDARY_FEED_URL,
+    xml_precipitation_forecast_url
 )
 
 # key names in buienradar xml:
@@ -440,7 +439,8 @@ def __get_int(section, name):
 
 
 def __get_ws_distance(wstation, latitude, longitude):
-    """Get the distance to the weatherstation from wstation section of xml.
+    """
+    Get the distance to the weatherstation from wstation section of xml.
 
     wstation: weerstation section of buienradar xml (dict)
     latitude: our latitude

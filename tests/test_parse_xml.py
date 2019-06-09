@@ -1,4 +1,4 @@
-"""testing xml parsing."""
+"""Testing xml parsing."""
 from datetime import datetime, timedelta
 
 import pytz

@@ -1,4 +1,4 @@
-"""testing json parsing."""
+"""Testing json parsing."""
 import json
 from datetime import datetime, timedelta
 

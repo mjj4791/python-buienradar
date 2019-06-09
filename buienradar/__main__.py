@@ -1,4 +1,5 @@
-"""Command line interface for buienradar library.
+"""
+Command line interface for buienradar library.
 
 Usage:
   buienradar [-v | -vv] [options]

@@ -1,10 +1,10 @@
 """Test for URL utilities."""
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
 
 from buienradar.urls import (
-    xml_precipitation_forecast_url,
     json_precipitation_forecast_url,
     radar_url,
+    xml_precipitation_forecast_url
 )
 
 
@@ -28,6 +28,7 @@ def parse_qs_dict(url):
 
 
 def test_base_urls():
+    """Test the url functions."""
     json_url = json_precipitation_forecast_url(1.23, 4.56)
     xml_url = xml_precipitation_forecast_url(1.23, 4.56)
 

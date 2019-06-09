@@ -59,10 +59,7 @@ from buienradar.constants import (
     WINDGUST,
     WINDSPEED
 )
-
-from buienradar.urls import (
-    json_precipitation_forecast_url, JSON_FEED_URL,
-)
+from buienradar.urls import JSON_FEED_URL, json_precipitation_forecast_url
 
 # buienradar date format: '07/26/2017 15:50:00'
 # "2019-02-03T19:20:00",
@@ -529,7 +526,8 @@ def __select_nearest_ws(jsondata, latitude, longitude):
 
 
 def __get_ws_distance(wstation, latitude, longitude):
-    """Get the distance to the weatherstation from wstation section of json.
+    """
+    Get the distance to the weatherstation from wstation section of json.
 
     wstation: weerstation section of buienradar json (dict)
     latitude: our latitude
@@ -566,7 +564,7 @@ def __is_valid(loc_data):
 
 
 def __getStationName(name, id):
-    """Construct a staiion name."""
+    """Construct a station name."""
     name = name.replace("Meetstation", "")
     name = name.strip()
     name += " (%s)" % id
