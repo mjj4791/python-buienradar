@@ -48,6 +48,12 @@ from buienradar.constants import (
     WINDSPEED
 )
 
+from buienradar.urls import (
+    xml_precipitation_forecast_url,
+    XML_FEED_URL,
+    XML_SECONDARY_FEED_URL,
+)
+
 # key names in buienradar xml:
 __BRROOT = 'buienradarnl'
 __BRWEERGEGEVENS = 'weergegevens'
@@ -225,28 +231,19 @@ def __get_url(url):
 
 def __get_ws_data():
     """Get buienradar xml data and return results."""
-    url = 'https://xml.buienradar.nl/'
-
-    result = __get_url(url)
+    result = __get_url(XML_FEED_URL)
     if result[SUCCESS]:
         return result
 
     # try secondary url:
-    url = 'https://api.buienradar.nl/'
-    result = __get_url(url)
+    result = __get_url(XML_SECONDARY_FEED_URL)
 
     return result
 
 
 def __get_precipfc_data(latitude, longitude):
     """Get buienradar forecasted precipitation."""
-    url = 'http://gadgets.buienradar.nl/data/raintext/?lat={}&lon={}'
-    # rounding coordinates prevents unnecessary redirects/calls
-    url = url.format(
-        round(latitude, 2),
-        round(longitude, 2)
-    )
-    result = __get_url(url)
+    result = __get_url(xml_precipitation_forecast_url(latitude, longitude))
     return result
 
 
