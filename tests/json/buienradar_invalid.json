@@ -16,7 +16,7 @@
           "graphurl": "https://www.buienradar.nl/nederland/weerbericht/weergrafieken/6391",
           "iconurl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/cc.png",
           "weatherdescription": "Zwaar bewolkt",
-          "winddirection": "-",
+          "winddirection": "",
           "airpressure": null,
           "temperature": 0,
           "groundtemperature": 0,

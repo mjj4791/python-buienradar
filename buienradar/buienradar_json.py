@@ -14,6 +14,7 @@ from buienradar.constants import (
     AVERAGE,
     BAROMETERFC,
     BAROMETERFCNAME,
+    BAROMETERFCNAMENL,
     CONDCODE,
     CONDITION,
     CONTENT,
@@ -76,8 +77,10 @@ __ICONURL = "iconurl"
 __WEATHERDESCRIPTION = "weatherdescription"
 __FORECAST = "forecast"
 __FIVEDAYFORECAST = "fivedayforecast"
-__MAXTEMPERATURE = "maxtemperature"
-__MINTEMPERATURE = "mintemperature"
+__MAXTEMPERATUREMIN = "maxtemperatureMin"
+__MAXTEMPERATUREMAX = "maxtemperatureMax"
+__MINTEMPERATUREMIN = "mintemperatureMin"
+__MINTEMPERATUREMAX = "mintemperatureMax"
 __RAINCHANCE = "rainChance"
 __SUNCHANCE = "sunChance"
 __MMRAINMAX = "mmRainMax"
@@ -85,6 +88,14 @@ __MMRAINMIN = "mmRainMin"
 __WIND = "wind"
 __WINDDIRECTION = "windDirection"
 __DAY = "day"
+
+
+def __to_upper(val):
+    """Convert val into ucase value."""
+    try:
+        return val.upper()
+    except (ValueError, TypeError):
+        return val
 
 
 def __to_int(val):
@@ -128,7 +139,11 @@ def __getBarFC(pressure):
     """Parse the pressure and return FC (numerical)."""
     if pressure is None:
         return 0
-    press = __to_float1(pressure)
+    try:
+        press = __to_float1(pressure)
+    except:     # noqa E722
+        return 0
+
     if press < 974:
         return 1
     if press < 990:
@@ -148,7 +163,11 @@ def __getBarFCName(pressure):
     """Parse the pressure and return FC (String)."""
     if pressure is None:
         return None
-    press = __to_float1(pressure)
+    try:
+        press = __to_float1(pressure)
+    except:     # noqa E722
+        return None
+
     if press < 974:
         return "Thunderstorms"
     if press < 990:
@@ -164,10 +183,35 @@ def __getBarFCName(pressure):
     return "Very dry"
 
 
-# SENSOR_TYPES = { 'key': ['key in buienradar xml', conversion function], }
+def __getBarFCNameNL(pressure):
+    """Parse the pressure and return FC in Dutch (String)."""
+    if pressure is None:
+        return None
+    try:
+        press = __to_float1(pressure)
+    except:     # noqa E722
+        return None
+
+    if press < 974:
+        return "Zware storm"
+    if press < 990:
+        return "Storm"
+    if press < 1002:
+        return "Regen en wind"
+    if press < 1010:
+        return "Bewolkt"
+    if press < 1022:
+        return "Veranderlijk"
+    if press < 1035:
+        return "Mooi"
+    return "Zeer mooi"
+
+
+# SENSOR_TYPES = { 'key': ['key in buienradar json', conversion function], }
 SENSOR_TYPES = {
     BAROMETERFC: ['airpressure', __getBarFC],
     BAROMETERFCNAME: ['airpressure', __getBarFCName],
+    BAROMETERFCNAMENL: ['airpressure', __getBarFCNameNL],
     HUMIDITY: ['humidity', __to_int],
     GROUNDTEMP: ['groundtemperature', __to_float1],
     IRRADIANCE: ['sunpower', __to_int],
@@ -183,7 +227,7 @@ SENSOR_TYPES = {
     VISIBILITY: ['visibility', __to_int],
     WINDSPEED: ['windspeed', __to_float2],
     WINDFORCE: ['windspeedBft', __to_int],
-    WINDDIRECTION: ['winddirection', None],
+    WINDDIRECTION: ['winddirection', __to_upper],
     WINDAZIMUTH: ['winddirectiondegrees', __to_int],
     WINDGUST: ['windgusts', __to_float2],
 }
@@ -379,23 +423,60 @@ def __parse_fc_data(fc_data):
                     day,
                     __WEATHERDESCRIPTION)
             ),
-            TEMPERATURE: __get_float(day, __MAXTEMPERATURE),
-            MIN_TEMP: __get_float(day, __MINTEMPERATURE),
-            MAX_TEMP: __get_float(day, __MAXTEMPERATURE),
+            TEMPERATURE: __get_avr_float(day, __MAXTEMPERATUREMIN,
+                                         __MAXTEMPERATUREMAX),
+            MIN_TEMP: __get_float(day, __MINTEMPERATUREMIN),
+            MAX_TEMP: __get_float(day, __MAXTEMPERATUREMAX),
             SUN_CHANCE: __get_int(day, __SUNCHANCE),
             RAIN_CHANCE: __get_int(day, __RAINCHANCE),
-            RAIN: __get_float(day, __MMRAINMAX),
+            RAIN: __get_avr_float(day, __MMRAINMIN, __MMRAINMAX),
             MIN_RAIN: __get_float(day, __MMRAINMIN),  # new
             MAX_RAIN: __get_float(day, __MMRAINMAX),  # new
-            SNOW: 0,  # for compatibility
+            # depricated / for compatibility:
+            SNOW: 0,
             WINDFORCE: __get_int(day, __WIND),
-            WINDDIRECTION: __get_str(day, __WINDDIRECTION),      # new
+            # new: est. windspeed (m/s) from windforce (Bft):
+            WINDSPEED: __get_windspeed(__get_int(day, __WIND)),
+            # new: ONO/NW:
+            WINDDIRECTION: __get_str(day, __WINDDIRECTION).upper(),
+            # new; estimated windazimuth using __WINDDIRECTION:
+            WINDAZIMUTH: __get_windazimuth(__get_str(day, __WINDDIRECTION)),
             DATETIME: __to_localdatetime(__get_str(day, __DAY)),
         }
         fcdata[CONDITION][IMAGE] = day[__ICONURL]
 
         fc.append(fcdata)
     return fc
+
+
+def __get_windspeed(windforce):
+    speeds = {0: 0.25, 1: 0.51, 2: 2.06, 3: 3.6, 4: 5.66,
+              5: 8.23, 6: 11.32, 7: 14.4, 8: 17.49, 9: 21.09,
+              10: 24.69, 11: 28.81, 12: 32.41}
+
+    try:
+        return speeds[windforce]
+    except:     # noqa E722
+        return None
+
+
+def __get_windazimuth(winddirection):
+    """Get an estimate wind azimuth using the winddirection string."""
+    if not winddirection:
+        return None
+
+    dirs = {'N': 0, 'NNO': 22.5, 'NO': 45, 'ONO': 67.5, 'O': 90,
+            'OZO': 112.5, 'ZO': 135, 'ZZO': 157.5, 'Z': 180,
+            'ZZW': 202.5, 'ZW': 225, 'WZW': 247.5, 'W': 270,
+            'WNW': 292.5, 'NW': 315, 'NNW': 237.5,
+            'NNE': 22.5, 'NE': 45, 'ENE': 67.5, 'E': 90,
+            'ESE': 112.5, 'SE': 135, 'SSE': 157.5, 'S': 180,
+            'SSW': 202.5, 'SW': 225, 'WSW': 247.5
+            }
+    try:
+        return dirs[winddirection.upper()]
+    except:     # noqa E722
+        return None
 
 
 def __get_str(section, name):
@@ -412,6 +493,24 @@ def __get_float(section, name):
         return float(section[name])
     except (ValueError, TypeError, KeyError):
         return float(0)
+
+
+def __get_avr_float(section, name1, name2):
+    """Get the forecasted float from json section."""
+    try:
+        val1 = float(section[name1])
+    except (ValueError, TypeError, KeyError):
+        val1 = None
+    try:
+        val2 = float(section[name2])
+    except (ValueError, TypeError, KeyError):
+        val2 = None
+
+    if (val1 is not None and val2 is not None):
+        return (val1 + val2) / 2
+    if (val1 is not None):
+        return val1
+    return val2
 
 
 def __get_int(section, name):
@@ -557,7 +656,8 @@ def __is_valid(loc_data):
         if (key != CONDITION and key != STATIONNAME and key != MEASURED):
             if (func is not None):
                 sens_data = loc_data.get(value)
-                if (sens_data is not None and                         # noqa ignore W504
+                if (sens_data is not None and                        # noqa ignore W504
+                    func(sens_data) is not None and                  # noqa ignore W504
                     func(sens_data) != 0 and                         # noqa ignore W504
                     func(sens_data) != ""):
                     return True

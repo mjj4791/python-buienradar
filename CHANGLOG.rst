@@ -3,11 +3,20 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
-[1.0.1] - 2019-05-23
+[1.0.1] - 2019-06-10
 """"""""""""""""""""
 **changed**
 
 - updated version logic in setup
+- moved url logic to separate module
+- updated calculation of forcasted temperature and rain (json)
+- New sensor types:
+
+  - added (json only): barometerfcnamenl
+  - added forecast for (json only):
+
+    - windspeed (estimated using windforce)
+    - windazimuth (estimated using winddirection)
 
 
 [1.0.0] - 2019-03-02

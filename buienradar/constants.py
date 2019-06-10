@@ -14,6 +14,7 @@ ATTRIBUTION_INFO = "Data provided by buienradar.nl"
 ATTRIBUTION = "attribution"
 BAROMETERFC = 'barometerfc'               # new (json only!)
 BAROMETERFCNAME = 'barometerfcname'       # new (json only!)
+BAROMETERFCNAMENL = 'barometerfcnamenl'   # new (json only!)
 CONDCODE = 'condcode'
 CONDITION = 'condition'
 DATETIME = 'datetime'
