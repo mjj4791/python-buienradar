@@ -433,7 +433,8 @@ def test_readdata1():
                           'condition': 'cloudy',
                           'image': get_imageurl('cc'),
                           'detailed': 'cloudy',
-                          'exact': 'Heavily clouded'},
+                          'exact': 'Heavily clouded',
+                          'night': True},
             'stationname': 'Arcen (6391)',
             'measured': measured,
             'barometerfc': 0,
@@ -450,7 +451,8 @@ def test_readdata1():
                                         'condition': 'cloudy',
                                         'image': get_imageurl('c'),
                                         'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded'},
+                                        'exact': 'Heavily clouded',
+                                        'night': False},
                           'mintemp': 2.0, 'rainchance': 20,
                           'minrain': 0.0, 'maxrain': 0.0,
                           'winddirection': 'Z', 'windazimuth': 180,
@@ -462,7 +464,8 @@ def test_readdata1():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 90,
                           'minrain': 5.0, 'maxrain': 11.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -475,7 +478,8 @@ def test_readdata1():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 6.0, 'rainchance': 90,
                           'minrain': 3.0, 'maxrain': 8.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -488,7 +492,8 @@ def test_readdata1():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 70,
                           'minrain': 1.0, 'maxrain': 5.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -501,7 +506,9 @@ def test_readdata1():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False
+                                        },
                           'mintemp': 3.0, 'rainchance': 80,
                           'minrain': 3.0, 'maxrain': 7.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -543,7 +550,8 @@ def test_readdata1():
                           'condition': 'cloudy',
                           'image': get_imageurl('cc'),
                           'detailed': 'cloudy',
-                          'exact': 'Heavily clouded'},
+                          'exact': 'Heavily clouded',
+                          'night': True},
             'stationname': 'Arcen (6391)',
             'measured': measured,
             'barometerfc': 0,
@@ -560,7 +568,8 @@ def test_readdata1():
                                         'condition': 'cloudy',
                                         'image': get_imageurl('c'),
                                         'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded'},
+                                        'exact': 'Heavily clouded',
+                                        'night': False},
                           'mintemp': 2.0, 'rainchance': 20,
                           'minrain': 0.0, 'maxrain': 0.0,
                           'winddirection': 'Z', 'windazimuth': 180,
@@ -573,7 +582,8 @@ def test_readdata1():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 90,
                           'minrain': 5.0, 'maxrain': 11.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -586,7 +596,8 @@ def test_readdata1():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 6.0, 'rainchance': 90,
                           'minrain': 3.0, 'maxrain': 8.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -599,7 +610,8 @@ def test_readdata1():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 70,
                           'minrain': 1.0, 'maxrain': 5.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -612,7 +624,8 @@ def test_readdata1():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 80,
                           'minrain': 3.0, 'maxrain': 7.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -690,7 +703,8 @@ def test_readdata2():
                           'condition': 'rainy',
                           'image': get_imageurl('qq'),
                           'detailed': 'rainy',
-                          'exact': 'Heavily clouded with rain'},
+                          'exact': 'Heavily clouded with rain',
+                          'night': True},
             'stationname': 'De Bilt (6260)',
             'measured': measured,
             'precipitation': 0.1,
@@ -704,7 +718,8 @@ def test_readdata2():
                                         'condition': 'cloudy',
                                         'image': get_imageurl('c'),
                                         'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded'},
+                                        'exact': 'Heavily clouded',
+                                        'night': False},
                           'mintemp': 2.0, 'rainchance': 20,
                           'minrain': 0.0, 'maxrain': 0.0,
                           'winddirection': 'Z', 'windazimuth': 180,
@@ -717,7 +732,8 @@ def test_readdata2():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 90,
                           'minrain': 5.0, 'maxrain': 11.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -730,7 +746,8 @@ def test_readdata2():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 6.0, 'rainchance': 90,
                           'minrain': 3.0, 'maxrain': 8.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -743,7 +760,8 @@ def test_readdata2():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 70,
                           'minrain': 1.0, 'maxrain': 5.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -756,7 +774,8 @@ def test_readdata2():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 80,
                           'minrain': 3.0, 'maxrain': 7.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -802,7 +821,8 @@ def test_readdata2():
                           'condition': 'rainy',
                           'image': get_imageurl('qq'),
                           'detailed': 'rainy',
-                          'exact': 'Heavily clouded with rain'},
+                          'exact': 'Heavily clouded with rain',
+                          'night': True},
             'stationname': 'De Bilt (6260)',
             'measured': measured,
             'precipitation': 0.1,
@@ -819,7 +839,8 @@ def test_readdata2():
                                         'condition': 'cloudy',
                                         'image': get_imageurl('c'),
                                         'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded'},
+                                        'exact': 'Heavily clouded',
+                                        'night': False},
                           'mintemp': 2.0, 'rainchance': 20,
                           'minrain': 0.0, 'maxrain': 0.0,
                           'winddirection': 'Z', 'windazimuth': 180,
@@ -832,7 +853,8 @@ def test_readdata2():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 90,
                           'minrain': 5.0, 'maxrain': 11.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -845,7 +867,8 @@ def test_readdata2():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 6.0, 'rainchance': 90,
                           'minrain': 3.0, 'maxrain': 8.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -858,7 +881,8 @@ def test_readdata2():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 70,
                           'minrain': 1.0, 'maxrain': 5.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -871,7 +895,8 @@ def test_readdata2():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 80,
                           'minrain': 3.0, 'maxrain': 7.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -945,7 +970,8 @@ def test_readdata3():
                           'condition': 'cloudy',
                           'image': get_imageurl('cc'),
                           'detailed': 'cloudy',
-                          'exact': 'Heavily clouded'},
+                          'exact': 'Heavily clouded',
+                          'night': True},
             'stationname': 'Zeeplatform K13 (6252)',
             'measured': measured,
             'precipitation': 0.0,
@@ -962,7 +988,8 @@ def test_readdata3():
                                         'condition': 'cloudy',
                                         'image': get_imageurl('c'),
                                         'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded'},
+                                        'exact': 'Heavily clouded',
+                                        'night': False},
                           'mintemp': 2.0, 'rainchance': 20,
                           'minrain': 0.0, 'maxrain': 0.0,
                           'winddirection': 'Z', 'windazimuth': 180,
@@ -975,7 +1002,8 @@ def test_readdata3():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 90,
                           'minrain': 5.0, 'maxrain': 11.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -988,7 +1016,8 @@ def test_readdata3():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 6.0, 'rainchance': 90,
                           'minrain': 3.0, 'maxrain': 8.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -1001,7 +1030,8 @@ def test_readdata3():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 70,
                           'minrain': 1.0, 'maxrain': 5.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -1014,7 +1044,8 @@ def test_readdata3():
                                         'condition': 'rainy',
                                         'image': get_imageurl('q'),
                                         'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain'},
+                                        'exact': 'Heavily clouded with rain',
+                                        'night': False},
                           'mintemp': 3.0, 'rainchance': 80,
                           'minrain': 3.0, 'maxrain': 7.0,
                           'winddirection': 'ZW', 'windazimuth': 225,
@@ -1142,96 +1173,131 @@ def test_missing_data():
     longitude = 6.20
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: stationname "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: stationname ")
+            result[MESSAGE] == None and
+            result[DATA][STATIONNAME] == None)
 
     latitude = 52.07
     longitude = 5.88
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: feeltemperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: feeltemperature ")
+            result[MESSAGE] == None and
+            result[DATA][FEELTEMPERATURE] == None
+            )
 
     latitude = 52.65
     longitude = 4.98
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: humidity "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: humidity ")
+            result[MESSAGE] == None and
+            result[DATA][HUMIDITY] == None
+            )
 
     latitude = 52.10
     longitude = 5.18
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: groundtemperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: groundtemperature ")
+            result[MESSAGE] == None and
+            result[DATA][GROUNDTEMP] == None
+            )
 
     latitude = 52.92
     longitude = 4.78
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: temperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: temperature ")
+            result[MESSAGE] == None and
+            result[DATA][TEMPERATURE] == None
+            )
 
     latitude = 51.45
     longitude = 5.42
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: windspeed "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: windspeed ")
+            result[MESSAGE] == None and
+            result[DATA][WINDSPEED] == None
+            )
 
     latitude = 51.20
     longitude = 5.77
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: windspeedBft "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: windspeedBft ")
+            result[MESSAGE] == None and
+            result[DATA][WINDFORCE] == None
+            )
 
     latitude = 52.00
     longitude = 3.28
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: winddirectiondegrees "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] ==                              # noqa: ignore=W504
-            "Missing key(s) in br data: winddirectiondegrees ")
+            result[MESSAGE] == None and
+            result[DATA][WINDAZIMUTH] == None
+            )
 
     latitude = 51.57
     longitude = 4.93
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: winddirection "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: winddirection ")
+            result[MESSAGE] is None and
+            result[DATA][WINDDIRECTION] == None
+            )
 
     latitude = 52.07
     longitude = 6.65
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
 
-    expectedmsg = "Missing key(s) in br data: "
-    expectedmsg += "airpressure airpressure airpressure airpressure "
-    assert (result[SUCCESS])
-    assert (result[MESSAGE] == expectedmsg)
+    # expectedmsg = "Missing key(s) in br data: "
+    assert (result[SUCCESS] and
+            result[MESSAGE] is None and
+            result[DATA][PRESSURE] is None
+            )
 
     latitude = 52.43
     longitude = 6.27
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: windgusts "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: windgusts ")
+            result[MESSAGE] is None and
+            result[DATA][WINDGUST] is None
+            )
 
     latitude = 51.87
     longitude = 5.15
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: precipitation "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: precipitation ")
+            result[MESSAGE] is None and
+            result[DATA][PRECIPITATION] is None
+            )
 
     latitude = 51.98
     longitude = 4.10
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
+    # "Missing key(s) in br data: sunpower "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == "Missing key(s) in br data: sunpower ")
+            result[MESSAGE] is None and
+            result[DATA][IRRADIANCE] is None
+            )
 
 
 def test_invalid_data():

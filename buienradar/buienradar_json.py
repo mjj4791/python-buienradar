@@ -37,6 +37,7 @@ from buienradar.constants import (
     MESSAGE,
     MIN_RAIN,
     MIN_TEMP,
+    NIGHTTIME,
     PRECIPITATION,
     PRECIPITATION_FORECAST,
     PRESSURE,
@@ -390,9 +391,18 @@ def __parse_loc_data(loc_data, result):
             sens_data = loc_data[value]
             if key == CONDITION:
                 # update weather symbol & status text
-                desc = loc_data[__WEATHERDESCRIPTION]
-                result[DATA][CONDITION] = __cond_from_desc(desc)
+                # desc = loc_data[__WEATHERDESCRIPTION]
+                # result[DATA][CONDITION] = __cond_from_desc(desc)
+                #
+                # test clear-->sunny vs clear-->clear-night
+                # loc_data[__ICONURL] =
+                #   "https://www.buienradar.nl/resources/images/icons/weather/30x30/a.png"
+                # loc_data[__ICONURL] =
+                #   "https://www.buienradar.nl/resources/images/icons/weather/30x30/aa.png"
+                result[DATA][CONDITION] = __cond_from_image(
+                    loc_data[__ICONURL])
                 result[DATA][CONDITION][IMAGE] = loc_data[__ICONURL]
+
                 continue
             if key == STATIONNAME:
                 result[DATA][key] = __getStationName(loc_data[__STATIONNAME],
@@ -404,11 +414,11 @@ def __parse_loc_data(loc_data, result):
             else:
                 result[DATA][key] = sens_data
         except KeyError:
-            if result[MESSAGE] is None:
-                result[MESSAGE] = "Missing key(s) in br data: "
-            result[MESSAGE] += "%s " % value
-            log.warning("Data element with key='%s' "
-                        "not loaded from br data!", key)
+            # if result[MESSAGE] is None:
+            #    result[MESSAGE] = "Missing key(s) in br data: "
+            # result[MESSAGE] += "%s " % value
+            log.debug("Data element with key='%s' "
+                      "not loaded from br data!", key)
     result[SUCCESS] = True
     return result
 
@@ -418,10 +428,15 @@ def __parse_fc_data(fc_data):
     fc = []
     for day in fc_data:
         fcdata = {
-            CONDITION: __cond_from_desc(
+            # CONDITION: __cond_from_desc(
+            #    __get_str(
+            #        day,
+            #        __WEATHERDESCRIPTION)
+            # ),
+            CONDITION: __cond_from_image(
                 __get_str(
                     day,
-                    __WEATHERDESCRIPTION)
+                    __ICONURL)
             ),
             TEMPERATURE: __get_avr_float(day, __MAXTEMPERATUREMIN,
                                          __MAXTEMPERATUREMAX),
@@ -443,6 +458,8 @@ def __parse_fc_data(fc_data):
             WINDAZIMUTH: __get_windazimuth(__get_str(day, __WINDDIRECTION)),
             DATETIME: __to_localdatetime(__get_str(day, __DAY)),
         }
+        # fc never is about nighttime:
+        fcdata[CONDITION][NIGHTTIME] = False
         fcdata[CONDITION][IMAGE] = day[__ICONURL]
 
         fc.append(fcdata)
@@ -581,6 +598,29 @@ def __cond_from_desc(desc):
                     EXACTNL: exact_nl
                     }
     return None
+
+
+def __cond_from_image(image):
+    """Get the condition from the image url."""
+    # the image url should be something like: http://somehost/somefolder/cc.png
+    # or http://somehost/somefolder/c.png if there is not url,
+    # or the length is too small, we cannot determine the condition.
+    if image is None or len(image) < 6:
+        return None
+    # __BRCONDITIONS = { 'code': 'conditon', 'detailed', 'exact', 'exact_nl'}
+    code = image[-5:-4]
+    night = False
+    if image[-6:-5] == code:
+        night = True
+    if code in __BRCONDITIONS:
+        return {CONDCODE: code,
+                CONDITION: __BRCONDITIONS[code][0],
+                DETAILED: __BRCONDITIONS[code][1],
+                EXACT: __BRCONDITIONS[code][2],
+                EXACTNL: __BRCONDITIONS[code][3],
+                NIGHTTIME: night
+                }
+        return None
 
 
 def __select_nearest_ws(jsondata, latitude, longitude):

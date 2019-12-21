@@ -3,6 +3,19 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
+[1.0.2] - 2019-12-15
+""""""""""""""""""""
+**changed**
+
+- derive condition from icon url and no longer using condition text
+- updated tests
+- lowered loglevel of missng weather-data elements to debug
+
+**new**
+
+- added nighttime indicator in condition section; derived from icon url
+
+
 [1.0.1] - 2019-06-10
 """"""""""""""""""""
 **changed**
@@ -12,11 +25,11 @@ Changes that did not make it into a new release are marked with [unreleased].
 - updated calculation of forcasted temperature and rain (json)
 - New sensor types:
 
-  - added (json only): barometerfcnamenl
-  - added forecast for (json only):
+    - added (json only): barometerfcnamenl
+    - added forecast for (json only):
 
-    - windspeed (estimated using windforce)
-    - windazimuth (estimated using winddirection)
+        - windspeed (estimated using windforce)
+        - windazimuth (estimated using winddirection)
 
 
 [1.0.0] - 2019-03-02
