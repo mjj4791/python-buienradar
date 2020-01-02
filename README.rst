@@ -124,7 +124,8 @@ Example of returned data:
                 'condition': 'rainy',
                 'detailed': 'rainy',
                 'condcode': 'q',
-                'exact': 'Heavily clouded with rain'
+                'exact': 'Heavily clouded with rain',
+                'night': True
             },
             'feeltemperature': 8.8,
             'groundtemperature': 11.3,
@@ -154,7 +155,8 @@ Example of returned data:
                     'condition': 'rainy',
                     'condcode': 'f',
                     'detailed': 'partlycloudy-light-rain',
-                    'exact': 'Alternatingly cloudy with some light rain'},
+                    'exact': 'Alternatingly cloudy with some light rain',
+                    'night': False},
                     'exact_nl': 'Afwisselend bewolkt met (mogelijk) wat lichte regen',
                     'image': 'https://www.buienradar.nl/resources/images/icons/weather/30x30/f.png',
                     'sunchance': 40,
@@ -233,6 +235,7 @@ Use the constants defined in the buienradar component to get the data from the r
         - EXACT: the exact condition as reported (translated to english)
         - EXACTNL: the exact condition as reported
         - IMAGE: A symbol (url) for the current weather
+        - NIGHTTIME: indicator if the condition is a daytime or nighttime condition
 
     - FEELTEMPERATURE: The feeltemperature (json only)
     - GROUNDTEMP: the current ground temperature (in C)
