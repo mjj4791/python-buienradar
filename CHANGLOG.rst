@@ -3,6 +3,13 @@ Changelog
 All notable changes to this project will be documented in this file.
 Changes that did not make it into a new release are marked with [unreleased].
 
+[1.0.3/4] - 2019-12-15
+""""""""""""""""""""""
+**changed**
+
+- updated reademe / documentation
+- updated setup.py (set content type for readme).
+
 [1.0.2] - 2019-12-15
 """"""""""""""""""""
 **changed**

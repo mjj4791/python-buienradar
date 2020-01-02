@@ -26,10 +26,10 @@ def version_from_git():
 setup(
     name='buienradar',
 
-    version='1.0.1',
+    version='1.0.4',
 
     description=__doc__,
-    long_description_content_type='text/markdown',
+    long_description_content_type='text/x-rst',
     long_description=long_description,
 
     # The project's main homepage.
@@ -48,7 +48,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
