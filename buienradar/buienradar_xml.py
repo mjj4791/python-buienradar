@@ -148,8 +148,8 @@ def get_xml_data(latitude=52.091579, longitude=5.119734):
     final_result = {SUCCESS: False, MESSAGE: None,
                     CONTENT: None, RAINCONTENT: None}
 
-    log.info("Getting buienradar data for latitude=%s, longitude=%s",
-             latitude, longitude)
+    log.debug("Getting buienradar data for latitude=%s, longitude=%s",
+              latitude, longitude)
     result = __get_ws_data()
 
     if result[SUCCESS]:
@@ -209,7 +209,7 @@ def parse_xml_data(content, raincontent, latitude=52.091579,
 
 def __get_url(url):
     """Load data from url and return result."""
-    log.info("Retrieving xml weather data (%s)...", url)
+    log.debug("Retrieving xml weather data (%s)...", url)
     result = {SUCCESS: False, MESSAGE: None}
     try:
         r = requests.get(url)
@@ -248,7 +248,7 @@ def __get_precipfc_data(latitude, longitude):
 
 def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
     """Parse the buienradar xml and rain data."""
-    log.info("Parse ws data: latitude: %s, longitude: %s", latitude, longitude)
+    log.debug("Parse ws data: latitude: %s, longitude: %s", latitude, longitude)
     result = {SUCCESS: False, MESSAGE: None, DATA: None}
 
     # convert the xml data into a dictionary:

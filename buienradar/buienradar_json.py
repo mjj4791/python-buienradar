@@ -244,8 +244,8 @@ def get_json_data(latitude=52.091579, longitude=5.119734):
                     CONTENT: None,
                     RAINCONTENT: None}
 
-    log.info("Getting buienradar json data for latitude=%s, longitude=%s",
-             latitude, longitude)
+    log.debug("Getting buienradar json data for latitude=%s, longitude=%s",
+              latitude, longitude)
     result = __get_ws_data()
 
     if result[SUCCESS]:
@@ -322,7 +322,7 @@ def __get_precipfc_data(latitude, longitude):
 
 def __get_url(url):
     """Load json data from url and return result."""
-    log.info("Retrieving  weather data (%s)...", url)
+    log.debug("Retrieving  weather data (%s)...", url)
     result = {SUCCESS: False, MESSAGE: None}
     try:
         r = requests.get(url)
@@ -343,7 +343,7 @@ def __get_url(url):
 
 def __parse_ws_data(jsondata, latitude=52.091579, longitude=5.119734):
     """Parse the buienradar json and rain data."""
-    log.info("Parse ws data: latitude: %s, longitude: %s", latitude, longitude)
+    log.debug("Parse ws data: latitude: %s, longitude: %s", latitude, longitude)
     result = {SUCCESS: False, MESSAGE: None, DATA: None}
 
     # select the nearest weather station
