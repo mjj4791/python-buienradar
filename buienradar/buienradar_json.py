@@ -572,7 +572,7 @@ def __parse_precipfc_data(data, timeframe):
         # Ter controle: een waarde van 77 is gelijk aan een neerslagintensiteit
         # van 0,1 mm/u.
         val = float(val.replace(',', '.'))
-        mmu = 10**(float((val - 109)) / 32)
+        mmu = 10**((val - 109) / 32)
         totalrain = totalrain + float(mmu)
         numberoflines = numberoflines + 1
         index += 1
