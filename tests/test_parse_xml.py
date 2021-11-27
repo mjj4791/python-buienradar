@@ -336,6 +336,24 @@ def test_precip_fc5():
     assert (expect == result)
 
 
+def test_precip_decimal_values():
+    """Test parsing precipitation forecast data containing decimal values."""
+    def timeframe(minutes=0):
+        return (datetime.now() + timedelta(minutes=minutes)).strftime("%H:%M")
+
+    data = ""
+    data += "10,10|%s\n" % timeframe(0)
+    data += "100|%s\n" % timeframe(5)
+    data += "192,456798213|%s\n" % timeframe(10)
+    data += "55.55|%s\n" % timeframe(15)
+
+    result = __parse_precipfc_data(data, 20)
+    expect = {'total': 33.84, 'timeframe': 20, 'average': 135.36}
+
+    # test calling results in the loop close cleanly
+    assert (result == expect)
+
+
 def test_parse_timeframe():
     """Test loading and parsing xml file."""
     data = None
