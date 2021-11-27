@@ -95,7 +95,7 @@ def __to_upper(val):
     """Convert val into ucase value."""
     try:
         return val.upper()
-    except (ValueError, TypeError):
+    except (AttributeError, ValueError, TypeError):
         return val
 
 
@@ -103,7 +103,7 @@ def __to_int(val):
     """Convert val into an integer value."""
     try:
         return int(val)
-    except (ValueError, TypeError):
+    except (AttributeError, ValueError, TypeError):
         return 0
 
 
@@ -111,7 +111,7 @@ def __to_float(val, digits):
     """Convert val into float with digits decimal."""
     try:
         return round(float(val), digits)
-    except (ValueError, TypeError):
+    except (AttributeError, ValueError, TypeError):
         return float(0)
 
 
@@ -132,7 +132,7 @@ def __to_localdatetime(val):
         dt = datetime.strptime(val, __DATE_FORMAT)
         dt = pytz.timezone(__TIMEZONE).localize(dt)
         return dt
-    except (ValueError, TypeError):
+    except (AttributeError, ValueError, TypeError):
         return None
 
 
@@ -343,7 +343,8 @@ def __get_url(url):
 
 def __parse_ws_data(jsondata, latitude=52.091579, longitude=5.119734):
     """Parse the buienradar json and rain data."""
-    log.debug("Parse ws data: latitude: %s, longitude: %s", latitude, longitude)
+    log.debug("Parse ws data: latitude: %s, longitude: %s",
+              latitude, longitude)
     result = {SUCCESS: False, MESSAGE: None, DATA: None}
 
     # select the nearest weather station
@@ -571,7 +572,8 @@ def __parse_precipfc_data(data, timeframe):
         #
         # Ter controle: een waarde van 77 is gelijk aan een neerslagintensiteit
         # van 0,1 mm/u.
-        mmu = 10**(float((int(val) - 109)) / 32)
+        val = float(val.replace(',', '.'))
+        mmu = 10**((val - 109) / 32)
         totalrain = totalrain + float(mmu)
         numberoflines = numberoflines + 1
         index += 1
@@ -584,20 +586,6 @@ def __parse_precipfc_data(data, timeframe):
     result[TIMEFRAME] = timeframe
 
     return result
-
-
-def __cond_from_desc(desc):
-    """Get the condition name from the condition description."""
-    # '{ 'code': 'conditon', 'detailed', 'exact', 'exact_nl'}
-    for code, [condition, detailed, exact, exact_nl] in __BRCONDITIONS.items():
-        if exact_nl == desc:
-            return {CONDCODE: code,
-                    CONDITION: condition,
-                    DETAILED: detailed,
-                    EXACT: exact,
-                    EXACTNL: exact_nl
-                    }
-    return None
 
 
 def __cond_from_image(image):
@@ -620,7 +608,7 @@ def __cond_from_image(image):
                 EXACTNL: __BRCONDITIONS[code][3],
                 NIGHTTIME: night
                 }
-        return None
+    return None
 
 
 def __select_nearest_ws(jsondata, latitude, longitude):
@@ -697,9 +685,9 @@ def __is_valid(loc_data):
             if (func is not None):
                 sens_data = loc_data.get(value)
                 if (sens_data is not None and                        # noqa ignore W504
-                    func(sens_data) is not None and                  # noqa ignore W504
-                    func(sens_data) != 0 and                         # noqa ignore W504
-                    func(sens_data) != ""):
+                        func(sens_data) is not None and                  # noqa ignore W504
+                        func(sens_data) != 0 and                         # noqa ignore W504
+                        func(sens_data) != ""):
                     return True
 
 

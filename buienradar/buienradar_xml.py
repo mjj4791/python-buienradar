@@ -248,7 +248,8 @@ def __get_precipfc_data(latitude, longitude):
 
 def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
     """Parse the buienradar xml and rain data."""
-    log.debug("Parse ws data: latitude: %s, longitude: %s", latitude, longitude)
+    log.debug("Parse ws data: latitude: %s, longitude: %s",
+              latitude, longitude)
     result = {SUCCESS: False, MESSAGE: None, DATA: None}
 
     # convert the xml data into a dictionary:
@@ -325,7 +326,8 @@ def __parse_precipfc_data(data, timeframe):
         #
         # Ter controle: een waarde van 77 is gelijk aan een neerslagintensiteit
         # van 0,1 mm/u.
-        mmu = 10**(float((int(val) - 109)) / 32)
+        val = float(val.replace(',', '.'))
+        mmu = 10 ** ((val - 109) / 32)
         totalrain = totalrain + float(mmu)
         numberoflines = numberoflines + 1
         index += 1

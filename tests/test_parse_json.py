@@ -338,6 +338,24 @@ def test_precip_fc5():
     assert (expect == result)
 
 
+def test_precip_decimal_values():
+    """Test parsing precipitation forecast data containing decimal values."""
+    def timeframe(minutes=0):
+        return (datetime.now() + timedelta(minutes=minutes)).strftime("%H:%M")
+
+    data = ""
+    data += "10,10|%s\n" % timeframe(0)
+    data += "100|%s\n" % timeframe(5)
+    data += "192,456798213|%s\n" % timeframe(10)
+    data += "55.55|%s\n" % timeframe(15)
+
+    result = __parse_precipfc_data(data, 20)
+    expect = {'total': 33.84, 'timeframe': 20, 'average': 135.36}
+
+    # test calling results in the loop close cleanly
+    assert (result == expect)
+
+
 def test_parse_timeframe():
     """Test loading and parsing xml file."""
     data = None
@@ -1175,8 +1193,8 @@ def test_missing_data():
     print(result)
     # "Missing key(s) in br data: stationname "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == None and
-            result[DATA][STATIONNAME] == None)
+            result[MESSAGE] is None and
+            result[DATA][STATIONNAME] is None)
 
     latitude = 52.07
     longitude = 5.88
@@ -1184,8 +1202,8 @@ def test_missing_data():
     print(result)
     # "Missing key(s) in br data: feeltemperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == None and
-            result[DATA][FEELTEMPERATURE] == None
+            result[MESSAGE] is None and
+            result[DATA][FEELTEMPERATURE] is None
             )
 
     latitude = 52.65
@@ -1194,8 +1212,8 @@ def test_missing_data():
     print(result)
     # "Missing key(s) in br data: humidity "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == None and
-            result[DATA][HUMIDITY] == None
+            result[MESSAGE] is None and
+            result[DATA][HUMIDITY] is None
             )
 
     latitude = 52.10
@@ -1204,8 +1222,8 @@ def test_missing_data():
     print(result)
     # "Missing key(s) in br data: groundtemperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == None and
-            result[DATA][GROUNDTEMP] == None
+            result[MESSAGE] is None and
+            result[DATA][GROUNDTEMP] is None
             )
 
     latitude = 52.92
@@ -1214,8 +1232,8 @@ def test_missing_data():
     print(result)
     # "Missing key(s) in br data: temperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == None and
-            result[DATA][TEMPERATURE] == None
+            result[MESSAGE] is None and
+            result[DATA][TEMPERATURE] is None
             )
 
     latitude = 51.45
@@ -1224,8 +1242,8 @@ def test_missing_data():
     print(result)
     # "Missing key(s) in br data: windspeed "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == None and
-            result[DATA][WINDSPEED] == None
+            result[MESSAGE] is None and
+            result[DATA][WINDSPEED] is None
             )
 
     latitude = 51.20
@@ -1234,8 +1252,8 @@ def test_missing_data():
     print(result)
     # "Missing key(s) in br data: windspeedBft "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == None and
-            result[DATA][WINDFORCE] == None
+            result[MESSAGE] is None and
+            result[DATA][WINDFORCE] is None
             )
 
     latitude = 52.00
@@ -1244,8 +1262,8 @@ def test_missing_data():
     print(result)
     # "Missing key(s) in br data: winddirectiondegrees "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
-            result[MESSAGE] == None and
-            result[DATA][WINDAZIMUTH] == None
+            result[MESSAGE] is None and
+            result[DATA][WINDAZIMUTH] is None
             )
 
     latitude = 51.57
@@ -1255,7 +1273,7 @@ def test_missing_data():
     # "Missing key(s) in br data: winddirection "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
-            result[DATA][WINDDIRECTION] == None
+            result[DATA][WINDDIRECTION] is None
             )
 
     latitude = 52.07
