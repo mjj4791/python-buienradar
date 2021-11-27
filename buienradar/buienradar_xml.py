@@ -384,8 +384,8 @@ def __parse_loc_data(loc_data, result):
             if result[MESSAGE] is None:
                 result[MESSAGE] = "Missing key(s) in br data: "
             result[MESSAGE] += "%s " % value
-            log.warning("Data element with key='%s' "
-                        "not loaded from br data!", key)
+            log.debug("Data element with key='%s' not loaded from br data!",
+                      key)
     result[SUCCESS] = True
     return result
 
