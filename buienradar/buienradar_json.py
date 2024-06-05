@@ -67,6 +67,7 @@ from buienradar.urls import JSON_FEED_URL, json_precipitation_forecast_url
 # "2019-02-03T19:20:00",
 __DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 __TIMEZONE = 'Europe/Amsterdam'
+__PYTZ_TIMEZONE = pytz.timezone(__TIMEZONE)
 
 __ACTUAL = "actual"
 __STATIONMEASUREMENTS = "stationmeasurements"
@@ -130,7 +131,7 @@ def __to_localdatetime(val):
     try:
         #  "timestamp": "2019-02-03T19:20:00",
         dt = datetime.strptime(val, __DATE_FORMAT)
-        dt = pytz.timezone(__TIMEZONE).localize(dt)
+        dt = __PYTZ_TIMEZONE.localize(dt)
         return dt
     except (AttributeError, ValueError, TypeError):
         return None
