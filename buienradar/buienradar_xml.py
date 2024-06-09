@@ -81,7 +81,7 @@ __BRWINDKRACHT = 'windkracht'
 # buienradat date format: '07/26/2017 15:50:00'
 __DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
 __TIMEZONE = 'Europe/Amsterdam'
-
+__PYTZ_TIMEZONE = pytz.timezone(__TIMEZONE)
 
 def __to_int(val):
     """Convert val into an integer value."""
@@ -113,7 +113,7 @@ def __to_localdatetime(val):
     """Convert val into a local datetime for tz Europe/Amsterdam."""
     try:
         dt = datetime.strptime(val, __DATE_FORMAT)
-        dt = pytz.timezone(__TIMEZONE).localize(dt)
+        dt = __PYTZ_TIMEZONE.localize(dt)
         return dt
     except (ValueError, TypeError):
         return None
@@ -398,7 +398,7 @@ def __parse_fc_data(fc_data):
         daysection = __BRDAYFC % daycnt
         if daysection in fc_data:
             tmpsect = fc_data[daysection]
-            fcdatetime = datetime.now(pytz.timezone(__TIMEZONE))
+            fcdatetime = datetime.now(__PYTZ_TIMEZONE)
             fcdatetime = fcdatetime.replace(hour=12,
                                             minute=0,
                                             second=0,
