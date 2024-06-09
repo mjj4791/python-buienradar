@@ -1,7 +1,14 @@
 Changelog
 =========
 All notable changes to this project will be documented in this file.
-Changes that did not make it into a new release are marked with [unreleased].
+
+
+[1.0.6] - 2024-06-09
+""""""""""""""""""""
+**changed**
+
+- make pytz.timezone(__TIMEZONE) a constant to prevent a locking call on each use
+
 
 [1.0.5] - 2021-11-27
 """"""""""""""""""""

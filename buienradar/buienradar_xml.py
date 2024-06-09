@@ -83,6 +83,7 @@ __DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
 __TIMEZONE = 'Europe/Amsterdam'
 __PYTZ_TIMEZONE = pytz.timezone(__TIMEZONE)
 
+
 def __to_int(val):
     """Convert val into an integer value."""
     try:
