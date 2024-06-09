@@ -18,7 +18,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 
 def version_from_git():
-    """Acquire package version form current git tag."""
+    """Acquire package version from current git tag."""
     return check_output(['git', 'describe', '--tags', '--abbrev=0'],
                         universal_newlines=True)
 
@@ -26,7 +26,7 @@ def version_from_git():
 setup(
     name='buienradar',
 
-    version='1.0.5',
+    version='1.0.6',
 
     description=__doc__,
     long_description_content_type='text/x-rst',
@@ -60,7 +60,9 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8'
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12'
     ],
 
     keywords='buienradar weather',

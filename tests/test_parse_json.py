@@ -71,116 +71,116 @@ def test_to_localdatetime():
 
     # check invalid dates:
     dt = __to_localdatetime('')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime(None)
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-01-02T03:04:05')
-    assert(("%s" % dt) == '2017-01-02 03:04:05+01:00')
+    assert (("%s" % dt) == '2017-01-02 03:04:05+01:00')
 
     # (invalid) month:
     dt = __to_localdatetime('2017-00-02T03:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-12-02T03:04:05')
-    assert(("%s" % dt) == '2017-12-02 03:04:05+01:00')
+    assert (("%s" % dt) == '2017-12-02 03:04:05+01:00')
 
     dt = __to_localdatetime('2017-13-02T03:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     # (invalid) day:
     dt = __to_localdatetime('2017-01-00T03:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-01-31T03:04:05')
-    assert(("%s" % dt) == '2017-01-31 03:04:05+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:04:05+01:00')
 
     dt = __to_localdatetime('2017-01-32T03:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-02-28T03:04:05')
-    assert(("%s" % dt) == '2017-02-28 03:04:05+01:00')
+    assert (("%s" % dt) == '2017-02-28 03:04:05+01:00')
 
     dt = __to_localdatetime('2017-02-29T03:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     # (invalid) year:
     dt = __to_localdatetime('17-01-01T03:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('017-01-1T03:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     # (invalid) hour:
     dt = __to_localdatetime('2017-01-31T00:04:05')
-    assert(("%s" % dt) == '2017-01-31 00:04:05+01:00')
+    assert (("%s" % dt) == '2017-01-31 00:04:05+01:00')
 
     dt = __to_localdatetime('2017-01-31T03:04:05')
-    assert(("%s" % dt) == '2017-01-31 03:04:05+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:04:05+01:00')
 
     dt = __to_localdatetime('2017-01-31T23:04:05')
-    assert(("%s" % dt) == '2017-01-31 23:04:05+01:00')
+    assert (("%s" % dt) == '2017-01-31 23:04:05+01:00')
 
     dt = __to_localdatetime('2017-01-01T24:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-01-01T25:04:05')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-01-01T01:04:05 PM')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-01-01T01:04:05 AM')
-    assert(dt is None)
+    assert (dt is None)
 
     # (invalid) minute:
     dt = __to_localdatetime('2017-01-31T03:00:05')
-    assert(("%s" % dt) == '2017-01-31 03:00:05+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:00:05+01:00')
 
     dt = __to_localdatetime('2017-01-31T03:04:05')
-    assert(("%s" % dt) == '2017-01-31 03:04:05+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:04:05+01:00')
 
     dt = __to_localdatetime('2017-01-31T03:59:05')
-    assert(("%s" % dt) == '2017-01-31 03:59:05+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:59:05+01:00')
 
     dt = __to_localdatetime('2017-01-01T03:60:05')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-01-01T25:-4:05')
-    assert(dt is None)
+    assert (dt is None)
 
     # (invalid) second:
     dt = __to_localdatetime('2017-01-31T03:04:00')
-    assert(("%s" % dt) == '2017-01-31 03:04:00+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:04:00+01:00')
 
     dt = __to_localdatetime('2017-01-31T03:04:01')
-    assert(("%s" % dt) == '2017-01-31 03:04:01+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:04:01+01:00')
 
     dt = __to_localdatetime('2017-01-31T03:04:59')
-    assert(("%s" % dt) == '2017-01-31 03:04:59+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:04:59+01:00')
 
     dt = __to_localdatetime('2017-01-01T24:04:60')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-01-01T25:04:-5')
-    assert(dt is None)
+    assert (dt is None)
 
     dt = __to_localdatetime('2017-01-31T03:04:05')
-    assert(("%s" % dt) == '2017-01-31 03:04:05+01:00')
+    assert (("%s" % dt) == '2017-01-31 03:04:05+01:00')
 
     # check DST/tz offset:
     dt = __to_localdatetime('2017-01-02T01:02:03')
-    assert(("%s" % dt) == '2017-01-02 01:02:03+01:00')
+    assert (("%s" % dt) == '2017-01-02 01:02:03+01:00')
 
     dt = __to_localdatetime('2017-02-28T13:31:11')
-    assert(("%s" % dt) == '2017-02-28 13:31:11+01:00')
+    assert (("%s" % dt) == '2017-02-28 13:31:11+01:00')
 
     dt = __to_localdatetime('2017-12-31T13:31:11')
-    assert(("%s" % dt) == '2017-12-31 13:31:11+01:00')
+    assert (("%s" % dt) == '2017-12-31 13:31:11+01:00')
 
     dt = __to_localdatetime('2017-07-10T13:31:11')
-    assert(("%s" % dt) == '2017-07-10 13:31:11+02:00')
+    assert (("%s" % dt) == '2017-07-10 13:31:11+02:00')
 
 
 def test_rain_data():
@@ -188,8 +188,8 @@ def test_rain_data():
     result = get_data(usexml=False)
 
     # we must have content:
-    assert(result[CONTENT] is not None)
-    assert(result[RAINCONTENT] is not None)
+    assert (result[CONTENT] is not None)
+    assert (result[RAINCONTENT] is not None)
 
     # check raindata:
     lines = result[RAINCONTENT].splitlines()
@@ -202,7 +202,7 @@ def test_rain_data():
             val = int(val)
         except ValueError:
             print("Unable to parse line: <%s>, not na integer." % (line))
-            assert(False)
+            assert (False)
 
         try:
             datetime.strptime(key, '%H:%M')
@@ -215,41 +215,41 @@ def test_json_data():
     result = get_data(usexml=False)
 
     # we must have content:
-    assert(result[CONTENT] is not None)
-    assert(result[RAINCONTENT] is not None)
+    assert (result[CONTENT] is not None)
+    assert (result[RAINCONTENT] is not None)
 
     # check all elements we use from the xml:
     jsondata = json.loads(result[CONTENT])
     actueelweer = jsondata[__ACTUAL]
-    assert(actueelweer is not None)
+    assert (actueelweer is not None)
 
     weerstations = actueelweer[__STATIONMEASUREMENTS]
-    assert(weerstations is not None)
+    assert (weerstations is not None)
 
     weerstation = weerstations[1]
-    assert(weerstation[__LAT] is not None)
-    assert(weerstation[__LON] is not None)
+    assert (weerstation[__LAT] is not None)
+    assert (weerstation[__LON] is not None)
 
-    assert(weerstation[__STATIONID] is not None)
-    assert(weerstation[__STATIONNAME] is not None)
-    assert(weerstation[SENSOR_TYPES[HUMIDITY][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[GROUNDTEMP][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[IRRADIANCE][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[MEASURED][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[PRECIPITATION][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[PRESSURE][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[STATIONNAME][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[CONDITION][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[TEMPERATURE][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[VISIBILITY][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDSPEED][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDFORCE][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDDIRECTION][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDAZIMUTH][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[WINDGUST][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[RAINLAST24HOUR][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[RAINLASTHOUR][0]] is not None)
-    assert(weerstation[SENSOR_TYPES[FEELTEMPERATURE][0]] is not None)
+    assert (weerstation[__STATIONID] is not None)
+    assert (weerstation[__STATIONNAME] is not None)
+    assert (weerstation[SENSOR_TYPES[HUMIDITY][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[GROUNDTEMP][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[IRRADIANCE][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[MEASURED][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[PRECIPITATION][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[PRESSURE][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[STATIONNAME][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[CONDITION][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[TEMPERATURE][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[VISIBILITY][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[WINDSPEED][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[WINDFORCE][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[WINDDIRECTION][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[WINDAZIMUTH][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[WINDGUST][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[RAINLAST24HOUR][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[RAINLASTHOUR][0]] is not None)
+    assert (weerstation[SENSOR_TYPES[FEELTEMPERATURE][0]] is not None)
 
 
 def test_precip_fc():
@@ -367,37 +367,37 @@ def test_parse_timeframe():
         result = parse_data(data, raindata,
                             latitude, longitude, 4, usexml=False)
         # timeframe=4 should raise a ValueError, so:
-        assert(False)
+        assert (False)
     except ValueError:
         # timeframe=4 should raise a ValueError, so:
-        assert(True)
+        assert (True)
 
     try:
         result = parse_data(data, raindata,
                             latitude, longitude, 5, usexml=False)
         # timeframe=5 should NOT raise a ValueError, so:
-        assert(True and result[SUCCESS] is False)
+        assert (True and result[SUCCESS] is False)
     except ValueError:
         # timeframe=5 should NOT raise a ValueError, so:
-        assert(False)
+        assert (False)
 
     try:
         result = parse_data(data, raindata,
                             latitude, longitude, 121, usexml=False)
         # timeframe=121 should raise a ValueError, so:
-        assert(False)
+        assert (False)
     except ValueError:
         # timeframe=121 should raise a ValueError, so:
-        assert(True)
+        assert (True)
 
     try:
         result = parse_data(data, raindata,
                             latitude, longitude, 120, usexml=False)
         # timeframe=120 should NOT raise a ValueError, so:
-        assert(True and result[SUCCESS] is False)
+        assert (True and result[SUCCESS] is False)
     except ValueError:
         # timeframe=120 should NOT raise a ValueError, so:
-        assert(False)
+        assert (False)
 
 
 def test_readdata1():
@@ -417,10 +417,10 @@ def test_readdata1():
     longitude = 6.20
     result = parse_data(data, raindata, latitude, longitude, usexml=False)
     print(result)
-    assert(result[SUCCESS] and result[MESSAGE] is None)
+    assert (result[SUCCESS] and result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6391)' in result[DATA][STATIONNAME])
 
     # check the data:
@@ -548,14 +548,14 @@ def test_readdata1():
         'msg': None,
         'distance': 0.0
     }
-    assert(expect == result)
+    assert (expect == result)
 
     result = parse_data(data, raindata, latitude, longitude, 30, usexml=False)
     print(result)
-    assert(result[SUCCESS] and result[MESSAGE] is None)
+    assert (result[SUCCESS] and result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6391)' in result[DATA][STATIONNAME])
 
     expect = {
@@ -665,7 +665,7 @@ def test_readdata1():
         'msg': None,
         'distance': 0.0
     }
-    assert(expect == result)
+    assert (expect == result)
 
 
 def test_readdata2():
@@ -686,11 +686,11 @@ def test_readdata2():
     longitude = 5.19
     result = parse_data(data, raindata, latitude, longitude, usexml=False)
     print(result)
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6260)' in result[DATA][STATIONNAME])
 
     # check the data:
@@ -818,15 +818,15 @@ def test_readdata2():
         'msg': None,
         'distance': 1.306732
     }
-    assert(expect == result)
+    assert (expect == result)
 
     result = parse_data(data, raindata, latitude, longitude, 30, usexml=False)
     print(result)
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6260)' in result[DATA][STATIONNAME])
 
     expect = {
@@ -936,7 +936,7 @@ def test_readdata2():
         'msg': None,
         'distance': 1.306732
     }
-    assert(expect == result)
+    assert (expect == result)
 
 
 def test_readdata3():
@@ -953,11 +953,11 @@ def test_readdata3():
     longitude = 3.23
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            result[MESSAGE] is None)
 
     # check the selected weatherstation:
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6252)' in result[DATA][STATIONNAME])
 
     # check the data:
@@ -1083,7 +1083,7 @@ def test_readdata3():
         'msg': None,
         'distance': 1.297928
     }
-    assert(expect == result)
+    assert (expect == result)
 
 
 def test_nojson():
@@ -1328,8 +1328,8 @@ def test_invalid_data():
     longitude = 6.20
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
-    assert(result[SUCCESS] is False)
-    assert(result[MESSAGE] == 'Location data is invalid.')
+    assert (result[SUCCESS] is False)
+    assert (result[MESSAGE] == 'Location data is invalid.')
 
     file = open('tests/json/buienradar_invalidfc1.json', 'r')
     data = file.read()
@@ -1339,19 +1339,19 @@ def test_invalid_data():
     longitude = 4.10
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            result[MESSAGE] is None)
     # test Temperature (average):
-    assert(len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
+    assert (len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
            result[DATA][FORECAST][0][TEMPERATURE] == 6.5)
     # test missing maxtemperatureMin:
-    assert(len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
+    assert (len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
            result[DATA][FORECAST][1][TEMPERATURE] == 10)
     # test missing maxtemperatureMax:
-    assert(len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
+    assert (len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
            result[DATA][FORECAST][2][TEMPERATURE] == 9)
     # test missing maxtemperatureMin and maxtemperatureMax:
-    assert(len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
+    assert (len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
            result[DATA][FORECAST][3][TEMPERATURE] is None)
 
     # read xml with invalid ws coordinates
@@ -1365,7 +1365,7 @@ def test_invalid_data():
     longitude = 6.20
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6375)' in result[DATA][STATIONNAME])
 
     # 'Meetstation Arnhem' contains invalid gps info,
@@ -1374,7 +1374,7 @@ def test_invalid_data():
     longitude = 5.88
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6260)' in result[DATA][STATIONNAME])
 
     # 'Meetstation Berkhout' contains invalid gps info,
@@ -1383,7 +1383,7 @@ def test_invalid_data():
     longitude = 4.98
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
-    assert(result[SUCCESS] and                              # noqa: ignore=W504
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6248)' in result[DATA][STATIONNAME])
 
 
@@ -1391,13 +1391,13 @@ def test__get_str():
     """Test get_str function."""
     section = {"key1": "value", "key2": "", "key3": None}
     value = __get_str(section, "key1")
-    assert(value == "value")
+    assert (value == "value")
 
     value = __get_str(section, "key2")
-    assert(value == "")
+    assert (value == "")
 
     value = __get_str(section, "key3")
-    assert(value is None)
+    assert (value is None)
 
 
 def test__get_windspeed():
@@ -1407,7 +1407,7 @@ def test__get_windspeed():
               10: 24.69, 11: 28.81, 12: 32.41, 13: None, -1: None, None: None}
     for k, expected in speeds.items():
         value = __get_windspeed(k)
-        assert(value == expected)
+        assert (value == expected)
 
 
 def test__get_windazimuth():
@@ -1428,20 +1428,20 @@ def test__get_windazimuth():
              'SSW': 202.5, 'SW': 225, 'WSW': 247.5}
     for k, expected in tests.items():
         value = __get_windazimuth(k)
-        assert(value == expected)
+        assert (value == expected)
 
 
 def test__get_float():
     """Test get_float function."""
     section = {"key1": 1.2, "key2": 0.0, "key3": None}
     value = __get_float(section, "key1")
-    assert(value == 1.2)
+    assert (value == 1.2)
 
     value = __get_float(section, "key2")
-    assert(value == 0.0)
+    assert (value == 0.0)
 
     value = __get_float(section, "key3")
-    assert(value == 0.0)
+    assert (value == 0.0)
 
 
 def test__get_int():
@@ -1449,28 +1449,28 @@ def test__get_int():
     section = {"key1": 1.2, "key2": 0.0, "key3": None,
                "key4": 3, "key5": 1.9, "key6": -1}
     value = __get_int(section, "key1")
-    assert(value == 1)
+    assert (value == 1)
 
     value = __get_int(section, "key2")
-    assert(value == 0)
+    assert (value == 0)
 
     value = __get_int(section, "key3")
-    assert(value == 0)
+    assert (value == 0)
 
     value = __get_int(section, "key4")
-    assert(value == 3)
+    assert (value == 3)
 
     value = __get_int(section, "key5")
-    assert(value == 1)
+    assert (value == 1)
 
     value = __get_int(section, "key6")
-    assert(value == -1)
+    assert (value == -1)
 
 
 def test__getstr():
     """Test get_str function."""
     value = __get_str(None, "test")
-    assert(value == "")
+    assert (value == "")
 
 
 def test__getBarFC():
@@ -1499,7 +1499,7 @@ def test__getBarFC():
              9999: 7}
     for k, expected in tests.items():
         value = __getBarFC(k)
-        assert(value == expected)
+        assert (value == expected)
 
 
 def test__getBarFCName():
@@ -1529,7 +1529,7 @@ def test__getBarFCName():
 
     for k, expected in tests.items():
         value = __getBarFCName(k)
-        assert(value == expected)
+        assert (value == expected)
 
 
 def test__getBarFCNameNL():
@@ -1559,4 +1559,4 @@ def test__getBarFCNameNL():
 
     for k, expected in tests.items():
         value = __getBarFCNameNL(k)
-        assert(value == expected)
+        assert (value == expected)
