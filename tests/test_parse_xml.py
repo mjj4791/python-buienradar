@@ -1222,3 +1222,100 @@ def test_invalid_data():
     result = parse_data(data, None, latitude, longitude, usexml=True)
     print(result)
     assert (result[SUCCESS] and '(6248)' in result[DATA][STATIONNAME])
+
+
+def test_id_upper1():
+    """Test loading and xml file with idin uppercase."""
+    # load buienradar.xml
+    file = open('tests/xml/buienradar_id_upper.xml', 'r')
+    data = file.read()
+    file.close()
+
+    file = open('tests/raindata.txt', 'r')
+    raindata = file.read()
+    file.close()
+
+    # select first weatherstation
+    # Meetstation Arcen (6391)
+    latitude = 51.50
+    longitude = 6.20
+    result = parse_data(data, raindata, latitude, longitude, usexml=True)
+    print(result)
+    assert (result[SUCCESS] and result[MESSAGE] is None)
+
+    # check the selected weatherstation:
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
+           '(6391)' in result[DATA][STATIONNAME])
+
+    # check the data:
+    fc1 = (datetime.now(pytz.timezone(__TIMEZONE)) + timedelta(days=1))
+    fc2 = (datetime.now(pytz.timezone(__TIMEZONE)) + timedelta(days=2))
+    fc3 = (datetime.now(pytz.timezone(__TIMEZONE)) + timedelta(days=3))
+    fc4 = (datetime.now(pytz.timezone(__TIMEZONE)) + timedelta(days=4))
+    fc5 = (datetime.now(pytz.timezone(__TIMEZONE)) + timedelta(days=5))
+
+    fc1 = fc1.replace(hour=12, minute=0, second=0, microsecond=0)
+    fc2 = fc2.replace(hour=12, minute=0, second=0, microsecond=0)
+    fc3 = fc3.replace(hour=12, minute=0, second=0, microsecond=0)
+    fc4 = fc4.replace(hour=12, minute=0, second=0, microsecond=0)
+    fc5 = fc5.replace(hour=12, minute=0, second=0, microsecond=0)
+
+    # '05/19/2017 00:20:00'
+    loc_dt = datetime(2017, 5, 19, hour=0, minute=20, second=0, microsecond=0)
+    measured = pytz.timezone(__TIMEZONE).localize(loc_dt)
+
+    # # Expected result:
+    expect = {
+        'success': True, 'msg': None, 'data': {
+            'attribution': 'Data provided by buienradar.nl',
+            'forecast': [
+                {
+                    'condition': {'condcode': 'j', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': 'Mix of clear and high clouds', 'exact_nl': 'Mix van opklaringen en hoge bewolking',
+                                  'image': get_imageurl('J')
+                                  },
+                    'temperature': 16.0, 'mintemp': 8.0, 'maxtemp': 16.0,
+                    'sunchance': 0, 'rainchance': 15, 'rain': 0.0, 'snow': 0.0,
+                    'windforce': 3, 'datetime': fc1
+                }, {
+                    'condition': {'condcode': 'b', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': 'Mix of clear and medium or low clouds', 'exact_nl': 'Mix van opklaringen en middelbare of lage bewolking',
+                                  'image': get_imageurl('B')
+                                  },
+                    'temperature': 17.0, 'mintemp': 8.0, 'maxtemp': 17.0,
+                    'sunchance': 43, 'rainchance': 1, 'rain': 0.0, 'snow': 0.0,
+                    'windforce': 3, 'datetime': fc2
+                }, {
+                    'condition': {'condcode': 'r', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': '?? Partly cloudy ??', 'exact_nl': '?? Partly cloudy ??',
+                                  'image': get_imageurl('R')},
+                    'temperature': 22.0, 'mintemp': 10.0, 'maxtemp': 22.0,
+                    'sunchance': 0, 'rainchance': 3, 'rain': 0.0, 'snow': 0.0,
+                    'windforce': 4, 'datetime': fc3
+                }, {
+                    'condition': {'condcode': 'm', 'condition': 'rainy', 'detailed': 'light-rain', 'exact': 'Heavily clouded with some light rain', 'exact_nl': 'Zwaar bewolkt met wat lichte regen',
+                                  'image': get_imageurl('M')
+                                    },
+                    'temperature': 18.0, 'mintemp': 11.0, 'maxtemp': 18.0,
+                    'sunchance': 0, 'rainchance': 43, 'rain': 1.8, 'snow': 0.0,
+                    'windforce': 4, 'datetime': fc4
+                }, {
+                    'condition': {'condcode': 'f', 'condition': 'rainy', 'detailed': 'partlycloudy-light-rain', 'exact': 'Alternatingly cloudy with some light rain', 'exact_nl': 'Afwisselend bewolkt met (mogelijk) wat lichte regen',
+                                    'image': get_imageurl('F')
+                                },
+                    'temperature': 15.0, 'mintemp': 9.0, 'maxtemp': 15.0,
+                    'sunchance': 0, 'rainchance': 76, 'rain': 4.4, 'snow': 0.0,
+                    'windforce': 4, 'datetime': fc5
+                }
+            ],
+            'precipitation_forecast': {'average': 0.0, 'total': 0.0, 'timeframe': 60},
+            'humidity': 95, 'groundtemperature': 15.9, 'irradiance': 614,
+            'measured': measured,
+            'precipitation': 2.0, 'pressure': 1021.23,
+            'stationname': 'Arcen (6391)',
+            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt',
+                          'image': get_imageurl('CC')
+                            },
+            'temperature': 16.3, 'visibility': 38400,
+            'windspeed': 3.13, 'windforce': 2, 'winddirection': 'ONO', 'windazimuth': 77, 'windgust': 4.4
+        },
+        'distance': 0.0
+    }
+    assert (expect == result)

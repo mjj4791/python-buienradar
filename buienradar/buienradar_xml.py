@@ -366,7 +366,7 @@ def __parse_loc_data(loc_data, result):
             sens_data = loc_data[value]
             if key == CONDITION:
                 # update weather symbol & status text
-                code = sens_data[__BRID][:1]
+                code = sens_data[__BRID][:1].lower()
                 result[DATA][CONDITION] = condition_from_code(code)
                 result[DATA][CONDITION][IMAGE] = sens_data[__BRTEXT]
             else:
@@ -406,7 +406,7 @@ def __parse_fc_data(fc_data):
                                             microsecond=0)
             # add daycnt days
             fcdatetime = fcdatetime + timedelta(days=daycnt)
-            code = tmpsect.get(__BRICOON, []).get(__BRID)
+            code = tmpsect.get(__BRICOON, []).get(__BRID).lower()
             fcdata = {
                 CONDITION: condition_from_code(code),
                 TEMPERATURE: __get_float(tmpsect, __BRMAXTEMP),

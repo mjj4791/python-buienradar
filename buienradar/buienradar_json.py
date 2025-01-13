@@ -589,14 +589,18 @@ def __parse_precipfc_data(data, timeframe):
     return result
 
 
-def __cond_from_image(image):
+def __cond_from_image(img):
     """Get the condition from the image url."""
-    # the image url should be something like: http://somehost/somefolder/cc.png
-    # or http://somehost/somefolder/c.png if there is not url,
-    # or the length is too small, we cannot determine the condition.
-    if image is None or len(image) < 6:
+    # the image url should be something like:
+    # - http://somehost/somefolder/cc.png (night time)
+    # - http://somehost/somefolder/CC.png
+    # - http://somehost/somefolder/c.png (day time)
+    # - http://somehost/somefolder/C.png
+    #  if there is not url or the length is too small, we cannot determine the condition.
+    if img is None or len(img) < 6:
         return None
     # __BRCONDITIONS = { 'code': 'conditon', 'detailed', 'exact', 'exact_nl'}
+    image = img.lower()
     code = image[-5:-4]
     night = False
     if image[-6:-5] == code:
