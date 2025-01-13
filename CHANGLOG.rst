@@ -2,6 +2,13 @@ Changelog
 =========
 All notable changes to this project will be documented in this file.
 
+[1.0.7] - 2025-01-13
+""""""""""""""""""""
+**changed**
+
+- json: support iconurl conditionimage independent of casing (upper/lower case)
+- xml: support icon/id independent if casing (upper/lower case)
+
 
 [1.0.6] - 2024-06-09
 """"""""""""""""""""
