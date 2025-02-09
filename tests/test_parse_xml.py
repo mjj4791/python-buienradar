@@ -1270,51 +1270,70 @@ def test_id_upper1():
             'attribution': 'Data provided by buienradar.nl',
             'forecast': [
                 {
-                    'condition': {'condcode': 'j', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': 'Mix of clear and high clouds', 'exact_nl': 'Mix van opklaringen en hoge bewolking',
-                                  'image': get_imageurl('J')
-                                  },
+                    'condition': {'condcode': 'j', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy', 'exact':
+                                  'Mix of clear and high clouds',
+                                  'exact_nl': 'Mix van opklaringen en hoge \
+bewolking',
+                                  'image': get_imageurl('J')},
                     'temperature': 16.0, 'mintemp': 8.0, 'maxtemp': 16.0,
                     'sunchance': 0, 'rainchance': 15, 'rain': 0.0, 'snow': 0.0,
                     'windforce': 3, 'datetime': fc1
                 }, {
-                    'condition': {'condcode': 'b', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': 'Mix of clear and medium or low clouds', 'exact_nl': 'Mix van opklaringen en middelbare of lage bewolking',
-                                  'image': get_imageurl('B')
-                                  },
+                    'condition': {'condcode': 'b', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy', 'exact':
+                                  'Mix of clear and medium or low clouds',
+                                  'exact_nl': 'Mix van opklaringen en \
+middelbare of lage bewolking',
+                                  'image': get_imageurl('B')},
                     'temperature': 17.0, 'mintemp': 8.0, 'maxtemp': 17.0,
                     'sunchance': 43, 'rainchance': 1, 'rain': 0.0, 'snow': 0.0,
                     'windforce': 3, 'datetime': fc2
                 }, {
-                    'condition': {'condcode': 'r', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': '?? Partly cloudy ??', 'exact_nl': '?? Partly cloudy ??',
+                    'condition': {'condcode': 'r', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy', 'exact':
+                                  '?? Partly cloudy ??', 'exact_nl':
+                                  '?? Partly cloudy ??',
                                   'image': get_imageurl('R')},
                     'temperature': 22.0, 'mintemp': 10.0, 'maxtemp': 22.0,
                     'sunchance': 0, 'rainchance': 3, 'rain': 0.0, 'snow': 0.0,
                     'windforce': 4, 'datetime': fc3
                 }, {
-                    'condition': {'condcode': 'm', 'condition': 'rainy', 'detailed': 'light-rain', 'exact': 'Heavily clouded with some light rain', 'exact_nl': 'Zwaar bewolkt met wat lichte regen',
-                                  'image': get_imageurl('M')
-                                    },
+                    'condition': {'condcode': 'm', 'condition': 'rainy',
+                                  'detailed': 'light-rain', 'exact':
+                                  'Heavily clouded with some light rain',
+                                  'exact_nl': 'Zwaar bewolkt met wat lichte \
+regen',
+                                  'image': get_imageurl('M')},
                     'temperature': 18.0, 'mintemp': 11.0, 'maxtemp': 18.0,
                     'sunchance': 0, 'rainchance': 43, 'rain': 1.8, 'snow': 0.0,
                     'windforce': 4, 'datetime': fc4
                 }, {
-                    'condition': {'condcode': 'f', 'condition': 'rainy', 'detailed': 'partlycloudy-light-rain', 'exact': 'Alternatingly cloudy with some light rain', 'exact_nl': 'Afwisselend bewolkt met (mogelijk) wat lichte regen',
-                                    'image': get_imageurl('F')
-                                },
+                    'condition': {'condcode': 'f', 'condition': 'rainy',
+                                  'detailed': 'partlycloudy-light-rain',
+                                  'exact': 'Alternatingly cloudy with some \
+light rain', 'exact_nl':
+                                  'Afwisselend bewolkt met (mogelijk) wat \
+lichte regen',
+                                  'image': get_imageurl('F')},
                     'temperature': 15.0, 'mintemp': 9.0, 'maxtemp': 15.0,
                     'sunchance': 0, 'rainchance': 76, 'rain': 4.4, 'snow': 0.0,
                     'windforce': 4, 'datetime': fc5
                 }
             ],
-            'precipitation_forecast': {'average': 0.0, 'total': 0.0, 'timeframe': 60},
+            'precipitation_forecast': {'average': 0.0, 'total': 0.0,
+                                       'timeframe': 60},
             'humidity': 95, 'groundtemperature': 15.9, 'irradiance': 614,
             'measured': measured,
             'precipitation': 2.0, 'pressure': 1021.23,
             'stationname': 'Arcen (6391)',
-            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt',
-                          'image': get_imageurl('CC')
-                            },
+            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed':
+                          'cloudy', 'exact': 'Heavily clouded', 'exact_nl':
+                          'Zwaar bewolkt',
+                          'image': get_imageurl('CC')},
             'temperature': 16.3, 'visibility': 38400,
-            'windspeed': 3.13, 'windforce': 2, 'winddirection': 'ONO', 'windazimuth': 77, 'windgust': 4.4
+            'windspeed': 3.13, 'windforce': 2, 'winddirection': 'ONO',
+            'windazimuth': 77, 'windgust': 4.4
         },
         'distance': 0.0
     }

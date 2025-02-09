@@ -23,19 +23,26 @@ from buienradar.buienradar_json import (
     __getBarFCName,
     __getBarFCNameNL,
     __parse_precipfc_data,
-    __to_localdatetime
+    __to_localdatetime,
+    apply_image_workaround
 )
 from buienradar.constants import (
+    CONDCODE,
     CONDITION,
     CONTENT,
     DATA,
+    DETAILED,
+    EXACT,
+    EXACTNL,
     FEELTEMPERATURE,
     FORECAST,
     GROUNDTEMP,
     HUMIDITY,
+    IMAGE,
     IRRADIANCE,
     MEASURED,
     MESSAGE,
+    NIGHTTIME,
     PRECIPITATION,
     PRESSURE,
     RAINCONTENT,
@@ -1281,7 +1288,7 @@ def test_missing_data():
     result = parse_data(data, None, latitude, longitude, usexml=False)
     print(result)
 
-    # expectedmsg = "Missing key(s) in br data: "
+    # "Missing key(s) in br data: "
     assert (result[SUCCESS] and
             result[MESSAGE] is None and
             result[DATA][PRESSURE] is None
@@ -1561,6 +1568,7 @@ def test__getBarFCNameNL():
         value = __getBarFCNameNL(k)
         assert (value == expected)
 
+
 def test_iconurl1():
     """Test loading and parsing json file with iconurl in uppercase."""
     # load buienradar.xml
@@ -1585,11 +1593,16 @@ def test_iconurl1():
            '(6391)' in result[DATA][STATIONNAME])
 
     # # check the data:
-    fc1 = datetime(year=2025, month=1, day=13, hour=0, minute=0) # "2025-01-13T00:00:00",
-    fc2 = datetime(year=2025, month=1, day=14, hour=0, minute=0) # "2025-01-14T00:00:00",
-    fc3 = datetime(year=2025, month=1, day=15, hour=0, minute=0) # "2025-01-15T00:00:00",
-    fc4 = datetime(year=2025, month=1, day=16, hour=0, minute=0) # "2025-01-16T00:00:00",
-    fc5 = datetime(year=2025, month=1, day=17, hour=0, minute=0) # "2025-01-17T00:00:00",
+    # "2025-01-13T00:00:00":
+    fc1 = datetime(year=2025, month=1, day=13, hour=0, minute=0)
+    # "2025-01-14T00:00:00":
+    fc2 = datetime(year=2025, month=1, day=14, hour=0, minute=0)
+    # "2025-01-15T00:00:00":
+    fc3 = datetime(year=2025, month=1, day=15, hour=0, minute=0)
+    # "2025-01-16T00:00:00":
+    fc4 = datetime(year=2025, month=1, day=16, hour=0, minute=0)
+    # "2025-01-17T00:00:00":
+    fc5 = datetime(year=2025, month=1, day=17, hour=0, minute=0)
 
     fc1 = pytz.timezone(__TIMEZONE).localize(fc1)
     fc2 = pytz.timezone(__TIMEZONE).localize(fc2)
@@ -1608,44 +1621,76 @@ def test_iconurl1():
             'attribution': 'Data provided by buienradar.nl',
             'forecast': [
                 {
-                    'condition': {'condcode': 'b', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': 'Mix of clear and medium or low clouds', 'exact_nl': 'Mix van opklaringen en middelbare of lage bewolking', 'night': False,
-                                  'image': get_imageurl('B')},
+                    'condition': {
+                        'condcode': 'b', 'condition': 'cloudy',
+                        'detailed': 'partlycloudy',
+                        'exact': 'Mix of clear and medium or low clouds',
+                        'exact_nl':
+                        'Mix van opklaringen en middelbare of lage bewolking',
+                        'night': False,
+                        'image': get_imageurl('B')},
                     'temperature': 3.0, 'mintemp': -2.0, 'maxtemp': 3.0,
-                    'sunchance': 50, 'rainchance': 10, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06, 'winddirection': 'Z', 'windazimuth': 180,
+                    'sunchance': 50, 'rainchance': 10,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 2, 'windspeed': 2.06,
+                    'winddirection': 'Z', 'windazimuth': 180,
                     'datetime': fc1
                 }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt', 'night': False,
+                    'condition': {'condcode': 'c', 'condition': 'cloudy',
+                                  'detailed': 'cloudy', 'exact':
+                                  'Heavily clouded', 'exact_nl':
+                                  'Zwaar bewolkt', 'night': False,
                                   'image': get_imageurl('C')},
                     'temperature': 6.0, 'mintemp': -2.0, 'maxtemp': 6.0,
-                    'sunchance': 20, 'rainchance': 30, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 3, 'windspeed': 3.6, 'winddirection': 'ZW', 'windazimuth': 225,
+                    'sunchance': 20, 'rainchance': 30,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 3, 'windspeed': 3.6,
+                    'winddirection': 'ZW', 'windazimuth': 225,
                     'datetime': fc2
                 }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt', 'night': False,
+                    'condition': {'condcode': 'c', 'condition': 'cloudy',
+                                  'detailed': 'cloudy', 'exact':
+                                  'Heavily clouded', 'exact_nl':
+                                  'Zwaar bewolkt', 'night': False,
                                   'image': get_imageurl('C')},
                     'temperature': 8.0, 'mintemp': 3.0, 'maxtemp': 8.0,
-                    'sunchance': 10, 'rainchance': 30, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06, 'winddirection': 'ZW', 'windazimuth': 225,
+                    'sunchance': 10, 'rainchance': 30,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 2, 'windspeed': 2.06,
+                    'winddirection': 'ZW', 'windazimuth': 225,
                     'datetime': fc3
                 }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt', 'night': False,
+                    'condition': {'condcode': 'c', 'condition': 'cloudy',
+                                  'detailed': 'cloudy', 'exact':
+                                  'Heavily clouded', 'exact_nl':
+                                  'Zwaar bewolkt', 'night': False,
                                   'image': get_imageurl('C')},
                     'temperature': 7.0, 'mintemp': 3.0, 'maxtemp': 7.0,
-                    'sunchance': 20, 'rainchance': 10, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06, 'winddirection': 'ZW', 'windazimuth': 225,
+                    'sunchance': 20, 'rainchance': 10,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 2, 'windspeed': 2.06,
+                    'winddirection': 'ZW', 'windazimuth': 225,
                     'datetime': fc4
                 }, {
-                    'condition': {'condcode': 'b', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': 'Mix of clear and medium or low clouds', 'exact_nl': 'Mix van opklaringen en middelbare of lage bewolking', 'night': False,
+                    'condition': {'condcode': 'b', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy', 'exact':
+                                  'Mix of clear and medium or low clouds',
+                                  'exact_nl': 'Mix van opklaringen en \
+middelbare of lage bewolking',
+                                  'night': False,
                                   'image': get_imageurl('B')},
                     'temperature': 5.0, 'mintemp': -1.0, 'maxtemp': 5.0,
-                    'sunchance': 30, 'rainchance': 10, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06, 'winddirection': 'ZW', 'windazimuth': 225,
+                    'sunchance': 30, 'rainchance': 10,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 2, 'windspeed': 2.06,
+                    'winddirection': 'ZW', 'windazimuth': 225,
                     'datetime': fc5
                 }
             ],
-            'precipitation_forecast': {'average': 0.0, 'total': 0.0, 'timeframe': 60},
-            'barometerfc': 7, 'barometerfcname': 'Very dry', 'barometerfcnamenl': 'Zeer mooi',
+            'precipitation_forecast': {'average': 0.0, 'total': 0.0,
+                                       'timeframe': 60},
+            'barometerfc': 7, 'barometerfcname': 'Very dry',
+            'barometerfcnamenl': 'Zeer mooi',
             'humidity': 84,
             'groundtemperature': -2.2,
             'irradiance': 0,
@@ -1653,12 +1698,16 @@ def test_iconurl1():
             'precipitation': 0.0,
             'pressure': 1040.6,
             'stationname': 'Arcen (6391)',
-            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt', 'night': True,
+            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed':
+                          'cloudy', 'exact': 'Heavily clouded', 'exact_nl':
+                          'Zwaar bewolkt', 'night': True,
                           'image': get_imageurl('CC')},
             'rainlast24hour': 0.0, 'rainlasthour': 0.0,
             'temperature': -0.2, 'feeltemperature': -2.0,
             'visibility': 22200.0,
-            'windspeed': 1.5, 'windforce': 1, 'winddirection': 'ZZO', 'windazimuth': 160, 'windgust': 2.0
+            'windspeed': 1.5, 'windforce': 1,
+            'winddirection': 'ZZO', 'windazimuth': 160,
+            'windgust': 2.0
         },
         'distance': 0.0
     }
@@ -1689,11 +1738,16 @@ def test_iconurl2():
            '(6391)' in result[DATA][STATIONNAME])
 
     # # check the data:
-    fc1 = datetime(year=2025, month=1, day=13, hour=0, minute=0) # "2025-01-13T00:00:00",
-    fc2 = datetime(year=2025, month=1, day=14, hour=0, minute=0) # "2025-01-14T00:00:00",
-    fc3 = datetime(year=2025, month=1, day=15, hour=0, minute=0) # "2025-01-15T00:00:00",
-    fc4 = datetime(year=2025, month=1, day=16, hour=0, minute=0) # "2025-01-16T00:00:00",
-    fc5 = datetime(year=2025, month=1, day=17, hour=0, minute=0) # "2025-01-17T00:00:00",
+    # "2025-01-13T00:00:00":
+    fc1 = datetime(year=2025, month=1, day=13, hour=0, minute=0)
+    # "2025-01-14T00:00:00":
+    fc2 = datetime(year=2025, month=1, day=14, hour=0, minute=0)
+    # "2025-01-15T00:00:00":
+    fc3 = datetime(year=2025, month=1, day=15, hour=0, minute=0)
+    # "2025-01-16T00:00:00":
+    fc4 = datetime(year=2025, month=1, day=16, hour=0, minute=0)
+    # "2025-01-17T00:00:00":
+    fc5 = datetime(year=2025, month=1, day=17, hour=0, minute=0)
 
     fc1 = pytz.timezone(__TIMEZONE).localize(fc1)
     fc2 = pytz.timezone(__TIMEZONE).localize(fc2)
@@ -1712,44 +1766,75 @@ def test_iconurl2():
             'attribution': 'Data provided by buienradar.nl',
             'forecast': [
                 {
-                    'condition': {'condcode': 'b', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': 'Mix of clear and medium or low clouds', 'exact_nl': 'Mix van opklaringen en middelbare of lage bewolking', 'night': False,
+                    'condition': {'condcode': 'b', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy', 'exact':
+                                  'Mix of clear and medium or low clouds',
+                                  'exact_nl': 'Mix van opklaringen en \
+middelbare of lage bewolking',
+                                  'night': False,
                                   'image': get_imageurl('b')},
                     'temperature': 3.0, 'mintemp': -2.0, 'maxtemp': 3.0,
-                    'sunchance': 50, 'rainchance': 10, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06, 'winddirection': 'Z', 'windazimuth': 180,
+                    'sunchance': 50, 'rainchance': 10,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 2, 'windspeed': 2.06,
+                    'winddirection': 'Z', 'windazimuth': 180,
                     'datetime': fc1
                 }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt', 'night': False,
+                    'condition': {'condcode': 'c', 'condition': 'cloudy',
+                                  'detailed': 'cloudy', 'exact':
+                                  'Heavily clouded', 'exact_nl':
+                                  'Zwaar bewolkt', 'night': False,
                                   'image': get_imageurl('c')},
                     'temperature': 6.0, 'mintemp': -2.0, 'maxtemp': 6.0,
-                    'sunchance': 20, 'rainchance': 30, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 3, 'windspeed': 3.6, 'winddirection': 'ZW', 'windazimuth': 225,
+                    'sunchance': 20, 'rainchance': 30,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 3, 'windspeed': 3.6,
+                    'winddirection': 'ZW', 'windazimuth': 225,
                     'datetime': fc2
                 }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt', 'night': False,
+                    'condition': {'condcode': 'c', 'condition': 'cloudy',
+                                  'detailed': 'cloudy', 'exact':
+                                  'Heavily clouded', 'exact_nl':
+                                  'Zwaar bewolkt', 'night': False,
                                   'image': get_imageurl('c')},
                     'temperature': 8.0, 'mintemp': 3.0, 'maxtemp': 8.0,
-                    'sunchance': 10, 'rainchance': 30, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06, 'winddirection': 'ZW', 'windazimuth': 225,
+                    'sunchance': 10, 'rainchance': 30,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 2, 'windspeed': 2.06,
+                    'winddirection': 'ZW', 'windazimuth': 225,
                     'datetime': fc3
                 }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt', 'night': False,
+                    'condition': {'condcode': 'c', 'condition': 'cloudy',
+                                  'detailed': 'cloudy', 'exact':
+                                  'Heavily clouded', 'exact_nl':
+                                  'Zwaar bewolkt', 'night': False,
                                   'image': get_imageurl('c')},
                     'temperature': 7.0, 'mintemp': 3.0, 'maxtemp': 7.0,
-                    'sunchance': 20, 'rainchance': 10, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06, 'winddirection': 'ZW', 'windazimuth': 225,
+                    'sunchance': 20, 'rainchance': 10,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 2, 'windspeed': 2.06,
+                    'winddirection': 'ZW', 'windazimuth': 225,
                     'datetime': fc4
                 }, {
-                    'condition': {'condcode': 'b', 'condition': 'cloudy', 'detailed': 'partlycloudy', 'exact': 'Mix of clear and medium or low clouds', 'exact_nl': 'Mix van opklaringen en middelbare of lage bewolking', 'night': False,
+                    'condition': {'condcode': 'b', 'condition': 'cloudy',
+                                  'detailed': 'partlycloudy', 'exact':
+                                  'Mix of clear and medium or low clouds',
+                                  'exact_nl': 'Mix van opklaringen en \
+middelbare of lage bewolking',
+                                  'night': False,
                                   'image': get_imageurl('b')},
                     'temperature': 5.0, 'mintemp': -1.0, 'maxtemp': 5.0,
-                    'sunchance': 30, 'rainchance': 10, 'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06, 'winddirection': 'ZW', 'windazimuth': 225,
+                    'sunchance': 30, 'rainchance': 10,
+                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
+                    'windforce': 2, 'windspeed': 2.06,
+                    'winddirection': 'ZW', 'windazimuth': 225,
                     'datetime': fc5
                 }
             ],
-            'precipitation_forecast': {'average': 0.0, 'total': 0.0, 'timeframe': 60},
-            'barometerfc': 7, 'barometerfcname': 'Very dry', 'barometerfcnamenl': 'Zeer mooi',
+            'precipitation_forecast': {'average': 0.0, 'total': 0.0,
+                                       'timeframe': 60},
+            'barometerfc': 7, 'barometerfcname': 'Very dry',
+            'barometerfcnamenl': 'Zeer mooi',
             'humidity': 84,
             'groundtemperature': -2.2,
             'irradiance': 0,
@@ -1757,13 +1842,219 @@ def test_iconurl2():
             'precipitation': 0.0,
             'pressure': 1040.6,
             'stationname': 'Arcen (6391)',
-            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed': 'cloudy', 'exact': 'Heavily clouded', 'exact_nl': 'Zwaar bewolkt', 'night': True,
+            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed':
+                          'cloudy', 'exact': 'Heavily clouded', 'exact_nl':
+                          'Zwaar bewolkt', 'night': True,
                           'image': get_imageurl('cc')},
             'rainlast24hour': 0.0, 'rainlasthour': 0.0,
             'temperature': -0.2, 'feeltemperature': -2.0,
             'visibility': 22200.0,
-            'windspeed': 1.5, 'windforce': 1, 'winddirection': 'ZZO', 'windazimuth': 160, 'windgust': 2.0
+            'windspeed': 1.5, 'windforce': 1,
+            'winddirection': 'ZZO',
+            'windazimuth': 160, 'windgust': 2.0
         },
         'distance': 0.0
     }
     assert (expect == result)
+
+
+def test_apply_image_workaround1():
+    """Apply workaround to empty data object."""
+    data = {}
+    data = apply_image_workaround(data)
+    assert data is not None
+
+
+def test_apply_image_workaround2():
+    """Apply workaround to empty data object with condition, but no image."""
+    data = {
+        'condition': {}
+    }
+    data = apply_image_workaround(data)
+    assert data is not None
+
+
+def test_apply_image_workaround3():
+    """Apply workaround to empty data object with condition and empty image."""
+    data = {
+        'condition': {
+            'image': "",
+            'condcode': 'a',
+            'condition': 'condition',
+            'detailed': 'detailed',
+            'exact': 'exact',
+            "exact_nl": 'exactnl',
+            'night': False
+        }
+    }
+    data = apply_image_workaround(data)
+    assert data is not None
+    assert (data[CONDITION][IMAGE] == "")
+    assert (data[CONDITION][CONDCODE] == "a")
+    assert (data[CONDITION][CONDITION] == "condition")
+    assert (data[CONDITION][DETAILED] == "detailed")
+    assert (data[CONDITION][EXACT] == "exact")
+    assert (data[CONDITION][EXACTNL] == "exactnl")
+    assert (data[CONDITION][NIGHTTIME] is False)
+
+
+def test_apply_image_workaround4():
+    """Apply workaround: to empty data, condition, non-empty image."""
+    data = {
+        'condition': {
+            'image': "http://somewhere.com/someimage.gif",
+            'condcode': 'a',
+            'condition': 'condition',
+            'detailed': 'detailed',
+            'exact': 'exact',
+            'exact_nl': 'exactnl',
+            'night': False
+        }
+    }
+    data = apply_image_workaround(data)
+    assert data is not None
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/someimage.gif")
+    assert (data[CONDITION][CONDCODE] == "a")
+    assert (data[CONDITION][CONDITION] == "condition")
+    assert (data[CONDITION][DETAILED] == "detailed")
+    assert (data[CONDITION][EXACT] == "exact")
+    assert (data[CONDITION][EXACTNL] == "exactnl")
+    assert (data[CONDITION][NIGHTTIME] is False)
+
+
+def test_apply_image_workaround5():
+    """Apply workaround to empty data object with condition and image."""
+    data = {
+        "condition": {
+            'image': "http://somewhere.com/someimage.png",
+            'condcode': 'a',
+            'condition': 'condition',
+            'detailed': 'detailed',
+            'exact': 'exact',
+            'exact_nl': 'exactnl',
+            'night': False
+        }
+    }
+    data = apply_image_workaround(data)
+    assert data is not None
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][CONDCODE] == "a")
+    assert (data[CONDITION][CONDITION] == "condition")
+    assert (data[CONDITION][DETAILED] == "detailed")
+    assert (data[CONDITION][EXACT] == "exact")
+    assert (data[CONDITION][EXACTNL] == "exactnl")
+    assert (data[CONDITION][NIGHTTIME] is False)
+
+
+def test_apply_image_workaround6():
+    """Apply workaround: empty data, condition, empty forecast."""
+    data = {
+        'condition': {
+            'image': "http://somewhere.com/someimage.png",
+            'condcode': 'a',
+            'condition': 'condition',
+            'detailed': 'detailed',
+            'exact': 'exact',
+            'exact_nl': 'exactnl',
+            'night': False
+        },
+        'forecast': []
+    }
+    data = apply_image_workaround(data)
+    assert data is not None
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][CONDCODE] == "a")
+    assert (data[CONDITION][CONDITION] == "condition")
+    assert (data[CONDITION][DETAILED] == "detailed")
+    assert (data[CONDITION][EXACT] == "exact")
+    assert (data[CONDITION][EXACTNL] == "exactnl")
+    assert (data[CONDITION][NIGHTTIME] is False)
+
+    assert (data[FORECAST] == [])
+
+
+def test_apply_image_workaround7():
+    """Apply workaround: empty data, condition, one empty forecast."""
+    data = {
+        'condition': {
+            'image': "http://somewhere.com/someimage.png",
+            'condcode': 'a',
+            'condition': 'condition',
+            'detailed': 'detailed',
+            'exact': 'exact',
+            "exact_nl": 'exactnl',
+            "night": False
+        },
+        'forecast': [{}]
+    }
+    data = apply_image_workaround(data)
+    assert data is not None
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][CONDCODE] == "a")
+    assert (data[CONDITION][CONDITION] == "condition")
+    assert (data[CONDITION][DETAILED] == "detailed")
+    assert (data[CONDITION][EXACT] == "exact")
+    assert (data[CONDITION][EXACTNL] == "exactnl")
+    assert (data[CONDITION][NIGHTTIME] is False)
+
+    assert (data[FORECAST] == [{}])
+
+
+def test_apply_image_workaround8():
+    """Apply workaround: empty data,  condition, one empty forecast."""
+    data = {
+        'condition': {
+            'image': "http://somewhere.com/someimage.png",
+            'condcode': 'a',
+            'condition': 'condition',
+            'detailed': 'detailed',
+            'exact': 'exact',
+            'exact_nl': 'exactnl',
+            'night': False
+        },
+        'forecast': [{'condition': {'image': ''}}]
+    }
+    data = apply_image_workaround(data)
+    assert data is not None
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][CONDCODE] == "a")
+    assert (data[CONDITION][CONDITION] == "condition")
+    assert (data[CONDITION][DETAILED] == "detailed")
+    assert (data[CONDITION][EXACT] == "exact")
+    assert (data[CONDITION][EXACTNL] == "exactnl")
+    assert (data[CONDITION][NIGHTTIME] is False)
+
+    assert (data[FORECAST] == [{'condition': {'image': ''}}])
+
+
+def test_apply_image_workaround9():
+    """Apply workaround: empty data, condition, one empty forecast."""
+    data = {
+        'condition': {
+            'image': "http://somewhere.com/someimage.png",
+            'condcode': 'a',
+            'condition': 'condition',
+            'detailed': 'detailed',
+            'exact': 'exact',
+            'exact_nl': 'exactnl',
+            'night': False
+        },
+        'forecast': [
+            {'condition': {'image': 'http://somewhere.com/someimage.gif'}},
+            {'condition': {'image': 'http://somewhere.com/someimage.png'}},
+        ]
+    }
+    data = apply_image_workaround(data)
+    assert data is not None
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][CONDCODE] == "a")
+    assert (data[CONDITION][CONDITION] == "condition")
+    assert (data[CONDITION][DETAILED] == "detailed")
+    assert (data[CONDITION][EXACT] == "exact")
+    assert (data[CONDITION][EXACTNL] == "exactnl")
+    assert (data[CONDITION][NIGHTTIME] is False)
+
+    assert (data[FORECAST][0][CONDITION][IMAGE] ==
+            'http://somewhere.com/someimage.gif')
+    assert (data[FORECAST][1][CONDITION][IMAGE] ==
+            'http://somewhere.com/SOMEIMAGE.png')

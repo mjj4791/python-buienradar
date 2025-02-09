@@ -24,6 +24,7 @@ import pkg_resources
 from docopt import docopt
 
 from .buienradar import get_data, parse_data
+from .buienradar_json import image_workaround
 from .constants import CONTENT, MESSAGE, RAINCONTENT, SUCCESS
 
 
@@ -56,6 +57,9 @@ def main(argv=sys.argv[1:]):
 
         result = parse_data(result[CONTENT], result[RAINCONTENT],
                             latitude, longitude, timeframe, usexml)
+
+        result = image_workaround(result)
+
         log.info("result: %s", result)
         print(result)
     else:
