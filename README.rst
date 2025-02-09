@@ -5,11 +5,11 @@ Library and CLI tools for interacting with buienradar xml/api.
 
 - https://data.buienradar.nl/2.0/feed/json
 
-and precipitation forecase from:
+and precipitation forecast from:
 
 - https://gpsgadget.buienradar.nl/data/raintext?lat=<latitude>&lon=<longitude>
 
-Old XMI-based APIs used before http://xml.buienradar.nl.
+Old XML-based APIs used before http://xml.buienradar.nl.
 
 Requirements
 ------------
