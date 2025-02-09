@@ -1331,6 +1331,7 @@ def test_invalid_data():
     data = file.read()
     file.close()
 
+    # Meetstation Arcen
     latitude = 51.50
     longitude = 6.20
     result = parse_data(data, None, latitude, longitude, usexml=False)
@@ -1392,6 +1393,15 @@ def test_invalid_data():
     print(result)
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6248)' in result[DATA][STATIONNAME])
+
+    # "Meetstation Cadzand",
+    latitude = 51.38
+    longitude = 3.38
+    result = parse_data(data, None, latitude, longitude, usexml=False)
+    print(result)
+    assert (result[SUCCESS] and                              # noqa: ignore=W504
+           '(6308)' in result[DATA][STATIONNAME])
+    assert (result[SUCCESS] and result[DATA][CONDITION] is None)
 
 
 def test__get_str():

@@ -460,7 +460,8 @@ def __parse_loc_data(loc_data, result):
                 #   "https://www.buienradar.nl/resources/images/icons/weather/30x30/aa.png"
                 result[DATA][CONDITION] = __cond_from_image(
                     loc_data[__ICONURL])
-                result[DATA][CONDITION][IMAGE] = loc_data[__ICONURL]
+                if result[DATA][CONDITION]:
+                    result[DATA][CONDITION][IMAGE] = loc_data[__ICONURL]
 
                 continue
             if key == STATIONNAME:
@@ -473,9 +474,6 @@ def __parse_loc_data(loc_data, result):
             else:
                 result[DATA][key] = sens_data
         except KeyError:
-            # if result[MESSAGE] is None:
-            #    result[MESSAGE] = "Missing key(s) in br data: "
-            # result[MESSAGE] += "%s " % value
             log.debug("Data element with key='%s' "
                       "not loaded from br data!", key)
     result[SUCCESS] = True
@@ -686,7 +684,7 @@ def __select_nearest_ws(jsondata, latitude, longitude):
         ws_json = jsondata[__ACTUAL]
         ws_json = ws_json[__STATIONMEASUREMENTS]
     except (KeyError, TypeError):
-        log.warning("Missing section in Buienradar xmldata (%s)."
+        log.warning("Missing section in Buienradar jsondata (%s)."
                     "Can happen 00:00-01:00 CE(S)T",
                     __STATIONMEASUREMENTS)
         return None

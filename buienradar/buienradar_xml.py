@@ -368,7 +368,8 @@ def __parse_loc_data(loc_data, result):
                 # update weather symbol & status text
                 code = sens_data[__BRID][:1].lower()
                 result[DATA][CONDITION] = condition_from_code(code)
-                result[DATA][CONDITION][IMAGE] = sens_data[__BRTEXT]
+                if result[DATA][CONDITION]:
+                    result[DATA][CONDITION][IMAGE] = sens_data[__BRTEXT]
             else:
                 if key == STATIONNAME:
                     name = sens_data[__BRTEXT].replace("Meetstation", "")
