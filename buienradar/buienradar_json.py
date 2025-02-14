@@ -318,9 +318,10 @@ def image_workaround(result):
         # create workaround url:
         workaround_url = status_image_workaround_url(
             result[DATA][CONDITION][IMAGE])
-        # test if the workaround url resolves (200 OK) or not:
-        workaround_result = __get_url(workaround_url, False)
-        use_img_workaround = workaround_result.get(SUCCESS)
+        if workaround_url:
+            # test if the workaround url resolves (200 OK) or not:
+            workaround_result = __get_url(workaround_url, False)
+            use_img_workaround = workaround_result.get(SUCCESS)
     except KeyError:
         # no condition image url; re-check once we are able to retrieve
         # condition image url:
@@ -335,16 +336,20 @@ def image_workaround(result):
 
 def status_image_workaround_url(url):
     """Convert the new workaround image url."""
-    return re.sub(
-        r'(\w+)(?=\.png)',
-        lambda pat: pat.group(1).upper(),
-        url)
+    if re.match(r".+\/[a-z]{1,2}\.png$", url):
+        return re.sub(
+            r'([a-z]{1,2})(?=\.png$)',
+            lambda pat: pat.group(1).upper(),
+            url)
+    return None
 
 
 def __apply_condition_workaround(condition):
     image = condition.get(IMAGE)
     if image:
-        condition[IMAGE] = status_image_workaround_url(image)
+        new_image = status_image_workaround_url(image)
+        if new_image:
+            condition[IMAGE] = new_image
     return condition
 
 

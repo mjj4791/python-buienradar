@@ -1936,7 +1936,7 @@ def test_apply_image_workaround5():
     """Apply workaround to empty data object with condition and image."""
     data = {
         "condition": {
-            'image': "http://somewhere.com/someimage.png",
+            'image': "http://somewhere.com/aa.png",
             'condcode': 'a',
             'condition': 'condition',
             'detailed': 'detailed',
@@ -1947,7 +1947,7 @@ def test_apply_image_workaround5():
     }
     data = apply_image_workaround(data)
     assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/AA.png")
     assert (data[CONDITION][CONDCODE] == "a")
     assert (data[CONDITION][CONDITION] == "condition")
     assert (data[CONDITION][DETAILED] == "detailed")
@@ -1960,7 +1960,7 @@ def test_apply_image_workaround6():
     """Apply workaround: empty data, condition, empty forecast."""
     data = {
         'condition': {
-            'image': "http://somewhere.com/someimage.png",
+            'image': "http://somewhere.com/b.png",
             'condcode': 'a',
             'condition': 'condition',
             'detailed': 'detailed',
@@ -1972,7 +1972,7 @@ def test_apply_image_workaround6():
     }
     data = apply_image_workaround(data)
     assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/B.png")
     assert (data[CONDITION][CONDCODE] == "a")
     assert (data[CONDITION][CONDITION] == "condition")
     assert (data[CONDITION][DETAILED] == "detailed")
@@ -1987,7 +1987,7 @@ def test_apply_image_workaround7():
     """Apply workaround: empty data, condition, one empty forecast."""
     data = {
         'condition': {
-            'image': "http://somewhere.com/someimage.png",
+            'image': "http://somewhere.com/c.png",
             'condcode': 'a',
             'condition': 'condition',
             'detailed': 'detailed',
@@ -1999,7 +1999,7 @@ def test_apply_image_workaround7():
     }
     data = apply_image_workaround(data)
     assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/C.png")
     assert (data[CONDITION][CONDCODE] == "a")
     assert (data[CONDITION][CONDITION] == "condition")
     assert (data[CONDITION][DETAILED] == "detailed")
@@ -2014,7 +2014,7 @@ def test_apply_image_workaround8():
     """Apply workaround: empty data,  condition, one empty forecast."""
     data = {
         'condition': {
-            'image': "http://somewhere.com/someimage.png",
+            'image': "http://somewhere.com/dd.png",
             'condcode': 'a',
             'condition': 'condition',
             'detailed': 'detailed',
@@ -2026,7 +2026,7 @@ def test_apply_image_workaround8():
     }
     data = apply_image_workaround(data)
     assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/DD.png")
     assert (data[CONDITION][CONDCODE] == "a")
     assert (data[CONDITION][CONDITION] == "condition")
     assert (data[CONDITION][DETAILED] == "detailed")
@@ -2041,7 +2041,7 @@ def test_apply_image_workaround9():
     """Apply workaround: empty data, condition, one empty forecast."""
     data = {
         'condition': {
-            'image': "http://somewhere.com/someimage.png",
+            'image': "http://somewhere.com/a.png",
             'condcode': 'a',
             'condition': 'condition',
             'detailed': 'detailed',
@@ -2050,13 +2050,13 @@ def test_apply_image_workaround9():
             'night': False
         },
         'forecast': [
-            {'condition': {'image': 'http://somewhere.com/someimage.gif'}},
-            {'condition': {'image': 'http://somewhere.com/someimage.png'}},
+            {'condition': {'image': 'http://somewhere.com/b.gif'}},
+            {'condition': {'image': 'http://somewhere.com/c.png'}},
         ]
     }
     data = apply_image_workaround(data)
     assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/SOMEIMAGE.png")
+    assert (data[CONDITION][IMAGE] == "http://somewhere.com/A.png")
     assert (data[CONDITION][CONDCODE] == "a")
     assert (data[CONDITION][CONDITION] == "condition")
     assert (data[CONDITION][DETAILED] == "detailed")
@@ -2065,6 +2065,6 @@ def test_apply_image_workaround9():
     assert (data[CONDITION][NIGHTTIME] is False)
 
     assert (data[FORECAST][0][CONDITION][IMAGE] ==
-            'http://somewhere.com/someimage.gif')
+            'http://somewhere.com/b.gif')
     assert (data[FORECAST][1][CONDITION][IMAGE] ==
-            'http://somewhere.com/SOMEIMAGE.png')
+            'http://somewhere.com/C.png')
