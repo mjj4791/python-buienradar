@@ -2,7 +2,7 @@
 import json
 from datetime import datetime, timedelta
 
-import pytz
+import requests_mock
 
 from buienradar.buienradar import get_data, parse_data
 from buienradar.buienradar_json import (
@@ -23,26 +23,19 @@ from buienradar.buienradar_json import (
     __getBarFCName,
     __getBarFCNameNL,
     __parse_precipfc_data,
-    __to_localdatetime,
-    apply_image_workaround
+    __to_localdatetime
 )
 from buienradar.constants import (
-    CONDCODE,
     CONDITION,
     CONTENT,
     DATA,
-    DETAILED,
-    EXACT,
-    EXACTNL,
     FEELTEMPERATURE,
     FORECAST,
     GROUNDTEMP,
     HUMIDITY,
-    IMAGE,
     IRRADIANCE,
     MEASURED,
     MESSAGE,
-    NIGHTTIME,
     PRECIPITATION,
     PRESSURE,
     RAINCONTENT,
@@ -58,9 +51,15 @@ from buienradar.constants import (
     WINDGUST,
     WINDSPEED
 )
+from buienradar.urls import JSON_FEED_URL, json_precipitation_forecast_url
 
-__TIMEZONE = 'Europe/Amsterdam'
-__DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+def load_file(name):
+    """Load a file with test data."""
+    file = open(name, 'r')
+    data = file.read()
+    file.close()
+    return data
 
 
 def get_imageurl(img):
@@ -190,11 +189,21 @@ def test_to_localdatetime():
     assert (("%s" % dt) == '2017-07-10 13:31:11+02:00')
 
 
-def test_rain_data():
+def test_rain_data(snapshot):
     """Test format of retrieved rain data."""
-    result = get_data(usexml=False)
+    latitude = 52.091579
+    longitude = 5.119734
+    with requests_mock.Mocker() as m:
+        m.get(JSON_FEED_URL, text=load_file('tests/json/buienradar.json'))
+        m.get(
+            json_precipitation_forecast_url(latitude, longitude),
+            text=load_file('tests/raindata/raindata.txt')
+        )
+
+        result = get_data(latitude, longitude, usexml=False)
 
     # we must have content:
+    assert result == snapshot
     assert (result[CONTENT] is not None)
     assert (result[RAINCONTENT] is not None)
 
@@ -217,11 +226,23 @@ def test_rain_data():
             print("Unable to parse line: <%s>, not na time (HH:MM)." % (line))
 
 
-def test_json_data():
+def test_json_data(snapshot):
     """Check json data elements."""
-    result = get_data(usexml=False)
+    #  This test fetches LIVE data, so cannot use snapshot...
+    latitude = 52.091579
+    longitude = 5.119734
+    with requests_mock.Mocker() as m:
+        m.get(JSON_FEED_URL, text=load_file('tests/json/buienradar.json'))
+        m.get(
+            json_precipitation_forecast_url(latitude, longitude),
+            text=load_file('tests/raindata/raindata.txt')
+        )
+
+        result = get_data(usexml=False)
 
     # we must have content:
+    assert result == snapshot
+    assert (result is not None)
     assert (result[CONTENT] is not None)
     assert (result[RAINCONTENT] is not None)
 
@@ -259,7 +280,7 @@ def test_json_data():
     assert (weerstation[SENSOR_TYPES[FEELTEMPERATURE][0]] is not None)
 
 
-def test_precip_fc():
+def test_precip_fc(snapshot):
     """Test parsing precipitation forecast data."""
     data = ""
     for n in range(0, 24):
@@ -267,44 +288,31 @@ def test_precip_fc():
                               timedelta(minutes=n * 5)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 60)
-    expect = {'average': 0.0, 'total': 0.0, 'timeframe': 60}
 
-    # test calling results in the loop close cleanly
-    print(result)
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_precip_fc2():
+def test_precip_fc2(snapshot):
     """Test parsing precipitation forecast data."""
     data = ""
     for n in range(0, 24):
         data += "100|%s\n" % (datetime.now() +              # noqa: ignore=W504
                               timedelta(minutes=n * 5)).strftime("%H:%M")
-
     result = __parse_precipfc_data(data, 60)
-    expect = {'average': 0.52, 'timeframe': 60, 'total': 0.52}
-
-    # test calling results in the loop close cleanly
-    print(result)
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_precip_fc3():
+def test_precip_fc3(snapshot):
     """Test parsing precipitation forecast data."""
     data = ""
     for n in range(0, 24):
         data += "100|%s\n" % (datetime.now() +                  # noqa: ignore=W504
                               timedelta(minutes=n * 5)).strftime("%H:%M")
-
     result = __parse_precipfc_data(data, 30)
-    expect = {'average': 0.52, 'timeframe': 30, 'total': 0.26}
-
-    # test calling results in the loop close cleanly
-    print(result)
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_precip_fc4():
+def test_precip_fc4(snapshot):
     """Test parsing precipitation forecast data."""
     data = ""
     for n in range(0, 24):
@@ -312,14 +320,10 @@ def test_precip_fc4():
                               timedelta(minutes=n * 5)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 30)
-    expect = {'average': 0.1, 'timeframe': 30, 'total': 0.05}
-
-    # test calling results in the loop close cleanly
-    print(result)
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_precip_fc5():
+def test_precip_fc5(snapshot):
     """Test parsing precipitation forecast data."""
     data = ""
     data += "000|%s\n" % (datetime.now() +                  # noqa: ignore=W504
@@ -338,14 +342,10 @@ def test_precip_fc5():
                          timedelta(minutes=35)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 30)
-    expect = {'total': 302.54, 'timeframe': 30, 'average': 605.09}
-
-    # test calling results in the loop close cleanly
-    print(result)
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_precip_decimal_values():
+def test_precip_decimal_values(snapshot):
     """Test parsing precipitation forecast data containing decimal values."""
     def timeframe(minutes=0):
         return (datetime.now() + timedelta(minutes=minutes)).strftime("%H:%M")
@@ -357,14 +357,11 @@ def test_precip_decimal_values():
     data += "55.55|%s\n" % timeframe(15)
 
     result = __parse_precipfc_data(data, 20)
-    expect = {'total': 33.84, 'timeframe': 20, 'average': 135.36}
-
-    # test calling results in the loop close cleanly
-    assert (result == expect)
+    assert result == snapshot
 
 
-def test_parse_timeframe():
-    """Test loading and parsing xml file."""
+def test_parse_timeframe(snapshot):
+    """Test loading and parsing file."""
     data = None
     raindata = None
 
@@ -407,284 +404,40 @@ def test_parse_timeframe():
         assert (False)
 
 
-def test_readdata1():
-    """Test loading and parsing xml file."""
+def test_readdata1_60(snapshot):
+    """Test loading and parsing file."""
     # load buienradar.xml
-    file = open('tests/json/buienradar.json', 'r')
-    data = file.read()
-    file.close()
-
-    file = open('tests/raindata.txt', 'r')
-    raindata = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar.json')
+    raindata = load_file('tests/raindata/raindata.txt')
 
     # select first weatherstation
     # Meetstation Arcen (6391)
     latitude = 51.50
     longitude = 6.20
     result = parse_data(data, raindata, latitude, longitude, usexml=False)
-    print(result)
-    assert (result[SUCCESS] and result[MESSAGE] is None)
+    assert result == snapshot
 
-    # check the selected weatherstation:
-    assert (result[SUCCESS] and                              # noqa: ignore=W504
-           '(6391)' in result[DATA][STATIONNAME])
 
-    # check the data:
-    fc1 = datetime(year=2019, month=2, day=5, hour=0, minute=0)
-    fc2 = datetime(year=2019, month=2, day=6, hour=0, minute=0)
-    fc3 = datetime(year=2019, month=2, day=7, hour=0, minute=0)
-    fc4 = datetime(year=2019, month=2, day=8, hour=0, minute=0)
-    fc5 = datetime(year=2019, month=2, day=9, hour=0, minute=0)
+def test_readdata1_30(snapshot):
+    """Test loading and parsing file."""
+    # load buienradar.xml
+    data = load_file('tests/json/buienradar.json')
+    raindata = load_file('tests/raindata/raindata.txt')
 
-    fc1 = pytz.timezone(__TIMEZONE).localize(fc1)
-    fc2 = pytz.timezone(__TIMEZONE).localize(fc2)
-    fc3 = pytz.timezone(__TIMEZONE).localize(fc3)
-    fc4 = pytz.timezone(__TIMEZONE).localize(fc4)
-    fc5 = pytz.timezone(__TIMEZONE).localize(fc5)
-
-    # '05/19/2017 00:20:00'
-    loc_dt = datetime(2019, 2, 4, hour=21, minute=0, second=0, microsecond=0)
-    measured = pytz.timezone(__TIMEZONE).localize(loc_dt)
-
-    # Expected result:
-    expect = {
-        'success': True,
-        'data': {
-            'windgust': 9.73,
-            'windforce': 4,
-            'condition': {'condcode': 'c',
-                          'exact_nl': 'Zwaar bewolkt',
-                          'condition': 'cloudy',
-                          'image': get_imageurl('cc'),
-                          'detailed': 'cloudy',
-                          'exact': 'Heavily clouded',
-                          'night': True},
-            'stationname': 'Arcen (6391)',
-            'measured': measured,
-            'barometerfc': 0,
-            'barometerfcname': None,
-            'barometerfcnamenl': None,
-            'precipitation': 0.0,
-            'groundtemperature': 3.0,
-            'humidity': 70,
-            'feeltemperature': -0.8,
-            'irradiance': 0,
-            'forecast': [{'snow': 0, 'rain': 0.0,
-                          'condition': {'condcode': 'c',
-                                        'exact_nl': 'Zwaar bewolkt',
-                                        'condition': 'cloudy',
-                                        'image': get_imageurl('c'),
-                                        'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded',
-                                        'night': False},
-                          'mintemp': 2.0, 'rainchance': 20,
-                          'minrain': 0.0, 'maxrain': 0.0,
-                          'winddirection': 'Z', 'windazimuth': 180,
-                          'temperature': 6.0, 'windforce': 3, 'windspeed': 3.6,
-                          'sunchance': 20, 'maxtemp': 6.0, 'datetime': fc1},
-                         {'snow': 0, 'rain': 8.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 90,
-                          'minrain': 5.0, 'maxrain': 11.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10, 'maxtemp': 10.0,
-                          'datetime': fc2},
-                         {'snow': 0, 'rain': 5.5,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 6.0, 'rainchance': 90,
-                          'minrain': 3.0, 'maxrain': 8.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc3},
-                         {'snow': 0, 'rain': 3.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 70,
-                          'minrain': 1.0, 'maxrain': 5.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 8.0, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 20,
-                          'maxtemp': 9.0, 'datetime': fc4},
-                         {'snow': 0, 'rain': 5.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False
-                                        },
-                          'mintemp': 3.0, 'rainchance': 80,
-                          'minrain': 3.0, 'maxrain': 7.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 5,
-                          'windspeed': 8.23, 'sunchance': 20,
-                          'maxtemp': 10.0, 'datetime': fc5}],
-            'temperature': 3.6,
-            'winddirection': 'ZW',
-            'pressure': 0.0,
-            'attribution': 'Data provided by buienradar.nl',
-            'rainlast24hour': 0.0,
-            'windspeed': 5.69,
-            'precipitation_forecast': {'total': 0.0,
-                                       'timeframe': 60,
-                                       'average': 0.0},
-            'rainlasthour': 0.0,
-            'visibility': 0,
-            'windazimuth': 215},
-        'msg': None,
-        'distance': 0.0
-    }
-    assert (expect == result)
+    # select first weatherstation
+    # Meetstation Arcen (6391)
+    latitude = 51.50
+    longitude = 6.20
 
     result = parse_data(data, raindata, latitude, longitude, 30, usexml=False)
-    print(result)
-    assert (result[SUCCESS] and result[MESSAGE] is None)
-
-    # check the selected weatherstation:
-    assert (result[SUCCESS] and                              # noqa: ignore=W504
-           '(6391)' in result[DATA][STATIONNAME])
-
-    expect = {
-        'success': True,
-        'data': {
-            'windgust': 9.73,
-            'windforce': 4,
-            'condition': {'condcode': 'c',
-                          'exact_nl': 'Zwaar bewolkt',
-                          'condition': 'cloudy',
-                          'image': get_imageurl('cc'),
-                          'detailed': 'cloudy',
-                          'exact': 'Heavily clouded',
-                          'night': True},
-            'stationname': 'Arcen (6391)',
-            'measured': measured,
-            'barometerfc': 0,
-            'barometerfcname': None,
-            'barometerfcnamenl': None,
-            'precipitation': 0.0,
-            'groundtemperature': 3.0,
-            'humidity': 70,
-            'feeltemperature': -0.8,
-            'irradiance': 0,
-            'forecast': [{'snow': 0, 'rain': 0.0,
-                          'condition': {'condcode': 'c',
-                                        'exact_nl': 'Zwaar bewolkt',
-                                        'condition': 'cloudy',
-                                        'image': get_imageurl('c'),
-                                        'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded',
-                                        'night': False},
-                          'mintemp': 2.0, 'rainchance': 20,
-                          'minrain': 0.0, 'maxrain': 0.0,
-                          'winddirection': 'Z', 'windazimuth': 180,
-                          'temperature': 6.0, 'windforce': 3,
-                          'windspeed': 3.6, 'sunchance': 20,
-                          'maxtemp': 6.0, 'datetime': fc1},
-                         {'snow': 0, 'rain': 8.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 90,
-                          'minrain': 5.0, 'maxrain': 11.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc2},
-                         {'snow': 0, 'rain': 5.5,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 6.0, 'rainchance': 90,
-                          'minrain': 3.0, 'maxrain': 8.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc3},
-                         {'snow': 0, 'rain': 3.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 70,
-                          'minrain': 1.0, 'maxrain': 5.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 8.0, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 20,
-                          'maxtemp': 9.0, 'datetime': fc4},
-                         {'snow': 0, 'rain': 5.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 80,
-                          'minrain': 3.0, 'maxrain': 7.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 5,
-                          'windspeed': 8.23, 'sunchance': 20,
-                          'maxtemp': 10.0, 'datetime': fc5}],
-            'temperature': 3.6,
-            'winddirection': 'ZW',
-            'pressure': 0.0,
-            'attribution': 'Data provided by buienradar.nl',
-            'rainlast24hour': 0.0,
-            'windspeed': 5.69,
-            'precipitation_forecast': {'total': 0.0,
-                                       'timeframe': 30,
-                                       'average': 0.0},
-            'rainlasthour': 0.0,
-            'visibility': 0,
-            'windazimuth': 215},
-        'msg': None,
-        'distance': 0.0
-    }
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_readdata2():
+def test_readdata2_60(snapshot):
     """Test loading and parsing json file."""
     # load buienradar.json
-    file = open('tests/json/buienradar.json', 'r')
-    data = file.read()
-    file.close()
-
-    file = open('tests/raindata77.txt', 'r')
-    raindata = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar.json')
+    raindata = load_file('tests/raindata/raindata77.txt')
 
     # select non-first weather stationnaam
     # gps coordinates not exact, so non-zero distance
@@ -692,266 +445,29 @@ def test_readdata2():
     latitude = 52.11
     longitude = 5.19
     result = parse_data(data, raindata, latitude, longitude, usexml=False)
-    print(result)
-    assert (result[SUCCESS] and                              # noqa: ignore=W504
-           result[MESSAGE] is None)
-
-    # check the selected weatherstation:
-    assert (result[SUCCESS] and                              # noqa: ignore=W504
-           '(6260)' in result[DATA][STATIONNAME])
-
-    # check the data:
-    fc1 = datetime(year=2019, month=2, day=5, hour=0, minute=0)
-    fc2 = datetime(year=2019, month=2, day=6, hour=0, minute=0)
-    fc3 = datetime(year=2019, month=2, day=7, hour=0, minute=0)
-    fc4 = datetime(year=2019, month=2, day=8, hour=0, minute=0)
-    fc5 = datetime(year=2019, month=2, day=9, hour=0, minute=0)
-
-    fc1 = pytz.timezone(__TIMEZONE).localize(fc1)
-    fc2 = pytz.timezone(__TIMEZONE).localize(fc2)
-    fc3 = pytz.timezone(__TIMEZONE).localize(fc3)
-    fc4 = pytz.timezone(__TIMEZONE).localize(fc4)
-    fc5 = pytz.timezone(__TIMEZONE).localize(fc5)
-
-    # '05/19/2017 00:20:00'
-    loc_dt = datetime(2019, 2, 4, hour=21, minute=0, second=0, microsecond=0)
-    measured = pytz.timezone(__TIMEZONE).localize(loc_dt)
-
-    # Expected result:
-    expect = {
-        'success': True,
-        'data': {
-            'windgust': 10.95,
-            'windforce': 4,
-            'condition': {'condcode': 'q',
-                          'exact_nl': 'Zwaar bewolkt en regen',
-                          'condition': 'rainy',
-                          'image': get_imageurl('qq'),
-                          'detailed': 'rainy',
-                          'exact': 'Heavily clouded with rain',
-                          'night': True},
-            'stationname': 'De Bilt (6260)',
-            'measured': measured,
-            'precipitation': 0.1,
-            'groundtemperature': 2.7,
-            'humidity': 96,
-            'feeltemperature': -2.0,
-            'irradiance': 0,
-            'forecast': [{'snow': 0, 'rain': 0.0,
-                          'condition': {'condcode': 'c',
-                                        'exact_nl': 'Zwaar bewolkt',
-                                        'condition': 'cloudy',
-                                        'image': get_imageurl('c'),
-                                        'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded',
-                                        'night': False},
-                          'mintemp': 2.0, 'rainchance': 20,
-                          'minrain': 0.0, 'maxrain': 0.0,
-                          'winddirection': 'Z', 'windazimuth': 180,
-                          'temperature': 6.0, 'windforce': 3,
-                          'windspeed': 3.6, 'sunchance': 20,
-                          'maxtemp': 6.0, 'datetime': fc1},
-                         {'snow': 0, 'rain': 8.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 90,
-                          'minrain': 5.0, 'maxrain': 11.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc2},
-                         {'snow': 0, 'rain': 5.5,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 6.0, 'rainchance': 90,
-                          'minrain': 3.0, 'maxrain': 8.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc3},
-                         {'snow': 0, 'rain': 3.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 70,
-                          'minrain': 1.0, 'maxrain': 5.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 8.0, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 20,
-                          'maxtemp': 9.0, 'datetime': fc4},
-                         {'snow': 0, 'rain': 5.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 80,
-                          'minrain': 3.0, 'maxrain': 7.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 5,
-                          'windspeed': 8.23, 'sunchance': 20,
-                          'maxtemp': 10.0, 'datetime': fc5}],
-            'temperature': 2.9,
-            'winddirection': 'ZZW',
-            'pressure': 1022.14,
-            'attribution': 'Data provided by buienradar.nl',
-            'barometerfc': 6,
-            'barometerfcname': 'Stable',
-            'barometerfcnamenl': 'Mooi',
-            'rainlast24hour': 2.5,
-            'windspeed': 6.57,
-            'precipitation_forecast': {'total': 0.1,
-                                       'timeframe': 60,
-                                       'average': 0.1},
-            'rainlasthour': 0.2,
-            'visibility': 4320,
-            'windazimuth': 207},
-        'msg': None,
-        'distance': 1.306732
-    }
-    assert (expect == result)
-
-    result = parse_data(data, raindata, latitude, longitude, 30, usexml=False)
-    print(result)
-    assert (result[SUCCESS] and                              # noqa: ignore=W504
-           result[MESSAGE] is None)
-
-    # check the selected weatherstation:
-    assert (result[SUCCESS] and                              # noqa: ignore=W504
-           '(6260)' in result[DATA][STATIONNAME])
-
-    expect = {
-        'success': True,
-        'data': {
-            'windgust': 10.95,
-            'windforce': 4,
-            'condition': {'condcode': 'q',
-                          'exact_nl': 'Zwaar bewolkt en regen',
-                          'condition': 'rainy',
-                          'image': get_imageurl('qq'),
-                          'detailed': 'rainy',
-                          'exact': 'Heavily clouded with rain',
-                          'night': True},
-            'stationname': 'De Bilt (6260)',
-            'measured': measured,
-            'precipitation': 0.1,
-            'groundtemperature': 2.7,
-            'humidity': 96,
-            'barometerfc': 6,
-            'barometerfcname': 'Stable',
-            'barometerfcnamenl': 'Mooi',
-            'feeltemperature': -2.0,
-            'irradiance': 0,
-            'forecast': [{'snow': 0, 'rain': 0.0,
-                          'condition': {'condcode': 'c',
-                                        'exact_nl': 'Zwaar bewolkt',
-                                        'condition': 'cloudy',
-                                        'image': get_imageurl('c'),
-                                        'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded',
-                                        'night': False},
-                          'mintemp': 2.0, 'rainchance': 20,
-                          'minrain': 0.0, 'maxrain': 0.0,
-                          'winddirection': 'Z', 'windazimuth': 180,
-                          'temperature': 6.0, 'windforce': 3,
-                          'windspeed': 3.6, 'sunchance': 20,
-                          'maxtemp': 6.0, 'datetime': fc1},
-                         {'snow': 0, 'rain': 8.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 90,
-                          'minrain': 5.0, 'maxrain': 11.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc2},
-                         {'snow': 0, 'rain': 5.5,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 6.0, 'rainchance': 90,
-                          'minrain': 3.0, 'maxrain': 8.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc3},
-                         {'snow': 0, 'rain': 3.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 70,
-                          'minrain': 1.0, 'maxrain': 5.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 8.0, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 20,
-                          'maxtemp': 9.0, 'datetime': fc4},
-                         {'snow': 0, 'rain': 5.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 80,
-                          'minrain': 3.0, 'maxrain': 7.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 5,
-                          'windspeed': 8.23, 'sunchance': 20,
-                          'maxtemp': 10.0, 'datetime': fc5}],
-            'temperature': 2.9,
-            'winddirection': 'ZZW',
-            'pressure': 1022.14,
-            'attribution': 'Data provided by buienradar.nl',
-            'rainlast24hour': 2.5,
-            'windspeed': 6.57,
-            'precipitation_forecast': {'total': 0.05,
-                                       'timeframe': 30,
-                                       'average': 0.1},
-            'rainlasthour': 0.2,
-            'visibility': 4320,
-            'windazimuth': 207},
-        'msg': None,
-        'distance': 1.306732
-    }
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_readdata3():
+def test_readdata2_30(snapshot):
     """Test loading and parsing json file."""
     # load buienradar.json
-    file = open('tests/json/buienradar.json', 'r')
-    data = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar.json')
+    raindata = load_file('tests/raindata/raindata77.txt')
+
+    # select non-first weather stationnaam
+    # gps coordinates not exact, so non-zero distance
+    # Meetstation De Bilt (6260)
+    latitude = 52.11
+    longitude = 5.19
+
+    result = parse_data(data, raindata, latitude, longitude, 30, usexml=False)
+    assert result == snapshot
+
+
+def test_readdata3(snapshot):
+    """Test loading and parsing json file."""
+    # load buienradar.json
+    data = load_file('tests/json/buienradar.json')
 
     # select last weather stationnaam
     # gps coordinates not exact, so non-zero distance
@@ -959,166 +475,26 @@ def test_readdata3():
     latitude = 53.23
     longitude = 3.23
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
-    assert (result[SUCCESS] and                              # noqa: ignore=W504
-           result[MESSAGE] is None)
-
-    # check the selected weatherstation:
-    assert (result[SUCCESS] and                              # noqa: ignore=W504
-           '(6252)' in result[DATA][STATIONNAME])
-
-    # check the data:
-    fc1 = datetime(year=2019, month=2, day=5, hour=0, minute=0)
-    fc2 = datetime(year=2019, month=2, day=6, hour=0, minute=0)
-    fc3 = datetime(year=2019, month=2, day=7, hour=0, minute=0)
-    fc4 = datetime(year=2019, month=2, day=8, hour=0, minute=0)
-    fc5 = datetime(year=2019, month=2, day=9, hour=0, minute=0)
-
-    fc1 = pytz.timezone(__TIMEZONE).localize(fc1)
-    fc2 = pytz.timezone(__TIMEZONE).localize(fc2)
-    fc3 = pytz.timezone(__TIMEZONE).localize(fc3)
-    fc4 = pytz.timezone(__TIMEZONE).localize(fc4)
-    fc5 = pytz.timezone(__TIMEZONE).localize(fc5)
-
-    # '05/19/2017 00:20:00'
-    loc_dt = datetime(2019, 2, 4, hour=20, minute=50, second=0, microsecond=0)
-    measured = pytz.timezone(__TIMEZONE).localize(loc_dt)
-
-    # Expected result:
-    expect = {
-        'success': True,
-        'data': {
-            'windgust': 10.35,
-            'windforce': 4,
-            'condition': {'condcode': 'c',
-                          'exact_nl': 'Zwaar bewolkt',
-                          'condition': 'cloudy',
-                          'image': get_imageurl('cc'),
-                          'detailed': 'cloudy',
-                          'exact': 'Heavily clouded',
-                          'night': True},
-            'stationname': 'Zeeplatform K13 (6252)',
-            'measured': measured,
-            'precipitation': 0.0,
-            'barometerfc': 5,
-            'barometerfcname': 'Unstable',
-            'barometerfcnamenl': 'Veranderlijk',
-            'groundtemperature': 0.0,
-            'humidity': 0,
-            'feeltemperature': 0.0,
-            'irradiance': 0,
-            'forecast': [{'snow': 0, 'rain': 0.0,
-                          'condition': {'condcode': 'c',
-                                        'exact_nl': 'Zwaar bewolkt',
-                                        'condition': 'cloudy',
-                                        'image': get_imageurl('c'),
-                                        'detailed': 'cloudy',
-                                        'exact': 'Heavily clouded',
-                                        'night': False},
-                          'mintemp': 2.0, 'rainchance': 20,
-                          'minrain': 0.0, 'maxrain': 0.0,
-                          'winddirection': 'Z', 'windazimuth': 180,
-                          'temperature': 6.0, 'windforce': 3,
-                          'windspeed': 3.6, 'sunchance': 20,
-                          'maxtemp': 6.0, 'datetime': fc1},
-                         {'snow': 0, 'rain': 8.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 90,
-                          'minrain': 5.0, 'maxrain': 11.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc2},
-                         {'snow': 0, 'rain': 5.5,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 6.0, 'rainchance': 90,
-                          'minrain': 3.0, 'maxrain': 8.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 10,
-                          'maxtemp': 10.0, 'datetime': fc3},
-                         {'snow': 0, 'rain': 3.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 70,
-                          'minrain': 1.0, 'maxrain': 5.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 8.0, 'windforce': 4,
-                          'windspeed': 5.66, 'sunchance': 20,
-                          'maxtemp': 9.0, 'datetime': fc4},
-                         {'snow': 0, 'rain': 5.0,
-                          'condition': {'condcode': 'q',
-                                        'exact_nl': 'Zwaar bewolkt en regen',
-                                        'condition': 'rainy',
-                                        'image': get_imageurl('q'),
-                                        'detailed': 'rainy',
-                                        'exact': 'Heavily clouded with rain',
-                                        'night': False},
-                          'mintemp': 3.0, 'rainchance': 80,
-                          'minrain': 3.0, 'maxrain': 7.0,
-                          'winddirection': 'ZW', 'windazimuth': 225,
-                          'temperature': 9.5, 'windforce': 5,
-                          'windspeed': 8.23, 'sunchance': 20,
-                          'maxtemp': 10.0, 'datetime': fc5}],
-            'temperature': 0.0,
-            'winddirection': 'WNW',
-            'pressure': 1018.36,
-            'attribution': 'Data provided by buienradar.nl',
-            'rainlast24hour': 0.0,
-            'windspeed': 7.94,
-            'precipitation_forecast': None,
-            'rainlasthour': 0.0,
-            'visibility': 0,
-            'windazimuth': 286},
-        'msg': None,
-        'distance': 1.297928
-    }
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_nojson():
+def test_nojson(snapshot):
     """Test loading and parsing invalid json file."""
     # load nojson_file
-    file = open('tests/json/buienradar_nojson.json', 'r')
-    data = file.read()
-    file.close()
-
+    data = load_file('tests/json/buienradar_nojson.json')
     result = parse_data(data, None, usexml=False)
-
-    # test calling results in the loop close cleanly
-    print(result)
-    assert (result[SUCCESS] is False and                    # noqa: ignore=W504
-            result[MESSAGE] == 'Unable to parse content as json.')
+    assert result == snapshot
 
 
-def test_nows():
+def test_nows(snapshot):
     """Test loading and parsing invalid json file; no weatherstation."""
-    file = open('tests/json/buienradar_nows.json', 'r')
-    data = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_nows.json')
 
     result = parse_data(data, None, usexml=False)
     # test calling results in the loop close cleanly
-    print(result)
     assert (result[SUCCESS] is False and                    # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
+    assert result == snapshot
 
     file = open('tests/json/buienradar_nows2.json', 'r')
     data = file.read()
@@ -1126,9 +502,9 @@ def test_nows():
 
     result = parse_data(data, None, usexml=False)
     # test calling results in the loop close cleanly
-    print(result)
     assert (result[SUCCESS] is False and                    # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
+    assert result == snapshot
 
     file = open('tests/json/buienradar_nows3.json', 'r')
     data = file.read()
@@ -1136,9 +512,9 @@ def test_nows():
 
     result = parse_data(data, None, usexml=False)
     # test calling results in the loop close cleanly
-    print(result)
     assert (result[SUCCESS] is False and                    # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
+    assert result == snapshot
 
     file = open('tests/json/buienradar_nows5.json', 'r')
     data = file.read()
@@ -1146,9 +522,9 @@ def test_nows():
 
     result = parse_data(data, None, usexml=False)
     # test calling results in the loop close cleanly
-    print(result)
     assert (result[SUCCESS] is False and                    # noqa: ignore=W504
             result[MESSAGE] == 'No location selected.')
+    assert result == snapshot
 
 
 def test_wsdistancen_with_none():
@@ -1156,197 +532,184 @@ def test_wsdistancen_with_none():
     latitude = 51.50
     longitude = 6.20
     distance = __get_ws_distance(None, latitude, longitude)
-    print(distance)
     assert (distance is None)
 
 
-def test_nofc():
+def test_nofc(snapshot):
     """Test loading and parsing invalid json file: no forecast data."""
-    file = open('tests/json/buienradar_nofc.json', 'r')
-    data = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_nofc.json')
 
     result = parse_data(data, None, usexml=False)
 
     # test calling results in the loop close cleanly
-    print(result)
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] == 'Unable to extract forecast data.')
+    assert result == snapshot
 
 
-def test_nofc2():
+def test_nofc2(snapshot):
     """Test loading and parsing invalid json file; no forecast."""
-    file = open('tests/json/buienradar_nofc2.json', 'r')
-    data = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_nofc2.json')
 
     result = parse_data(data, None, usexml=False)
 
     # test calling results in the loop close cleanly
-    print(result)
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             len(result[DATA][FORECAST]) == 0)
+    assert result == snapshot
 
 
-def test_missing_data():
+def test_missing_data(snapshot):
     """Test loading and parsing invalid json file; missing data fields."""
-    file = open('tests/json/buienradar_missing.json', 'r')
-    data = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_missing.json')
 
     latitude = 51.50
     longitude = 6.20
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: stationname "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][STATIONNAME] is None)
+    assert result == snapshot
 
     latitude = 52.07
     longitude = 5.88
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: feeltemperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][FEELTEMPERATURE] is None
             )
+    assert result == snapshot
 
     latitude = 52.65
     longitude = 4.98
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: humidity "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][HUMIDITY] is None
             )
+    assert result == snapshot
 
     latitude = 52.10
     longitude = 5.18
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: groundtemperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][GROUNDTEMP] is None
             )
+    assert result == snapshot
 
     latitude = 52.92
     longitude = 4.78
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: temperature "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][TEMPERATURE] is None
             )
+    assert result == snapshot
 
     latitude = 51.45
     longitude = 5.42
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: windspeed "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][WINDSPEED] is None
             )
+    assert result == snapshot
 
     latitude = 51.20
     longitude = 5.77
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: windspeedBft "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][WINDFORCE] is None
             )
+    assert result == snapshot
 
     latitude = 52.00
     longitude = 3.28
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: winddirectiondegrees "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][WINDAZIMUTH] is None
             )
+    assert result == snapshot
 
     latitude = 51.57
     longitude = 4.93
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: winddirection "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][WINDDIRECTION] is None
             )
+    assert result == snapshot
 
     latitude = 52.07
     longitude = 6.65
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
-
     # "Missing key(s) in br data: "
     assert (result[SUCCESS] and
             result[MESSAGE] is None and
             result[DATA][PRESSURE] is None
             )
+    assert result == snapshot
 
     latitude = 52.43
     longitude = 6.27
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: windgusts "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][WINDGUST] is None
             )
+    assert result == snapshot
 
     latitude = 51.87
     longitude = 5.15
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: precipitation "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][PRECIPITATION] is None
             )
+    assert result == snapshot
 
     latitude = 51.98
     longitude = 4.10
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     # "Missing key(s) in br data: sunpower "
     assert (result[SUCCESS] and                             # noqa: ignore=W504
             result[MESSAGE] is None and
             result[DATA][IRRADIANCE] is None
             )
+    assert result == snapshot
 
 
-def test_invalid_data():
+def test_invalid_data(snapshot):
     """Test loading and parsing json file with data that cannot be parsed."""
-    file = open('tests/json/buienradar_invalid.json', 'r')
-    data = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_invalid.json')
 
     # Meetstation Arcen
     latitude = 51.50
     longitude = 6.20
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     assert (result[SUCCESS] is False)
     assert (result[MESSAGE] == 'Location data is invalid.')
+    assert result == snapshot
 
-    file = open('tests/json/buienradar_invalidfc1.json', 'r')
-    data = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_invalidfc1.json')
 
     latitude = 51.98
     longitude = 4.10
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            result[MESSAGE] is None)
     # test Temperature (average):
@@ -1361,47 +724,46 @@ def test_invalid_data():
     # test missing maxtemperatureMin and maxtemperatureMax:
     assert (len(result[DATA][FORECAST]) == 5 and             # noqa: ignore=W504
            result[DATA][FORECAST][3][TEMPERATURE] is None)
+    assert result == snapshot
 
     # read xml with invalid ws coordinates
-    file = open('tests/json/buienradar_invalidws1.json', 'r')
-    data = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_invalidws1.json')
 
     # 'Meetstation Arcen' contains invalid gps info,
     # 'Meetstation Volkel' will be selected as alternative
     latitude = 51.50
     longitude = 6.20
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6375)' in result[DATA][STATIONNAME])
+    assert result == snapshot
 
     # 'Meetstation Arnhem' contains invalid gps info,
     # 'Meetstation De Bilt' will be selected as alternative
     latitude = 52.07
     longitude = 5.88
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6260)' in result[DATA][STATIONNAME])
+    assert result == snapshot
 
     # 'Meetstation Berkhout' contains invalid gps info,
     # 'Meetstation Wijdenes' will be selected as alternative
     latitude = 52.65
     longitude = 4.98
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6248)' in result[DATA][STATIONNAME])
+    assert result == snapshot
 
     # "Meetstation Cadzand",
     latitude = 51.38
     longitude = 3.38
     result = parse_data(data, None, latitude, longitude, usexml=False)
-    print(result)
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6308)' in result[DATA][STATIONNAME])
     assert (result[SUCCESS] and result[DATA][CONDITION] is None)
+    assert result == snapshot
 
 
 def test__get_str():
@@ -1490,7 +852,7 @@ def test__getstr():
     assert (value == "")
 
 
-def test__getBarFC():
+def test__get_bar_fc():
     """Test __getBarFCName function."""
     tests = {None: 0, 'X': 1,
              0: 1,
@@ -1519,7 +881,7 @@ def test__getBarFC():
         assert (value == expected)
 
 
-def test__getBarFCName():
+def test__get_bar_fc_name():
     """Test __getBarFCName function."""
     tests = {None: None,
              0: 'Thunderstorms',
@@ -1549,7 +911,7 @@ def test__getBarFCName():
         assert (value == expected)
 
 
-def test__getBarFCNameNL():
+def test__get_bar_fc_name_nl():
     """Test __getBarFCNameNL function."""
     tests = {None: None,
              0: 'Zware storm',
@@ -1579,492 +941,37 @@ def test__getBarFCNameNL():
         assert (value == expected)
 
 
-def test_iconurl1():
+def test_iconurl1(snapshot):
     """Test loading and parsing json file with iconurl in uppercase."""
     # load buienradar.xml
-    file = open('tests/json/buienradar_iconurl_upper.json', 'r')
-    data = file.read()
-    file.close()
-
-    file = open('tests/raindata.txt', 'r')
-    raindata = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_iconurl_upper.json')
+    raindata = load_file('tests/raindata/raindata.txt')
 
     # select first weatherstation
     # Meetstation Arcen (6391)
     latitude = 51.50
     longitude = 6.20
     result = parse_data(data, raindata, latitude, longitude, usexml=False)
-    print(result)
     assert (result[SUCCESS] and result[MESSAGE] is None)
-
     # check the selected weatherstation:
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6391)' in result[DATA][STATIONNAME])
-
-    # # check the data:
-    # "2025-01-13T00:00:00":
-    fc1 = datetime(year=2025, month=1, day=13, hour=0, minute=0)
-    # "2025-01-14T00:00:00":
-    fc2 = datetime(year=2025, month=1, day=14, hour=0, minute=0)
-    # "2025-01-15T00:00:00":
-    fc3 = datetime(year=2025, month=1, day=15, hour=0, minute=0)
-    # "2025-01-16T00:00:00":
-    fc4 = datetime(year=2025, month=1, day=16, hour=0, minute=0)
-    # "2025-01-17T00:00:00":
-    fc5 = datetime(year=2025, month=1, day=17, hour=0, minute=0)
-
-    fc1 = pytz.timezone(__TIMEZONE).localize(fc1)
-    fc2 = pytz.timezone(__TIMEZONE).localize(fc2)
-    fc3 = pytz.timezone(__TIMEZONE).localize(fc3)
-    fc4 = pytz.timezone(__TIMEZONE).localize(fc4)
-    fc5 = pytz.timezone(__TIMEZONE).localize(fc5)
-
-    # #  "2025-01-13T17:40:00",
-    loc_dt = datetime(2025, 1, 13, hour=17, minute=40, second=0, microsecond=0)
-    measured = pytz.timezone(__TIMEZONE).localize(loc_dt)
-
-    # # Expected result:
-    expect = {
-        'success': True, 'msg': None,
-        'data': {
-            'attribution': 'Data provided by buienradar.nl',
-            'forecast': [
-                {
-                    'condition': {
-                        'condcode': 'b', 'condition': 'cloudy',
-                        'detailed': 'partlycloudy',
-                        'exact': 'Mix of clear and medium or low clouds',
-                        'exact_nl':
-                        'Mix van opklaringen en middelbare of lage bewolking',
-                        'night': False,
-                        'image': get_imageurl('B')},
-                    'temperature': 3.0, 'mintemp': -2.0, 'maxtemp': 3.0,
-                    'sunchance': 50, 'rainchance': 10,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06,
-                    'winddirection': 'Z', 'windazimuth': 180,
-                    'datetime': fc1
-                }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy',
-                                  'detailed': 'cloudy', 'exact':
-                                  'Heavily clouded', 'exact_nl':
-                                  'Zwaar bewolkt', 'night': False,
-                                  'image': get_imageurl('C')},
-                    'temperature': 6.0, 'mintemp': -2.0, 'maxtemp': 6.0,
-                    'sunchance': 20, 'rainchance': 30,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 3, 'windspeed': 3.6,
-                    'winddirection': 'ZW', 'windazimuth': 225,
-                    'datetime': fc2
-                }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy',
-                                  'detailed': 'cloudy', 'exact':
-                                  'Heavily clouded', 'exact_nl':
-                                  'Zwaar bewolkt', 'night': False,
-                                  'image': get_imageurl('C')},
-                    'temperature': 8.0, 'mintemp': 3.0, 'maxtemp': 8.0,
-                    'sunchance': 10, 'rainchance': 30,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06,
-                    'winddirection': 'ZW', 'windazimuth': 225,
-                    'datetime': fc3
-                }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy',
-                                  'detailed': 'cloudy', 'exact':
-                                  'Heavily clouded', 'exact_nl':
-                                  'Zwaar bewolkt', 'night': False,
-                                  'image': get_imageurl('C')},
-                    'temperature': 7.0, 'mintemp': 3.0, 'maxtemp': 7.0,
-                    'sunchance': 20, 'rainchance': 10,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06,
-                    'winddirection': 'ZW', 'windazimuth': 225,
-                    'datetime': fc4
-                }, {
-                    'condition': {'condcode': 'b', 'condition': 'cloudy',
-                                  'detailed': 'partlycloudy', 'exact':
-                                  'Mix of clear and medium or low clouds',
-                                  'exact_nl': 'Mix van opklaringen en \
-middelbare of lage bewolking',
-                                  'night': False,
-                                  'image': get_imageurl('B')},
-                    'temperature': 5.0, 'mintemp': -1.0, 'maxtemp': 5.0,
-                    'sunchance': 30, 'rainchance': 10,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06,
-                    'winddirection': 'ZW', 'windazimuth': 225,
-                    'datetime': fc5
-                }
-            ],
-            'precipitation_forecast': {'average': 0.0, 'total': 0.0,
-                                       'timeframe': 60},
-            'barometerfc': 7, 'barometerfcname': 'Very dry',
-            'barometerfcnamenl': 'Zeer mooi',
-            'humidity': 84,
-            'groundtemperature': -2.2,
-            'irradiance': 0,
-            'measured': measured,
-            'precipitation': 0.0,
-            'pressure': 1040.6,
-            'stationname': 'Arcen (6391)',
-            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed':
-                          'cloudy', 'exact': 'Heavily clouded', 'exact_nl':
-                          'Zwaar bewolkt', 'night': True,
-                          'image': get_imageurl('CC')},
-            'rainlast24hour': 0.0, 'rainlasthour': 0.0,
-            'temperature': -0.2, 'feeltemperature': -2.0,
-            'visibility': 22200.0,
-            'windspeed': 1.5, 'windforce': 1,
-            'winddirection': 'ZZO', 'windazimuth': 160,
-            'windgust': 2.0
-        },
-        'distance': 0.0
-    }
-    assert (expect == result)
+    assert result == snapshot
 
 
-def test_iconurl2():
+def test_iconurl2(snapshot):
     """Test loading and parsing json file with iconurl in lowercase."""
     # load buienradar.xml
-    file = open('tests/json/buienradar_iconurl_lower.json', 'r')
-    data = file.read()
-    file.close()
-
-    file = open('tests/raindata.txt', 'r')
-    raindata = file.read()
-    file.close()
+    data = load_file('tests/json/buienradar_iconurl_lower.json')
+    raindata = load_file('tests/raindata/raindata.txt')
 
     # select first weatherstation
     # Meetstation Arcen (6391)
     latitude = 51.50
     longitude = 6.20
     result = parse_data(data, raindata, latitude, longitude, usexml=False)
-    print(result)
     assert (result[SUCCESS] and result[MESSAGE] is None)
-
     # check the selected weatherstation:
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6391)' in result[DATA][STATIONNAME])
-
-    # # check the data:
-    # "2025-01-13T00:00:00":
-    fc1 = datetime(year=2025, month=1, day=13, hour=0, minute=0)
-    # "2025-01-14T00:00:00":
-    fc2 = datetime(year=2025, month=1, day=14, hour=0, minute=0)
-    # "2025-01-15T00:00:00":
-    fc3 = datetime(year=2025, month=1, day=15, hour=0, minute=0)
-    # "2025-01-16T00:00:00":
-    fc4 = datetime(year=2025, month=1, day=16, hour=0, minute=0)
-    # "2025-01-17T00:00:00":
-    fc5 = datetime(year=2025, month=1, day=17, hour=0, minute=0)
-
-    fc1 = pytz.timezone(__TIMEZONE).localize(fc1)
-    fc2 = pytz.timezone(__TIMEZONE).localize(fc2)
-    fc3 = pytz.timezone(__TIMEZONE).localize(fc3)
-    fc4 = pytz.timezone(__TIMEZONE).localize(fc4)
-    fc5 = pytz.timezone(__TIMEZONE).localize(fc5)
-
-    # #  "2025-01-13T17:40:00",
-    loc_dt = datetime(2025, 1, 13, hour=17, minute=40, second=0, microsecond=0)
-    measured = pytz.timezone(__TIMEZONE).localize(loc_dt)
-
-    # # Expected result:
-    expect = {
-        'success': True, 'msg': None,
-        'data': {
-            'attribution': 'Data provided by buienradar.nl',
-            'forecast': [
-                {
-                    'condition': {'condcode': 'b', 'condition': 'cloudy',
-                                  'detailed': 'partlycloudy', 'exact':
-                                  'Mix of clear and medium or low clouds',
-                                  'exact_nl': 'Mix van opklaringen en \
-middelbare of lage bewolking',
-                                  'night': False,
-                                  'image': get_imageurl('b')},
-                    'temperature': 3.0, 'mintemp': -2.0, 'maxtemp': 3.0,
-                    'sunchance': 50, 'rainchance': 10,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06,
-                    'winddirection': 'Z', 'windazimuth': 180,
-                    'datetime': fc1
-                }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy',
-                                  'detailed': 'cloudy', 'exact':
-                                  'Heavily clouded', 'exact_nl':
-                                  'Zwaar bewolkt', 'night': False,
-                                  'image': get_imageurl('c')},
-                    'temperature': 6.0, 'mintemp': -2.0, 'maxtemp': 6.0,
-                    'sunchance': 20, 'rainchance': 30,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 3, 'windspeed': 3.6,
-                    'winddirection': 'ZW', 'windazimuth': 225,
-                    'datetime': fc2
-                }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy',
-                                  'detailed': 'cloudy', 'exact':
-                                  'Heavily clouded', 'exact_nl':
-                                  'Zwaar bewolkt', 'night': False,
-                                  'image': get_imageurl('c')},
-                    'temperature': 8.0, 'mintemp': 3.0, 'maxtemp': 8.0,
-                    'sunchance': 10, 'rainchance': 30,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06,
-                    'winddirection': 'ZW', 'windazimuth': 225,
-                    'datetime': fc3
-                }, {
-                    'condition': {'condcode': 'c', 'condition': 'cloudy',
-                                  'detailed': 'cloudy', 'exact':
-                                  'Heavily clouded', 'exact_nl':
-                                  'Zwaar bewolkt', 'night': False,
-                                  'image': get_imageurl('c')},
-                    'temperature': 7.0, 'mintemp': 3.0, 'maxtemp': 7.0,
-                    'sunchance': 20, 'rainchance': 10,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06,
-                    'winddirection': 'ZW', 'windazimuth': 225,
-                    'datetime': fc4
-                }, {
-                    'condition': {'condcode': 'b', 'condition': 'cloudy',
-                                  'detailed': 'partlycloudy', 'exact':
-                                  'Mix of clear and medium or low clouds',
-                                  'exact_nl': 'Mix van opklaringen en \
-middelbare of lage bewolking',
-                                  'night': False,
-                                  'image': get_imageurl('b')},
-                    'temperature': 5.0, 'mintemp': -1.0, 'maxtemp': 5.0,
-                    'sunchance': 30, 'rainchance': 10,
-                    'rain': 0.0, 'minrain': 0.0, 'maxrain': 0.0, 'snow': 0,
-                    'windforce': 2, 'windspeed': 2.06,
-                    'winddirection': 'ZW', 'windazimuth': 225,
-                    'datetime': fc5
-                }
-            ],
-            'precipitation_forecast': {'average': 0.0, 'total': 0.0,
-                                       'timeframe': 60},
-            'barometerfc': 7, 'barometerfcname': 'Very dry',
-            'barometerfcnamenl': 'Zeer mooi',
-            'humidity': 84,
-            'groundtemperature': -2.2,
-            'irradiance': 0,
-            'measured': measured,
-            'precipitation': 0.0,
-            'pressure': 1040.6,
-            'stationname': 'Arcen (6391)',
-            'condition': {'condcode': 'c', 'condition': 'cloudy', 'detailed':
-                          'cloudy', 'exact': 'Heavily clouded', 'exact_nl':
-                          'Zwaar bewolkt', 'night': True,
-                          'image': get_imageurl('cc')},
-            'rainlast24hour': 0.0, 'rainlasthour': 0.0,
-            'temperature': -0.2, 'feeltemperature': -2.0,
-            'visibility': 22200.0,
-            'windspeed': 1.5, 'windforce': 1,
-            'winddirection': 'ZZO',
-            'windazimuth': 160, 'windgust': 2.0
-        },
-        'distance': 0.0
-    }
-    assert (expect == result)
-
-
-def test_apply_image_workaround1():
-    """Apply workaround to empty data object."""
-    data = {}
-    data = apply_image_workaround(data)
-    assert data is not None
-
-
-def test_apply_image_workaround2():
-    """Apply workaround to empty data object with condition, but no image."""
-    data = {
-        'condition': {}
-    }
-    data = apply_image_workaround(data)
-    assert data is not None
-
-
-def test_apply_image_workaround3():
-    """Apply workaround to empty data object with condition and empty image."""
-    data = {
-        'condition': {
-            'image': "",
-            'condcode': 'a',
-            'condition': 'condition',
-            'detailed': 'detailed',
-            'exact': 'exact',
-            "exact_nl": 'exactnl',
-            'night': False
-        }
-    }
-    data = apply_image_workaround(data)
-    assert data is not None
-    assert (data[CONDITION][IMAGE] == "")
-    assert (data[CONDITION][CONDCODE] == "a")
-    assert (data[CONDITION][CONDITION] == "condition")
-    assert (data[CONDITION][DETAILED] == "detailed")
-    assert (data[CONDITION][EXACT] == "exact")
-    assert (data[CONDITION][EXACTNL] == "exactnl")
-    assert (data[CONDITION][NIGHTTIME] is False)
-
-
-def test_apply_image_workaround4():
-    """Apply workaround: to empty data, condition, non-empty image."""
-    data = {
-        'condition': {
-            'image': "http://somewhere.com/someimage.gif",
-            'condcode': 'a',
-            'condition': 'condition',
-            'detailed': 'detailed',
-            'exact': 'exact',
-            'exact_nl': 'exactnl',
-            'night': False
-        }
-    }
-    data = apply_image_workaround(data)
-    assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/someimage.gif")
-    assert (data[CONDITION][CONDCODE] == "a")
-    assert (data[CONDITION][CONDITION] == "condition")
-    assert (data[CONDITION][DETAILED] == "detailed")
-    assert (data[CONDITION][EXACT] == "exact")
-    assert (data[CONDITION][EXACTNL] == "exactnl")
-    assert (data[CONDITION][NIGHTTIME] is False)
-
-
-def test_apply_image_workaround5():
-    """Apply workaround to empty data object with condition and image."""
-    data = {
-        "condition": {
-            'image': "http://somewhere.com/aa.png",
-            'condcode': 'a',
-            'condition': 'condition',
-            'detailed': 'detailed',
-            'exact': 'exact',
-            'exact_nl': 'exactnl',
-            'night': False
-        }
-    }
-    data = apply_image_workaround(data)
-    assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/AA.png")
-    assert (data[CONDITION][CONDCODE] == "a")
-    assert (data[CONDITION][CONDITION] == "condition")
-    assert (data[CONDITION][DETAILED] == "detailed")
-    assert (data[CONDITION][EXACT] == "exact")
-    assert (data[CONDITION][EXACTNL] == "exactnl")
-    assert (data[CONDITION][NIGHTTIME] is False)
-
-
-def test_apply_image_workaround6():
-    """Apply workaround: empty data, condition, empty forecast."""
-    data = {
-        'condition': {
-            'image': "http://somewhere.com/b.png",
-            'condcode': 'a',
-            'condition': 'condition',
-            'detailed': 'detailed',
-            'exact': 'exact',
-            'exact_nl': 'exactnl',
-            'night': False
-        },
-        'forecast': []
-    }
-    data = apply_image_workaround(data)
-    assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/B.png")
-    assert (data[CONDITION][CONDCODE] == "a")
-    assert (data[CONDITION][CONDITION] == "condition")
-    assert (data[CONDITION][DETAILED] == "detailed")
-    assert (data[CONDITION][EXACT] == "exact")
-    assert (data[CONDITION][EXACTNL] == "exactnl")
-    assert (data[CONDITION][NIGHTTIME] is False)
-
-    assert (data[FORECAST] == [])
-
-
-def test_apply_image_workaround7():
-    """Apply workaround: empty data, condition, one empty forecast."""
-    data = {
-        'condition': {
-            'image': "http://somewhere.com/c.png",
-            'condcode': 'a',
-            'condition': 'condition',
-            'detailed': 'detailed',
-            'exact': 'exact',
-            "exact_nl": 'exactnl',
-            "night": False
-        },
-        'forecast': [{}]
-    }
-    data = apply_image_workaround(data)
-    assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/C.png")
-    assert (data[CONDITION][CONDCODE] == "a")
-    assert (data[CONDITION][CONDITION] == "condition")
-    assert (data[CONDITION][DETAILED] == "detailed")
-    assert (data[CONDITION][EXACT] == "exact")
-    assert (data[CONDITION][EXACTNL] == "exactnl")
-    assert (data[CONDITION][NIGHTTIME] is False)
-
-    assert (data[FORECAST] == [{}])
-
-
-def test_apply_image_workaround8():
-    """Apply workaround: empty data,  condition, one empty forecast."""
-    data = {
-        'condition': {
-            'image': "http://somewhere.com/dd.png",
-            'condcode': 'a',
-            'condition': 'condition',
-            'detailed': 'detailed',
-            'exact': 'exact',
-            'exact_nl': 'exactnl',
-            'night': False
-        },
-        'forecast': [{'condition': {'image': ''}}]
-    }
-    data = apply_image_workaround(data)
-    assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/DD.png")
-    assert (data[CONDITION][CONDCODE] == "a")
-    assert (data[CONDITION][CONDITION] == "condition")
-    assert (data[CONDITION][DETAILED] == "detailed")
-    assert (data[CONDITION][EXACT] == "exact")
-    assert (data[CONDITION][EXACTNL] == "exactnl")
-    assert (data[CONDITION][NIGHTTIME] is False)
-
-    assert (data[FORECAST] == [{'condition': {'image': ''}}])
-
-
-def test_apply_image_workaround9():
-    """Apply workaround: empty data, condition, one empty forecast."""
-    data = {
-        'condition': {
-            'image': "http://somewhere.com/a.png",
-            'condcode': 'a',
-            'condition': 'condition',
-            'detailed': 'detailed',
-            'exact': 'exact',
-            'exact_nl': 'exactnl',
-            'night': False
-        },
-        'forecast': [
-            {'condition': {'image': 'http://somewhere.com/b.gif'}},
-            {'condition': {'image': 'http://somewhere.com/c.png'}},
-        ]
-    }
-    data = apply_image_workaround(data)
-    assert data is not None
-    assert (data[CONDITION][IMAGE] == "http://somewhere.com/A.png")
-    assert (data[CONDITION][CONDCODE] == "a")
-    assert (data[CONDITION][CONDITION] == "condition")
-    assert (data[CONDITION][DETAILED] == "detailed")
-    assert (data[CONDITION][EXACT] == "exact")
-    assert (data[CONDITION][EXACTNL] == "exactnl")
-    assert (data[CONDITION][NIGHTTIME] is False)
-
-    assert (data[FORECAST][0][CONDITION][IMAGE] ==
-            'http://somewhere.com/b.gif')
-    assert (data[FORECAST][1][CONDITION][IMAGE] ==
-            'http://somewhere.com/C.png')
+    assert result == snapshot

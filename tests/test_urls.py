@@ -32,8 +32,8 @@ def test_base_urls():
     json_url = json_precipitation_forecast_url(1.23, 4.56)
     xml_url = xml_precipitation_forecast_url(1.23, 4.56)
 
-    assert 'https://gpsgadget.buienradar.nl/data/raintext?' in json_url
-    assert 'http://gadgets.buienradar.nl/data/raintext/?' in xml_url
+    assert 'https://gps.buienradar.nl/getrr.php?' in json_url
+    assert 'https://gps.buienradar.nl/getrr.php?' in xml_url
 
     assert 'https://api.buienradar.nl/image/1.0/RadarMapNL?' in radar_url()
 

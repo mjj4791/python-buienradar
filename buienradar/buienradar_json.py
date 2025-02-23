@@ -1,7 +1,6 @@
 """Buienradar library to get parsed weather data from buienradar.nl."""
 import json
 import logging
-import re
 from datetime import datetime  # , timedelta
 
 import pytz
@@ -310,66 +309,6 @@ def parse_json_data(content, raincontent, latitude=52.091579,
 
     log.debug("Extracted weather-data: %s", result[DATA])
     return result
-
-
-def image_workaround(result):
-    """Check if we need to apply status image workaround and apply it."""
-    try:
-        # create workaround url:
-        workaround_url = status_image_workaround_url(
-            result[DATA][CONDITION][IMAGE])
-        if workaround_url:
-            # test if the workaround url resolves (200 OK) or not:
-            workaround_result = __get_url(workaround_url, False)
-            use_img_workaround = workaround_result.get(SUCCESS)
-    except KeyError:
-        # no condition image url; re-check once we are able to retrieve
-        # condition image url:
-        use_img_workaround = False
-
-    if use_img_workaround:
-        log.debug("Using image workaround for fetching condition images")
-        result[DATA] = apply_image_workaround(result[DATA])
-
-    return result
-
-
-def status_image_workaround_url(url):
-    """Convert the new workaround image url."""
-    if re.match(r".+\/[a-z]{1,2}\.png$", url):
-        return re.sub(
-            r'([a-z]{1,2})(?=\.png$)',
-            lambda pat: pat.group(1).upper(),
-            url)
-    return None
-
-
-def __apply_condition_workaround(condition):
-    image = condition.get(IMAGE)
-    if image:
-        new_image = status_image_workaround_url(image)
-        if new_image:
-            condition[IMAGE] = new_image
-    return condition
-
-
-def __apply_forecast_workaround(fc):
-    condition = fc.get(CONDITION)
-    if condition:
-        fc[CONDITION] = __apply_condition_workaround(condition)
-    return fc
-
-
-def apply_image_workaround(data):
-    """Apply the iage workaround to all image elementsin data."""
-    condition = data.get(CONDITION)
-    if condition:
-        data[CONDITION] = __apply_condition_workaround(condition)
-
-    forecast = data.get(FORECAST)
-    if forecast:
-        data[FORECAST] = [__apply_forecast_workaround(fc) for fc in forecast]
-    return data
 
 
 def __get_ws_data():

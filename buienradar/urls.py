@@ -4,10 +4,10 @@ XML_FEED_URL = 'https://xml.buienradar.nl/'
 XML_SECONDARY_FEED_URL = 'https://api.buienradar.nl/'
 
 JSON_PRECIPITATION_URL_TEMPLATE = (
-    'https://gpsgadget.buienradar.nl/data/raintext?lat={lat}&lon={lon}'
+    'https://gps.buienradar.nl/getrr.php?lat={lat}&lon={lon}'
 )
 XML_PRECIPITATION_URL_TEMPLATE = (
-    'http://gadgets.buienradar.nl/data/raintext/?lat={lat}&lon={lon}'
+    'https://gps.buienradar.nl/getrr.php?lat={lat}&lon={lon}'
 )
 RADAR_URL_TEMPLATE = (
     'https://api.buienradar.nl/image/1.0/RadarMapNL?w={w}&h={h}'

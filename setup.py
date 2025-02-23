@@ -26,7 +26,7 @@ def version_from_git():
 setup(
     name='buienradar',
 
-    version='1.0.8',
+    version='1.0.9',
 
     description=__doc__,
     long_description_content_type='text/x-rst',
