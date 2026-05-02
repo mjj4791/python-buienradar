@@ -1,7 +1,7 @@
 """Buienradar library to get parsed weather data from buienradar.nl."""
 import json
 import logging
-from datetime import datetime  # , timedelta
+from datetime import datetime, timedelta
 
 import pytz
 import requests
@@ -584,6 +584,29 @@ def __parse_precipfc_data(data, timeframe):
         result[AVERAGE] = 0
     result[TOTAL] = round(totalrain / 12, 2)
     result[TIMEFRAME] = timeframe
+
+    now = datetime.now(__PYTZ_TIMEZONE)
+    forecast = []
+    for line in lines:
+        if not line.strip():
+            continue
+        try:
+            (val, key) = line.split("|")
+            val = float(val.replace(',', '.'))
+            mmu = 10 ** ((val - 109) / 32)
+            hour, minute = map(int, key.strip().split(':'))
+            dt = __PYTZ_TIMEZONE.localize(
+                datetime(now.year, now.month, now.day, hour, minute)
+            )
+            if dt < now:
+                dt = dt + timedelta(days=1)
+            forecast.append({
+                DATETIME: dt,
+                PRECIPITATION: round(float(mmu), 2),
+            })
+        except (ValueError, KeyError):
+            continue
+    result[FORECAST] = forecast
 
     return result
 
