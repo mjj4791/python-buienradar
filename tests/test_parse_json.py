@@ -1,7 +1,10 @@
 """Testing json parsing."""
+import copy
 import json
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
+import pytz
 import requests_mock
 
 from buienradar.buienradar import get_data, parse_data
@@ -29,6 +32,7 @@ from buienradar.constants import (
     CONDITION,
     CONTENT,
     DATA,
+    DATETIME,
     FEELTEMPERATURE,
     FORECAST,
     GROUNDTEMP,
@@ -37,6 +41,7 @@ from buienradar.constants import (
     MEASURED,
     MESSAGE,
     PRECIPITATION,
+    PRECIPITATION_FORECAST,
     PRESSURE,
     RAINCONTENT,
     RAINLAST24HOUR,
@@ -68,6 +73,15 @@ def get_imageurl(img):
     result += 'resources/images/icons/weather/30x30/'
     result += img
     result += '.png'
+    return result
+
+
+def _drop_precipfc_forecast(result):
+    """Return a deep copy of result with the time-dependent forecast list removed."""
+    result = copy.deepcopy(result)
+    pf = result.get(DATA, {}).get(PRECIPITATION_FORECAST)
+    if isinstance(pf, dict):
+        pf.pop(FORECAST, None)
     return result
 
 
@@ -289,7 +303,7 @@ def test_precip_fc(snapshot):
 
     result = __parse_precipfc_data(data, 60)
 
-    assert result == snapshot
+    assert {k: v for k, v in result.items() if k != FORECAST} == snapshot
 
 
 def test_precip_fc2(snapshot):
@@ -299,7 +313,7 @@ def test_precip_fc2(snapshot):
         data += "100|%s\n" % (datetime.now() +              # noqa: ignore=W504
                               timedelta(minutes=n * 5)).strftime("%H:%M")
     result = __parse_precipfc_data(data, 60)
-    assert result == snapshot
+    assert {k: v for k, v in result.items() if k != FORECAST} == snapshot
 
 
 def test_precip_fc3(snapshot):
@@ -309,7 +323,7 @@ def test_precip_fc3(snapshot):
         data += "100|%s\n" % (datetime.now() +                  # noqa: ignore=W504
                               timedelta(minutes=n * 5)).strftime("%H:%M")
     result = __parse_precipfc_data(data, 30)
-    assert result == snapshot
+    assert {k: v for k, v in result.items() if k != FORECAST} == snapshot
 
 
 def test_precip_fc4(snapshot):
@@ -320,7 +334,7 @@ def test_precip_fc4(snapshot):
                               timedelta(minutes=n * 5)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 30)
-    assert result == snapshot
+    assert {k: v for k, v in result.items() if k != FORECAST} == snapshot
 
 
 def test_precip_fc5(snapshot):
@@ -342,7 +356,7 @@ def test_precip_fc5(snapshot):
                          timedelta(minutes=35)).strftime("%H:%M")
 
     result = __parse_precipfc_data(data, 30)
-    assert result == snapshot
+    assert {k: v for k, v in result.items() if k != FORECAST} == snapshot
 
 
 def test_precip_decimal_values(snapshot):
@@ -357,7 +371,7 @@ def test_precip_decimal_values(snapshot):
     data += "55.55|%s\n" % timeframe(15)
 
     result = __parse_precipfc_data(data, 20)
-    assert result == snapshot
+    assert {k: v for k, v in result.items() if k != FORECAST} == snapshot
 
 
 def test_parse_timeframe(snapshot):
@@ -415,7 +429,7 @@ def test_readdata1_60(snapshot):
     latitude = 51.50
     longitude = 6.20
     result = parse_data(data, raindata, latitude, longitude, usexml=False)
-    assert result == snapshot
+    assert _drop_precipfc_forecast(result) == snapshot
 
 
 def test_readdata1_30(snapshot):
@@ -430,7 +444,7 @@ def test_readdata1_30(snapshot):
     longitude = 6.20
 
     result = parse_data(data, raindata, latitude, longitude, 30, usexml=False)
-    assert result == snapshot
+    assert _drop_precipfc_forecast(result) == snapshot
 
 
 def test_readdata2_60(snapshot):
@@ -445,7 +459,7 @@ def test_readdata2_60(snapshot):
     latitude = 52.11
     longitude = 5.19
     result = parse_data(data, raindata, latitude, longitude, usexml=False)
-    assert result == snapshot
+    assert _drop_precipfc_forecast(result) == snapshot
 
 
 def test_readdata2_30(snapshot):
@@ -461,7 +475,7 @@ def test_readdata2_30(snapshot):
     longitude = 5.19
 
     result = parse_data(data, raindata, latitude, longitude, 30, usexml=False)
-    assert result == snapshot
+    assert _drop_precipfc_forecast(result) == snapshot
 
 
 def test_readdata3(snapshot):
@@ -956,7 +970,7 @@ def test_iconurl1(snapshot):
     # check the selected weatherstation:
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6391)' in result[DATA][STATIONNAME])
-    assert result == snapshot
+    assert _drop_precipfc_forecast(result) == snapshot
 
 
 def test_iconurl2(snapshot):
@@ -974,4 +988,95 @@ def test_iconurl2(snapshot):
     # check the selected weatherstation:
     assert (result[SUCCESS] and                              # noqa: ignore=W504
            '(6391)' in result[DATA][STATIONNAME])
-    assert result == snapshot
+    assert _drop_precipfc_forecast(result) == snapshot
+
+
+__PYTZ_TIMEZONE = pytz.timezone('Europe/Amsterdam')
+
+
+def test_precip_fc_forecast_list():
+    """Test that forecast list is present with correct length and values."""
+    data = ""
+    for n in range(0, 24):
+        data += "000|%s\n" % (datetime.now() +              # noqa: ignore=W504
+                              timedelta(minutes=n * 5)).strftime("%H:%M")
+    result = __parse_precipfc_data(data, 60)
+
+    assert FORECAST in result
+    assert len(result[FORECAST]) == 24
+    for entry in result[FORECAST]:
+        assert DATETIME in entry
+        assert PRECIPITATION in entry
+        assert entry[PRECIPITATION] == 0.0
+
+
+def test_precip_fc_forecast_midnight_straddle():
+    """Test that entries with times before now receive the next day's date."""
+    fixed_now = __PYTZ_TIMEZONE.localize(datetime(2025, 6, 15, 23, 45, 0))
+
+    data = (
+        "000|23:40\n"
+        "000|23:45\n"
+        "000|23:50\n"
+        "000|00:00\n"
+    )
+
+    with patch('buienradar.buienradar_json.datetime') as mock_dt:
+        mock_dt.now.return_value = fixed_now
+        mock_dt.side_effect = datetime
+        result = __parse_precipfc_data(data, 60)
+
+    forecast = result[FORECAST]
+    assert len(forecast) == 4
+
+    assert forecast[0][DATETIME].year == 2025
+    assert forecast[0][DATETIME].month == 6
+    assert forecast[0][DATETIME].day == 16
+    assert forecast[0][DATETIME].hour == 23
+    assert forecast[0][DATETIME].minute == 40
+
+    assert forecast[1][DATETIME].day == 15
+    assert forecast[1][DATETIME].hour == 23
+    assert forecast[1][DATETIME].minute == 45
+
+    assert forecast[2][DATETIME].day == 15
+    assert forecast[2][DATETIME].hour == 23
+    assert forecast[2][DATETIME].minute == 50
+
+    assert forecast[3][DATETIME].day == 16
+    assert forecast[3][DATETIME].hour == 0
+    assert forecast[3][DATETIME].minute == 0
+
+
+def test_precip_fc_forecast_decimal_comma():
+    """Test that comma-decimal raw values parse correctly in the forecast list."""
+    data = "86,6329598612474|09:55\n"
+    result = __parse_precipfc_data(data, 60)
+
+    assert FORECAST in result
+    assert len(result[FORECAST]) == 1
+
+    val = 86.6329598612474
+    expected = round(10 ** ((val - 109) / 32), 2)
+    assert result[FORECAST][0][PRECIPITATION] == expected
+    assert DATETIME in result[FORECAST][0]
+
+
+def test_precip_fc_forecast_malformed():
+    """Test that malformed and empty lines are skipped in the forecast list."""
+    # timeframe=5 → aggregate processes only line[1]; malformed lines at index 2+ are
+    # outside the aggregate window and only processed by the forecast loop (with try/except).
+    data = (
+        "000|10:00\n"
+        "100|10:05\n"
+        "malformed_line\n"
+        "|10:15\n"
+        "\n"
+    )
+    result = __parse_precipfc_data(data, 5)
+
+    assert FORECAST in result
+    assert len(result[FORECAST]) == 2
+    assert result[FORECAST][0][PRECIPITATION] == 0.0
+    expected = round(10 ** ((100 - 109) / 32), 2)
+    assert result[FORECAST][1][PRECIPITATION] == expected
