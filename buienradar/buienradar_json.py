@@ -69,27 +69,79 @@ __DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 __TIMEZONE = 'Europe/Amsterdam'
 __PYTZ_TIMEZONE = pytz.timezone(__TIMEZONE)
 
-__ACTUAL = "actual"
-__STATIONMEASUREMENTS = "stationmeasurements"
-__LAT = "lat"
-__LON = "lon"
-__STATIONID = "stationid"
-__STATIONNAME = "stationname"
-__ICONURL = "iconurl"
-__WEATHERDESCRIPTION = "weatherdescription"
-__FORECAST = "forecast"
-__FIVEDAYFORECAST = "fivedayforecast"
-__MAXTEMPERATUREMIN = "maxtemperatureMin"
-__MAXTEMPERATUREMAX = "maxtemperatureMax"
-__MINTEMPERATUREMIN = "mintemperatureMin"
-__MINTEMPERATUREMAX = "mintemperatureMax"
-__RAINCHANCE = "rainChance"
-__SUNCHANCE = "sunChance"
-__MMRAINMAX = "mmRainMax"
-__MMRAINMIN = "mmRainMin"
-__WIND = "wind"
-__WINDDIRECTION = "windDirection"
-__DAY = "day"
+__ACTUAL = "Actual"
+__STATIONMEASUREMENTS = "WeatherStationMeasurements"
+__LAT = "Latitude"
+__LON = "Longitude"
+__STATIONID = "StationId"
+
+# Fallback KNMI station coordinates keyed by StationId.
+# Used when the API returns Latitude/Longitude as 0 (known API regression).
+__KNMI_STATION_COORDS = {
+    6210: (52.17, 4.42),   # Valkenburg
+    6215: (52.12, 4.43),   # Voorschoten
+    6225: (52.46, 4.57),   # IJmuiden
+    6229: (52.97, 4.75),   # Texelhors
+    6235: (52.92, 4.78),   # De Kooy
+    6240: (52.31, 4.79),   # Schiphol
+    6242: (53.25, 4.92),   # Vlieland
+    6248: (52.63, 5.17),   # Wijdenes
+    6249: (52.65, 4.98),   # Berkhout
+    6251: (53.39, 5.35),   # Hoorn (Terschelling)
+    6252: (53.22, 3.22),   # K13
+    6257: (52.50, 4.60),   # Wijk aan Zee
+    6258: (52.65, 5.40),   # Houtribdijk
+    6260: (52.10, 5.18),   # De Bilt
+    6267: (52.88, 5.38),   # Stavoren
+    6269: (52.46, 5.52),   # Lelystad
+    6270: (53.22, 5.75),   # Leeuwarden
+    6273: (52.70, 5.88),   # Marknesse
+    6275: (52.07, 5.88),   # Deelen (Arnhem)
+    6277: (53.41, 6.20),   # Lauwersoog
+    6278: (52.43, 6.27),   # Heino
+    6279: (52.73, 6.52),   # Hoogeveen
+    6280: (53.13, 6.58),   # Eelde
+    6283: (52.07, 6.65),   # Hupsel
+    6285: (53.57, 6.40),   # Huibertgat
+    6286: (53.20, 7.15),   # Nieuw Beerta
+    6290: (52.27, 6.90),   # Twenthe
+    6310: (51.44, 3.60),   # Vlissingen
+    6315: (51.45, 4.00),   # Hansweert
+    6316: (51.66, 3.70),   # Schaar
+    6319: (51.23, 3.87),   # Westdorpe
+    6320: (51.93, 3.67),   # LE Goeree
+    6321: (51.99, 3.28),   # Europlatform
+    6323: (51.52, 3.88),   # Wilhelminadorp
+    6324: (51.60, 4.00),   # Stavenisse
+    6330: (51.98, 4.12),   # Hoek van Holland
+    6331: (51.52, 4.12),   # Tholen
+    6340: (51.45, 4.34),   # Woensdrecht
+    6343: (51.95, 4.45),   # Rotterdam
+    6348: (51.97, 4.93),   # Cabauw
+    6350: (51.57, 4.93),   # Gilze-Rijen
+    6356: (51.86, 5.15),   # Herwijnen
+    6370: (51.45, 5.42),   # Eindhoven
+    6375: (51.65, 5.70),   # Volkel
+    6377: (51.20, 5.77),   # Ell
+    6380: (50.91, 5.76),   # Maastricht
+    6391: (51.50, 6.20),   # Arcen
+}
+__STATIONNAME = "StationName"
+__ICONURL = "IconUrl"
+__WEATHERDESCRIPTION = "WeatherDescription"
+__FORECAST = "Forecast"
+__FIVEDAYFORECAST = "FiveDayForecast"
+__MAXTEMPERATUREMIN = "MaxTemperatureMin"
+__MAXTEMPERATUREMAX = "MaxTemperatureMax"
+__MINTEMPERATUREMIN = "MinTemperatureMin"
+__MINTEMPERATUREMAX = "MinTemperatureMax"
+__RAINCHANCE = "RainChance"
+__SUNCHANCE = "SunChance"
+__MMRAINMAX = "RainMaxMm"
+__MMRAINMIN = "RainMinMm"
+__WIND = "WindBeaufort"
+__WINDDIRECTION = "WindDirection"
+__DAY = "Day"
 
 
 def __to_upper(val):
@@ -211,27 +263,27 @@ def __getBarFCNameNL(pressure):
 
 # SENSOR_TYPES = { 'key': ['key in buienradar json', conversion function], }
 SENSOR_TYPES = {
-    BAROMETERFC: ['airpressure', __getBarFC],
-    BAROMETERFCNAME: ['airpressure', __getBarFCName],
-    BAROMETERFCNAMENL: ['airpressure', __getBarFCNameNL],
-    HUMIDITY: ['humidity', __to_int],
-    GROUNDTEMP: ['groundtemperature', __to_float1],
-    IRRADIANCE: ['sunpower', __to_int],
-    MEASURED: ['timestamp', __to_localdatetime],
-    PRECIPITATION: ['precipitation', __to_float1],
-    PRESSURE: ['airpressure', __to_float2],
-    STATIONNAME: ['stationname', None],
-    CONDITION: ['weatherdescription', None],
-    RAINLAST24HOUR: ['rainFallLast24Hour', __to_float1],
-    RAINLASTHOUR: ['rainFallLastHour', __to_float1],
-    TEMPERATURE: ['temperature', __to_float1],
-    FEELTEMPERATURE: ['feeltemperature', __to_float1],
-    VISIBILITY: ['visibility', __to_int],
-    WINDSPEED: ['windspeed', __to_float2],
-    WINDFORCE: ['windspeedBft', __to_int],
-    WINDDIRECTION: ['winddirection', __to_upper],
-    WINDAZIMUTH: ['winddirectiondegrees', __to_int],
-    WINDGUST: ['windgusts', __to_float2],
+    BAROMETERFC: ['AirPressure', __getBarFC],
+    BAROMETERFCNAME: ['AirPressure', __getBarFCName],
+    BAROMETERFCNAMENL: ['AirPressure', __getBarFCNameNL],
+    HUMIDITY: ['Humidity', __to_int],
+    GROUNDTEMP: ['GroundTemperature', __to_float1],
+    IRRADIANCE: ['Sunpower', __to_int],
+    MEASURED: ['Timestamp', __to_localdatetime],
+    PRECIPITATION: ['Precipitation', __to_float1],
+    PRESSURE: ['AirPressure', __to_float2],
+    STATIONNAME: ['StationName', None],
+    CONDITION: ['WeatherDescription', None],
+    RAINLAST24HOUR: ['RainfallLast24Hour', __to_float1],
+    RAINLASTHOUR: ['RainfallLastHour', __to_float1],
+    TEMPERATURE: ['Temperature', __to_float1],
+    FEELTEMPERATURE: ['FeelTemperature', __to_float1],
+    VISIBILITY: ['Visibility', __to_int],
+    WINDSPEED: ['Windspeed', __to_float2],
+    WINDFORCE: ['WindspeedBeaufort', __to_int],
+    WINDDIRECTION: ['WindDirection', __to_upper],
+    WINDAZIMUTH: ['WindDirectionDegrees', __to_int],
+    WINDGUST: ['WindGusts', __to_float2],
 }
 
 
@@ -669,6 +721,16 @@ def __get_ws_distance(wstation, latitude, longitude):
         try:
             wslat = float(wstation[__LAT])
             wslon = float(wstation[__LON])
+
+            if wslat == 0 and wslon == 0:
+                # API returned placeholder coordinates; try the fallback table.
+                station_id = wstation.get(__STATIONID)
+                if station_id in __KNMI_STATION_COORDS:
+                    wslat, wslon = __KNMI_STATION_COORDS[station_id]
+                    log.debug("Using fallback coords for station %s: "
+                              "(%s, %s)", station_id, wslat, wslon)
+                else:
+                    return None
 
             dist = vincenty((latitude, longitude), (wslat, wslon))
             log.debug("calc distance: %s (latitude: %s, longitude: "
