@@ -29,20 +29,27 @@ from buienradar.constants import (
     CONDITION,
     CONTENT,
     DATA,
+    DISTANCE,
     FEELTEMPERATURE,
     FORECAST,
     GROUNDTEMP,
     HUMIDITY,
     IRRADIANCE,
+    MAX_RAIN,
     MEASURED,
     MESSAGE,
+    MIN_RAIN,
     PRECIPITATION,
+    PRECIPITATION_FORECAST,
     PRESSURE,
+    RAIN,
     RAINCONTENT,
+    RAIN_CHANCE,
     RAINLAST24HOUR,
     RAINLASTHOUR,
     STATIONNAME,
     SUCCESS,
+    SUN_CHANCE,
     TEMPERATURE,
     VISIBILITY,
     WINDAZIMUTH,
@@ -462,6 +469,33 @@ def test_readdata2_30(snapshot):
 
     result = parse_data(data, raindata, latitude, longitude, 30, usexml=False)
     assert result == snapshot
+
+
+def test_weatherstationmeasurements_feed():
+    """Test current JSON feed structure with WeatherStationMeasurements."""
+    data = load_file('tests/json/buienradar_weatherstationmeasurements.json')
+    raindata = load_file('tests/raindata/raindata.txt')
+
+    result = parse_data(data, raindata, 52.07, 5.88, usexml=False)
+
+    assert result[SUCCESS] is True
+    assert result[MESSAGE] is None
+    assert result[DISTANCE] == 0
+    assert result[DATA][STATIONNAME] == 'Arnhem (6275)'
+    assert result[DATA][TEMPERATURE] == 14.4
+    assert result[DATA][WINDDIRECTION] == 'WNW'
+    assert result[DATA][WINDFORCE] == 2
+    assert result[DATA][WINDGUST] == 5.9
+    assert result[DATA][RAINLAST24HOUR] == 0.4
+    assert result[DATA][PRECIPITATION_FORECAST] is not None
+    assert len(result[DATA][FORECAST]) == 1
+    assert result[DATA][FORECAST][0][RAIN] == 2.3
+    assert result[DATA][FORECAST][0][MIN_RAIN] == 1.2
+    assert result[DATA][FORECAST][0][MAX_RAIN] == 3.4
+    assert result[DATA][FORECAST][0][RAIN_CHANCE] == 30
+    assert result[DATA][FORECAST][0][SUN_CHANCE] == 40
+    assert result[DATA][FORECAST][0][WINDFORCE] == 4
+    assert result[DATA][FORECAST][0][WINDDIRECTION] == 'NW'
 
 
 def test_readdata3(snapshot):
