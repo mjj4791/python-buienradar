@@ -1,0 +1,84 @@
+{
+  "actual": {
+    "WeatherStationMeasurements": [
+      {
+        "StationId": 6275,
+        "StationName": "Meetstation Arnhem",
+        "Latitude": 0,
+        "Longitude": 0,
+        "Region": null,
+        "Timestamp": "2026-06-15T11:40:00",
+        "WeatherDescription": "Cloudy",
+        "IconUrl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/c.png",
+        "FullIconUrl": "https://cdn.buienradar.nl/resources/images/icons/weather/96x96/C.png",
+        "GraphUrl": "https://www.buienradar.nl/nederland/weerbericht/weergrafieken/c",
+        "WindDirection": 13,
+        "AirPressure": 1017.2,
+        "Temperature": 14.4,
+        "GroundTemperature": 14.7,
+        "FeelTemperature": 14.4,
+        "Visibility": 29900,
+        "WindGusts": 5.9,
+        "Windspeed": 3.2,
+        "WindspeedBeaufort": null,
+        "Humidity": 75,
+        "Precipitation": 0,
+        "Sunpower": 282,
+        "RainfallLast24Hour": 0.4,
+        "RainfallLastHour": 0,
+        "WindDirectionDegrees": 292,
+        "DayHistory": null
+      },
+      {
+        "StationId": 6260,
+        "StationName": "Meetstation De Bilt",
+        "Latitude": 0,
+        "Longitude": 0,
+        "Region": null,
+        "Timestamp": "2026-06-15T11:40:00",
+        "WeatherDescription": "Cloudy",
+        "IconUrl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/b.png",
+        "FullIconUrl": "https://cdn.buienradar.nl/resources/images/icons/weather/96x96/B.png",
+        "GraphUrl": "https://www.buienradar.nl/nederland/weerbericht/weergrafieken/b",
+        "WindDirection": "NW",
+        "AirPressure": 1018.4,
+        "Temperature": 15.1,
+        "GroundTemperature": 15.5,
+        "FeelTemperature": 15.1,
+        "Visibility": 30000,
+        "WindGusts": 4.8,
+        "Windspeed": 2.9,
+        "WindspeedBeaufort": 2,
+        "Humidity": 72,
+        "Precipitation": 0,
+        "Sunpower": 300,
+        "RainfallLast24Hour": 0.1,
+        "RainfallLastHour": 0,
+        "WindDirectionDegrees": 315,
+        "DayHistory": null
+      }
+    ]
+  },
+  "forecast": {
+    "fivedayforecast": [
+      {
+        "Day": "2026-06-15T00:00:00",
+        "MinTemperature": "11",
+        "MaxTemperature": "18",
+        "MinTemperatureMax": 11,
+        "MinTemperatureMin": 11,
+        "MaxTemperatureMax": 18,
+        "MaxTemperatureMin": 18,
+        "RainChance": 30,
+        "SunChance": 40,
+        "WindDirection": "nw",
+        "WindBeaufort": 4,
+        "RainMinMm": 1.2,
+        "RainMaxMm": 3.4,
+        "WeatherDescription": "Partly cloudy",
+        "IconUrl": "https://www.buienradar.nl/resources/images/icons/weather/30x30/b.png",
+        "FullIconUrl": "https://cdn.buienradar.nl/resources/images/icons/weather/96x96/B.png"
+      }
+    ]
+  }
+}

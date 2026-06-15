@@ -71,6 +71,7 @@ __PYTZ_TIMEZONE = pytz.timezone(__TIMEZONE)
 
 __ACTUAL = "actual"
 __STATIONMEASUREMENTS = "stationmeasurements"
+__WEATHERSTATIONMEASUREMENTS = "WeatherStationMeasurements"
 __LAT = "lat"
 __LON = "lon"
 __STATIONID = "stationid"
@@ -90,6 +91,68 @@ __MMRAINMIN = "mmRainMin"
 __WIND = "wind"
 __WINDDIRECTION = "windDirection"
 __DAY = "day"
+
+__KEY_ALIASES = {
+    "mmrainmax": ["RainMaxMm"],
+    "mmrainmin": ["RainMinMm"],
+    "wind": ["WindBeaufort"],
+}
+
+__STATION_COORDINATES = {
+    6209: (52.47, 4.52, "IJmond"),
+    6215: (52.12, 4.43, "Voorschoten"),
+    6225: (52.47, 4.57, "IJmuiden"),
+    6229: (53.00, 4.75, "Texel"),
+    6235: (52.92, 4.78, "Den Helder"),
+    6239: (54.85, 4.73, "Noordzee"),
+    6240: (52.30, 4.77, "Amsterdam"),
+    6242: (53.25, 4.92, "Vlieland"),
+    6248: (52.63, 5.17, "Hoorn"),
+    6249: (52.65, 4.98, "Berkhout"),
+    6251: (53.38, 5.35, "Wadden"),
+    6252: (53.22, 3.22, "Noordzee"),
+    6257: (52.50, 4.60, "Wijk aan Zee"),
+    6258: (52.65, 5.40, "Enkhuizen-Lelystad"),
+    6260: (52.10, 5.18, "Utrecht"),
+    6267: (52.88, 5.38, "West-Friesland"),
+    6269: (52.45, 5.53, "Lelystad"),
+    6270: (53.22, 5.77, "Leeuwarden"),
+    6273: (52.70, 5.88, "Noordoostpolder"),
+    6275: (52.07, 5.88, "Arnhem"),
+    6277: (53.42, 6.20, "Noord-Groningen"),
+    6278: (52.43, 6.27, "Zwolle"),
+    6279: (52.73, 6.52, "Hoogeveen"),
+    6280: (53.13, 6.58, "Groningen"),
+    6283: (52.07, 6.65, "Oost-Overijssel"),
+    6285: (53.57, 6.40, "Schiermonnikoog"),
+    6286: (53.20, 7.15, "Oost-Groningen"),
+    6290: (52.27, 6.89, "Twente"),
+    6308: (51.38, 3.38, "Cadzand"),
+    6310: (51.44, 3.60, "Vlissingen"),
+    6312: (51.77, 3.62, "Oosterschelde"),
+    6313: (51.50, 3.25, "West-Zeeland"),
+    6315: (51.45, 4.00, "Oost-Zeeland"),
+    6316: (51.65, 3.70, "Schaar"),
+    6319: (51.23, 3.83, "Terneuzen"),
+    6320: (51.93, 3.67, "Goeree"),
+    6321: (52.00, 3.28, "Noordzee"),
+    6323: (51.53, 3.89, "Goes"),
+    6324: (51.60, 4.00, "Midden-Zeeland"),
+    6330: (51.98, 4.10, "Hoek van Holland"),
+    6331: (51.52, 4.13, "Tholen"),
+    6340: (51.45, 4.33, "Woensdrecht"),
+    6343: (51.88, 4.32, "Rotterdam Haven"),
+    6344: (51.95, 4.45, "Rotterdam"),
+    6348: (51.97, 4.93, "West-Utrecht"),
+    6350: (51.57, 4.93, "Gilze Rijen"),
+    6356: (51.87, 5.15, "Gorinchem"),
+    6370: (51.45, 5.42, "Eindhoven"),
+    6375: (51.65, 5.70, "Uden"),
+    6377: (51.20, 5.77, "Weert"),
+    6380: (50.91, 5.77, "Maastricht"),
+    6391: (51.50, 6.20, "Venlo"),
+    6392: (51.45, 6.20, "Horst"),
+}
 
 
 def __to_upper(val):
@@ -135,6 +198,57 @@ def __to_localdatetime(val):
         return dt
     except (AttributeError, ValueError, TypeError):
         return None
+
+
+def __get_item(data, key, default=None):
+    """Get a dict item by key, accepting Buienradar's changed key casing."""
+    if not isinstance(data, dict):
+        return default
+    keys = [key]
+    keys.extend(__KEY_ALIASES.get(key.lower(), []))
+    for candidate in keys:
+        if candidate in data:
+            return data[candidate]
+        lower_key = candidate.lower()
+        for data_key, value in data.items():
+            if isinstance(data_key, str) and data_key.lower() == lower_key:
+                return value
+    return default
+
+
+def __get_winddirection_from_degrees(degrees):
+    """Convert wind direction degrees to the Dutch wind direction label."""
+    try:
+        degrees = float(degrees)
+    except (ValueError, TypeError):
+        return None
+
+    directions = [
+        'N', 'NNO', 'NO', 'ONO', 'O', 'OZO', 'ZO', 'ZZO',
+        'Z', 'ZZW', 'ZW', 'WZW', 'W', 'WNW', 'NW', 'NNW'
+    ]
+    index = int(round(degrees / 22.5)) % len(directions)
+    return directions[index]
+
+
+def __get_windforce_from_windspeed(windspeed):
+    """Estimate Beaufort force from windspeed in m/s."""
+    try:
+        windspeed = float(windspeed)
+    except (ValueError, TypeError):
+        return None
+
+    windforces = [
+        (0, 0.25), (1, 0.51), (2, 2.06), (3, 3.60),
+        (4, 5.66), (5, 8.23), (6, 11.32), (7, 14.40),
+        (8, 17.49), (9, 21.09), (10, 24.69), (11, 28.81),
+        (12, 32.41)
+    ]
+    result = 0
+    for windforce, threshold in windforces:
+        if windspeed >= threshold:
+            result = windforce
+    return result
 
 
 def __getBarFC(pressure):
@@ -207,6 +321,76 @@ def __getBarFCNameNL(pressure):
     if press < 1035:
         return "Mooi"
     return "Zeer mooi"
+
+
+def __normalize_station(station):
+    """Normalize a WeatherStationMeasurements entry to stationmeasurements."""
+    station_id = __get_item(station, 'StationId')
+    try:
+        station_id = int(station_id)
+    except (ValueError, TypeError):
+        pass
+    coords = __STATION_COORDINATES.get(station_id, (None, None, None))
+    latitude = __get_item(station, 'Latitude')
+    longitude = __get_item(station, 'Longitude')
+
+    if not latitude or not longitude:
+        latitude = coords[0]
+        longitude = coords[1]
+
+    windspeed = __get_item(station, 'Windspeed')
+    winddirection = __get_item(station, 'WindDirection')
+    winddirection_degrees = __get_item(station, 'WindDirectionDegrees')
+    windforce = __get_item(station, 'WindspeedBeaufort')
+
+    if not isinstance(winddirection, str):
+        winddirection = __get_winddirection_from_degrees(winddirection_degrees)
+    if windforce is None:
+        windforce = __get_windforce_from_windspeed(windspeed)
+
+    normalized = {
+        'stationid': station_id,
+        'stationname': __get_item(station, 'StationName'),
+        'lat': latitude,
+        'lon': longitude,
+        'regio': __get_item(station, 'Region', coords[2]),
+        'timestamp': __get_item(station, 'Timestamp'),
+        'graphurl': __get_item(station, 'GraphUrl'),
+        'iconurl': __get_item(station, 'IconUrl'),
+        'weatherdescription': __get_item(station, 'WeatherDescription'),
+        'winddirection': winddirection,
+        'airpressure': __get_item(station, 'AirPressure'),
+        'temperature': __get_item(station, 'Temperature'),
+        'groundtemperature': __get_item(station, 'GroundTemperature'),
+        'feeltemperature': __get_item(station, 'FeelTemperature'),
+        'visibility': __get_item(station, 'Visibility'),
+        'windgusts': __get_item(station, 'WindGusts'),
+        'windspeed': windspeed,
+        'windspeedBft': windforce,
+        'humidity': __get_item(station, 'Humidity'),
+        'precipitation': __get_item(station, 'Precipitation'),
+        'sunpower': __get_item(station, 'Sunpower'),
+        'rainFallLast24Hour': __get_item(station, 'RainfallLast24Hour'),
+        'rainFallLastHour': __get_item(station, 'RainfallLastHour'),
+        'winddirectiondegrees': winddirection_degrees,
+    }
+    return normalized
+
+
+def __normalize_actual_data(jsondata):
+    """Add the legacy stationmeasurements section for the current feed."""
+    actual = __get_item(jsondata, __ACTUAL)
+    if not isinstance(actual, dict):
+        return jsondata
+    if __STATIONMEASUREMENTS in actual:
+        return jsondata
+
+    stations = __get_item(actual, __WEATHERSTATIONMEASUREMENTS)
+    if stations:
+        actual[__STATIONMEASUREMENTS] = [
+            __normalize_station(station) for station in stations
+        ]
+    return jsondata
 
 
 # SENSOR_TYPES = { 'key': ['key in buienradar json', conversion function], }
@@ -301,7 +485,9 @@ def parse_json_data(content, raincontent, latitude=52.091579,
             log.error("Unable to parse content as json. %s", err)
             return result
 
-        result = __parse_ws_data(json_content, latitude, longitude)
+        result = __parse_ws_data(
+            __normalize_actual_data(json_content), latitude, longitude
+        )
 
         if result[SUCCESS] and raincontent is not None:
             data = __parse_precipfc_data(raincontent, timeframe)
@@ -367,10 +553,15 @@ def __parse_ws_data(jsondata, latitude=52.091579, longitude=5.119734):
 
     # extract weather forecast
     try:
-        fc_data = jsondata[__FORECAST][__FIVEDAYFORECAST]
-    except (json.JSONDecodeError, KeyError):
+        fc_data = __get_item(__get_item(jsondata, __FORECAST),
+                             __FIVEDAYFORECAST)
+    except (json.JSONDecodeError, KeyError, TypeError):
         result[MESSAGE] = 'Unable to extract forecast data.'
         log.exception(result[MESSAGE])
+        return result
+
+    if fc_data is None:
+        result[MESSAGE] = 'Unable to extract forecast data.'
         return result
 
     if fc_data:
@@ -461,7 +652,7 @@ def __parse_fc_data(fc_data):
         }
         # fc never is about nighttime:
         fcdata[CONDITION][NIGHTTIME] = False
-        fcdata[CONDITION][IMAGE] = day[__ICONURL]
+        fcdata[CONDITION][IMAGE] = __get_item(day, __ICONURL)
 
         fc.append(fcdata)
     return fc
@@ -500,7 +691,7 @@ def __get_windazimuth(winddirection):
 def __get_str(section, name):
     """Get the forecasted string from json section."""
     try:
-        return section[name]
+        return __get_item(section, name, "")
     except (ValueError, TypeError, KeyError):
         return ""
 
@@ -508,7 +699,7 @@ def __get_str(section, name):
 def __get_float(section, name):
     """Get the forecasted float from json section."""
     try:
-        return float(section[name])
+        return float(__get_item(section, name))
     except (ValueError, TypeError, KeyError):
         return float(0)
 
@@ -516,11 +707,11 @@ def __get_float(section, name):
 def __get_avr_float(section, name1, name2):
     """Get the forecasted float from json section."""
     try:
-        val1 = float(section[name1])
+        val1 = float(__get_item(section, name1))
     except (ValueError, TypeError, KeyError):
         val1 = None
     try:
-        val2 = float(section[name2])
+        val2 = float(__get_item(section, name2))
     except (ValueError, TypeError, KeyError):
         val2 = None
 
@@ -534,7 +725,7 @@ def __get_avr_float(section, name1, name2):
 def __get_int(section, name):
     """Get the forecasted int from json section."""
     try:
-        return int(section[name])
+        return int(__get_item(section, name))
     except (ValueError, TypeError, KeyError):
         return 0
 
