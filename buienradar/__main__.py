@@ -19,8 +19,8 @@ Usage:
 """
 import logging
 import sys
+from importlib.metadata import version
 
-import pkg_resources
 from docopt import docopt
 
 from .buienradar import get_data, parse_data
@@ -30,7 +30,7 @@ from .constants import CONTENT, MESSAGE, RAINCONTENT, SUCCESS
 def main(argv=sys.argv[1:]):
     """Parse argument and start main program."""
     args = docopt(__doc__, argv=argv,
-                  version=pkg_resources.require('buienradar')[0].version)
+                  version=version('buienradar'))
 
     level = logging.ERROR
     if args['-v']:
