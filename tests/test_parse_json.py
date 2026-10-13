@@ -2,6 +2,7 @@
 import json
 from datetime import datetime, timedelta
 
+import pytest
 import requests_mock
 
 from buienradar.buienradar import get_data, parse_data
@@ -29,6 +30,7 @@ from buienradar.constants import (
     CONDITION,
     CONTENT,
     DATA,
+    DATETIME,
     FEELTEMPERATURE,
     FORECAST,
     GROUNDTEMP,
@@ -71,8 +73,84 @@ def get_imageurl(img):
     return result
 
 
+@pytest.mark.parametrize(('timestamp', 'expected'), [
+    ('2019-02-03T19:20:00', '2019-02-03T19:20:00+01:00'),
+    ('2026-01-13T01:50:00', '2026-01-13T01:50:00+01:00'),
+    ('2026-07-13T01:50:00', '2026-07-13T01:50:00+02:00'),
+    ('2026-01-13T01:50:00Z', '2026-01-13T02:50:00+01:00'),
+    ('2026-07-13T01:50:00Z', '2026-07-13T03:50:00+02:00'),
+    ('2026-07-13T01:50:00+02:00', '2026-07-13T01:50:00+02:00'),
+    ('2026-01-13T01:50:00-05:00', '2026-01-13T07:50:00+01:00'),
+    ('2026-07-13T23:50:00+00:00', '2026-07-14T01:50:00+02:00'),
+    ('2026-07-13T01:50:00.123Z', '2026-07-13T03:50:00.123000+02:00'),
+    ('2026-03-29T00:30:00Z', '2026-03-29T01:30:00+01:00'),
+    ('2026-03-29T01:30:00Z', '2026-03-29T03:30:00+02:00'),
+    ('2026-10-25T00:30:00Z', '2026-10-25T02:30:00+02:00'),
+    ('2026-10-25T01:30:00Z', '2026-10-25T02:30:00+01:00'),
+])
+def test_iso_timestamp(timestamp, expected):
+    """Preserve instants and apply Amsterdam's seasonal UTC offset."""
+    assert __to_localdatetime(timestamp).isoformat() == expected
+
+
+@pytest.mark.parametrize('timestamp', [
+    None, '', 123, [], {}, 'not a timestamp',
+    '2026-02-30T01:50:00Z', '2026-10-13T01:50:00+25:00',
+    '9999-12-31T23:59:59+00:00', '0001-01-01T00:00:00',
+])
+def test_invalid_timestamp(timestamp):
+    """Malformed values do not interrupt weather parsing."""
+    assert __to_localdatetime(timestamp) is None
+    assert SENSOR_TYPES[MEASURED][1](timestamp) is None
+
+
+@pytest.mark.parametrize(('timestamp', 'expected'), [
+    ('2026-01-13T01:50:00Z', '2026-01-13T01:50:00+01:00'),
+    ('2026-07-13T01:50:00Z', '2026-07-13T01:50:00+02:00'),
+    ('2026-07-13T01:50:00', '2026-07-13T01:50:00+02:00'),
+    ('2026-07-13T01:50:00.123Z', '2026-07-13T01:50:00.123000+02:00'),
+    ('2026-07-13T01:50:00+00:00', '2026-07-13T03:50:00+02:00'),
+    ('2026-07-13T01:50:00+02:00', '2026-07-13T01:50:00+02:00'),
+    ('2026-01-13T01:50:00-05:00', '2026-01-13T07:50:00+01:00'),
+])
+def test_measurement_timestamp(timestamp, expected):
+    """Normalize the provider's Z suffix only for station measurements."""
+    assert SENSOR_TYPES[MEASURED][1](timestamp).isoformat() == expected
+
+
+@pytest.mark.parametrize('station_index', range(4))
+def test_captured_z_measurements(station_index):
+    """Parse captured Z measurements and retain local forecast midnights."""
+    feed = json.loads(load_file('tests/json/stationmeasurement-z.json'))
+    station = feed['actual']['stationmeasurements'][station_index]
+
+    result = parse_data(json.dumps(feed), None, station['lat'],
+                        station['lon'], usexml=False)
+
+    assert result[SUCCESS]
+    assert str(station['stationid']) in result[DATA][STATIONNAME]
+    assert result[DATA][TEMPERATURE] == station['temperature']
+    assert result[DATA][WINDSPEED] == station['windspeed']
+    assert result[DATA][WINDGUST] == station['windgusts']
+    assert result[DATA][HUMIDITY] == station['humidity']
+    assert result[DATA][PRESSURE] == station['airpressure']
+    measured = result[DATA][MEASURED]
+    assert measured.isoformat() == '2026-10-13T01:50:00+02:00'
+    assert [day[DATETIME].isoformat() for day in result[DATA][FORECAST]] == [
+        f'2026-10-{day}T00:00:00+02:00' for day in range(14, 19)
+    ]
+
+    station['timestamp'] = '2026-10-13T02:00:00Z'
+    station['temperature'] += 1
+    updated = parse_data(json.dumps(feed), None, station['lat'],
+                         station['lon'], usexml=False)
+    assert updated[SUCCESS]
+    assert updated[DATA][MEASURED] - measured == timedelta(minutes=10)
+    assert updated[DATA][TEMPERATURE] == station['temperature']
+
+
 def test_to_localdatetime():
-    """Check he workign of the to_localdatetime function."""
+    """Check legacy timestamps and invalid calendar values."""
     #  "timestamp": "2019-02-03T19:20:00",
 
     # check invalid dates:

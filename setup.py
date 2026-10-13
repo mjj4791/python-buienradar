@@ -1,6 +1,5 @@
 """Library and CLI tools for interacting with buienradar."""
 
-import sys
 from codecs import open
 from os import path
 from subprocess import check_output
@@ -8,9 +7,6 @@ from subprocess import check_output
 from setuptools import find_packages, setup
 
 here = path.abspath(path.dirname(__file__))
-
-if sys.version_info < (3, 4):
-    raise RuntimeError("This package requires at least Python 3.4")
 
 # Get the long description from the README file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
@@ -26,7 +22,8 @@ def version_from_git():
 setup(
     name='buienradar',
 
-    version='1.0.9',
+    version='1.0.10',
+    python_requires='>=3.11',
 
     description=__doc__,
     long_description_content_type='text/x-rst',
@@ -56,13 +53,12 @@ setup(
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
 
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12'
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
+        'Programming Language :: Python :: 3.15'
     ],
 
     keywords='buienradar weather',
@@ -87,15 +83,14 @@ setup(
     # },
 
     # # If there are data files included in your packages that need to be
-    # # installed, specify them here.  If using Python 2.6 or less, then these
-    # # have to be included in MANIFEST.in as well.
+    # # installed, specify them here.
     # package_data={
     #     'sample': ['package_data.dat'],
     # },
 
     # # Although 'package_data' is the preferred approach, in some case you may
     # # need to place data files outside of your packages. See:
-    # # http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files # noqa
+    # # https://setuptools.pypa.io/en/latest/userguide/datafiles.html
     # # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
     # data_files=[('my_data', ['data/data_file'])],
 

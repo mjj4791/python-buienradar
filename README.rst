@@ -14,7 +14,7 @@ Old XML-based APIs used before http://xml.buienradar.nl.
 Requirements
 ------------
 
-- Python 3.4 (or higher)
+- Python 3.11 or higher (latest supported release: Python 3.15)
 
 
 Description
@@ -28,6 +28,24 @@ Installation
 .. code-block:: bash
 
     $ pip install buienradar
+
+JSON timestamps
+---------------
+
+Measurement and forecast timestamps are returned as timezone-aware datetimes
+in ``Europe/Amsterdam``. Values without a timezone are interpreted as Amsterdam
+local time. Numeric UTC offsets are honored.
+
+A feed captured on 13 October 2026 contained measurement timestamps such as
+``2026-10-13T01:50:00Z`` at HTTP response time ``00:01:02 GMT``. These appear
+to be Amsterdam local times incorrectly labeled as UTC. Station measurement
+timestamps ending in ``Z`` are therefore interpreted as Amsterdam local time.
+Forecast timestamps retain standard ISO parsing, where ``Z`` means UTC.
+
+This workaround does not guess timezone intent from the current clock. If the
+provider changes its station timestamps to true UTC while keeping the same
+``Z`` suffix, the workaround will need to be removed in a library update; the
+timestamp alone cannot reliably identify that change.
 
 Usage
 -----

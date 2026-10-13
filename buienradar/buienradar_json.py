@@ -1,7 +1,7 @@
 """Buienradar library to get parsed weather data from buienradar.nl."""
 import json
 import logging
-from datetime import datetime  # , timedelta
+from datetime import datetime
 
 import pytz
 import requests
@@ -63,9 +63,6 @@ from buienradar.constants import (
 )
 from buienradar.urls import JSON_FEED_URL, json_precipitation_forecast_url
 
-# buienradar date format: '07/26/2017 15:50:00'
-# "2019-02-03T19:20:00",
-__DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 __TIMEZONE = 'Europe/Amsterdam'
 __PYTZ_TIMEZONE = pytz.timezone(__TIMEZONE)
 
@@ -127,14 +124,21 @@ def __to_float1(val):
 
 
 def __to_localdatetime(val):
-    """Convert val into a local datetime for tz Europe/Amsterdam."""
+    """Parse ISO timestamps, treating values without an offset as local."""
     try:
-        #  "timestamp": "2019-02-03T19:20:00",
-        dt = datetime.strptime(val, __DATE_FORMAT)
-        dt = __PYTZ_TIMEZONE.localize(dt)
-        return dt
-    except (AttributeError, ValueError, TypeError):
+        dt = datetime.fromisoformat(val)
+        if dt.tzinfo is None:
+            return __PYTZ_TIMEZONE.localize(dt)
+        return dt.astimezone(__PYTZ_TIMEZONE)
+    except (ValueError, TypeError, OverflowError):
         return None
+
+
+def __to_measurement_datetime(val):
+    """Handle Buienradar's Amsterdam measurement times mislabeled with Z."""
+    if isinstance(val, str):
+        val = val.removesuffix('Z')
+    return __to_localdatetime(val)
 
 
 def __getBarFC(pressure):
@@ -217,7 +221,7 @@ SENSOR_TYPES = {
     HUMIDITY: ['humidity', __to_int],
     GROUNDTEMP: ['groundtemperature', __to_float1],
     IRRADIANCE: ['sunpower', __to_int],
-    MEASURED: ['timestamp', __to_localdatetime],
+    MEASURED: ['timestamp', __to_measurement_datetime],
     PRECIPITATION: ['precipitation', __to_float1],
     PRESSURE: ['airpressure', __to_float2],
     STATIONNAME: ['stationname', None],

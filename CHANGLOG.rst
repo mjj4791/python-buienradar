@@ -2,6 +2,23 @@ Changelog
 =========
 All notable changes to this project will be documented in this file.
 
+[1.0.10] - 2026-10-13
+"""""""""""""""""""""
+**changed**
+
+- Require Python 3.11 or higher.
+- Parse JSON timestamps with native ISO 8601 support, including ``Z``,
+  numeric UTC offsets and fractional seconds, to avoid missing measurement
+  timestamps that can prevent consumers from detecting new observations.
+- Interpret station measurement timestamps ending in ``Z`` as Amsterdam local
+  time to accommodate the provider's incorrectly labeled values. Honor numeric
+  UTC offsets and preserve local time for timestamps without an offset.
+- Keep forecast timestamp parsing independent of the station workaround.
+- Add regression coverage using captured station and forecast records.
+- Document that a future correction to the provider's ``Z`` values requires
+  a library update.
+
+
 [1.0.9] - 2025-02-23
 """"""""""""""""""""
 **changed**
