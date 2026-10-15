@@ -2,6 +2,13 @@ Changelog
 =========
 All notable changes to this project will be documented in this file.
 
+[1.0.10] - 2026-10-13
+""""""""""""""""""""""
+**changed**
+- support Buienradar station timestamps with a trailing Z while retaining the legacy timestamp format
+- honor explicit numeric timezone offsets
+
+
 [1.0.9] - 2025-02-23
 """"""""""""""""""""
 **changed**

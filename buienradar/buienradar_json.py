@@ -1,9 +1,9 @@
 """Buienradar library to get parsed weather data from buienradar.nl."""
 import json
 import logging
-from datetime import datetime  # , timedelta
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-import pytz
 import requests
 from vincenty import vincenty
 
@@ -67,7 +67,7 @@ from buienradar.urls import JSON_FEED_URL, json_precipitation_forecast_url
 # "2019-02-03T19:20:00",
 __DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 __TIMEZONE = 'Europe/Amsterdam'
-__PYTZ_TIMEZONE = pytz.timezone(__TIMEZONE)
+__ZI_TIMEZONE = ZoneInfo(__TIMEZONE)
 
 __ACTUAL = "actual"
 __STATIONMEASUREMENTS = "stationmeasurements"
@@ -125,17 +125,41 @@ def __to_float1(val):
     """Convert val into float with 1 decimal."""
     return __to_float(val, 1)
 
+def __to_localdatetime(val: str | None) -> datetime | None:
+    """
+    Convert a station or forecast timestamp to a timezone-aware datetime.
 
-def __to_localdatetime(val):
-    """Convert val into a local datetime for tz Europe/Amsterdam."""
-    try:
-        #  "timestamp": "2019-02-03T19:20:00",
-        dt = datetime.strptime(val, __DATE_FORMAT)
-        dt = __PYTZ_TIMEZONE.localize(dt)
-        return dt
-    except (AttributeError, ValueError, TypeError):
+    Legacy timestamps without a suffix are interpreted as Europe/Amsterdam
+    local time. ISO 8601 UTC designators (Z) and explicit numeric UTC offsets
+    are parsed as timezone-aware timestamps and retain their stated timezone.
+
+    Args:
+        val: ISO-like timestamp string.
+
+    Returns:
+        A timezone-aware datetime, or None if parsing fails.
+    """
+    if not isinstance(val, str) or not val:
         return None
 
+    # Buienradar's station timestamp uses a trailing Z while its clock
+    # value represents Europe/Amsterdam local time. Interpret that suffix
+    # as a feed quirk and attach the correct Amsterdam offset for the date
+    # (including daylight-saving time), rather than treating the clock value
+    # as UTC and shifting the displayed time.
+    has_z_suffix = val.endswith("Z")
+    timestamp = val[:-1] if has_z_suffix else val
+
+    try:
+        parsed_dt = datetime.fromisoformat(timestamp)
+    except ValueError:
+        return None
+
+    if has_z_suffix or parsed_dt.tzinfo is None:
+        return parsed_dt.replace(tzinfo=__ZI_TIMEZONE)
+
+    # Preserve explicit numeric UTC offsets supplied by the feed.
+    return parsed_dt
 
 def __getBarFC(pressure):
     """Parse the pressure and return FC (numerical)."""

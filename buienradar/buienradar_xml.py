@@ -2,10 +2,10 @@
 import logging
 from datetime import datetime, timedelta
 
-import pytz
 import requests
 import xmltodict
 from vincenty import vincenty
+from zoneinfo import ZoneInfo
 
 from buienradar.constants import (
     ATTRIBUTION,
@@ -81,7 +81,7 @@ __BRWINDKRACHT = 'windkracht'
 # buienradat date format: '07/26/2017 15:50:00'
 __DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
 __TIMEZONE = 'Europe/Amsterdam'
-__PYTZ_TIMEZONE = pytz.timezone(__TIMEZONE)
+__ZI_TIMEZONE = ZoneInfo(__TIMEZONE)
 
 
 def __to_int(val):
@@ -110,15 +110,34 @@ def __to_float1(val):
     return __to_float(val, 1)
 
 
-def __to_localdatetime(val):
-    """Convert val into a local datetime for tz Europe/Amsterdam."""
-    try:
-        dt = datetime.strptime(val, __DATE_FORMAT)
-        dt = __PYTZ_TIMEZONE.localize(dt)
-        return dt
-    except (ValueError, TypeError):
+def __to_localdatetime(val: str | None) -> datetime | None:
+    """
+    Convert an ISO-like timestamp string into a timezone-aware
+    datetime in Europe/Amsterdam.
+
+    Expected format:
+        YYYY-MM-DDTHH:MM:SS
+
+    Example:
+        "2019-02-03T19:20:00"
+
+    Args:
+        val: Timestamp string.
+
+    Returns:
+        Timezone-aware datetime in Europe/Amsterdam,
+        or None if parsing fails.
+    """
+    if not isinstance(val, str) or not val:
         return None
 
+    try:
+        naive_dt = datetime.strptime(val, __DATE_FORMAT)
+    except ValueError:
+        return None
+
+    # Attach timezone directly (zoneinfo handles DST correctly)
+    return naive_dt.replace(tzinfo=__ZI_TIMEZONE)
 
 # Sensor types are defined like so:
 # SENSOR_TYPES = { 'key': ['key in buienradar xml', conversion function], }
@@ -294,7 +313,7 @@ def __parse_ws_data(content, latitude=52.091579, longitude=5.119734):
     return result
 
 
-def __parse_precipfc_data(data, timeframe):
+def __parse_precipfc_data(data, timeframe) -> dict[str, object]:
     """Parse the forecasted precipitation data."""
     result = {AVERAGE: None, TOTAL: None, TIMEFRAME: None}
 
@@ -400,7 +419,7 @@ def __parse_fc_data(fc_data):
         daysection = __BRDAYFC % daycnt
         if daysection in fc_data:
             tmpsect = fc_data[daysection]
-            fcdatetime = datetime.now(__PYTZ_TIMEZONE)
+            fcdatetime = datetime.now(__ZI_TIMEZONE)
             fcdatetime = fcdatetime.replace(hour=12,
                                             minute=0,
                                             second=0,
